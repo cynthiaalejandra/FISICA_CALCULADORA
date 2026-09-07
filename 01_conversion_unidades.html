@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Conversión de Unidades — Física General</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700&family=Roboto:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #ffffff;
+  --surface: #f8fafb;
+  --surface2: #f0f5f4;
+  --green: #059669;
+  --green-light: #d1fae5;
+  --green-dark: #047857;
+  --teal: #0891b2;
+  --teal-light: #cffafe;
+  --gray: #555555;
+  --gray-light: #94a3b8;
+  --gray-dark: #334155;
+  --text: #1e293b;
+  --text-dim: #64748b;
+  --text-muted: #94a3b8;
+  --border: rgba(5,150,105,0.18);
+  --border-light: #e2e8f0;
+  --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.07), 0 1px 3px rgba(0,0,0,0.05);
+  --shadow-lg: 0 10px 30px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.04);
+  --gradient: linear-gradient(135deg, #059669, #0891b2);
+  --gradient-soft: linear-gradient(135deg, rgba(5,150,105,0.08), rgba(8,145,178,0.08));
+  --r: 12px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'Roboto',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;
+  font-weight:400;line-height:1.6;}
+
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-track{background:var(--surface);}
+::-webkit-scrollbar-thumb{background:var(--green);border-radius:3px;}
+
+/* ─── HEADER ─── */
+header{background:var(--bg);
+  border-bottom:1px solid var(--border-light);
+  box-shadow:var(--shadow);
+  padding:0 2rem;position:sticky;top:0;z-index:200;}
+.header-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;
+  justify-content:center;height:68px;gap:1rem;}
+.header-icon{width:40px;height:40px;border-radius:10px;background:var(--gradient);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.header-icon svg{width:22px;height:22px;}
+.header-center{text-align:center;}
+.header-center h1{font-family:'Poppins',sans-serif;font-size:clamp(1rem,2.5vw,1.4rem);
+  font-weight:700;letter-spacing:0.5px;color:var(--text);}
+.header-center p{font-size:0.75rem;color:var(--text-dim);letter-spacing:0.5px;
+  margin-top:1px;font-weight:400;}
+
+/* ─── MAIN ─── */
+main{max-width:1200px;margin:0 auto;padding:1.5rem 1.2rem 3rem;}
+
+/* ─── SYSTEM BAR ─── */
+.system-bar{display:flex;align-items:center;justify-content:center;gap:0.8rem;
+  background:var(--surface);border:1px solid var(--border-light);
+  border-radius:60px;padding:0.55rem 1.5rem;margin-bottom:1.5rem;
+  box-shadow:var(--shadow);flex-wrap:wrap;}
+.system-bar label{font-family:'Inter',sans-serif;font-size:0.72rem;letter-spacing:0.5px;
+  text-transform:uppercase;color:var(--text-dim);font-weight:600;}
+.sys-btn{background:transparent;border:1.5px solid var(--border-light);color:var(--text-dim);
+  padding:0.45rem 1.5rem;border-radius:50px;cursor:pointer;font-family:'Inter',sans-serif;
+  font-size:0.82rem;font-weight:500;transition:all 0.3s;}
+.sys-btn:hover{border-color:var(--green);color:var(--green);}
+.sys-btn.active-si{background:var(--gradient);
+  border-color:transparent;color:#fff;font-weight:600;box-shadow:0 2px 8px rgba(5,150,105,0.3);}
+.sys-btn.active-eng{background:linear-gradient(135deg,#0891b2,#0e7490);
+  border-color:transparent;color:#fff;font-weight:600;box-shadow:0 2px 8px rgba(8,145,178,0.3);}
+
+/* ─── TABS ─── */
+.main-tabs{display:flex;gap:0;margin-bottom:0;}
+.main-tab{flex:1;background:var(--surface);border:1px solid var(--border-light);
+  color:var(--text-dim);padding:0.85rem 0.5rem;cursor:pointer;
+  font-family:'Poppins',sans-serif;font-size:0.75rem;font-weight:600;letter-spacing:0.5px;
+  text-transform:uppercase;text-align:center;transition:all 0.3s;
+  position:relative;overflow:hidden;}
+.main-tab:first-child{border-radius:var(--r) 0 0 0;}
+.main-tab:last-child{border-radius:0 var(--r) 0 0;}
+.main-tab::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;
+  background:var(--gradient);transform:scaleX(0);transition:transform 0.3s;}
+.main-tab.active{color:var(--green);background:var(--bg);}
+.main-tab.active::after{transform:scaleX(1);}
+.main-tab:hover:not(.active){color:var(--text);background:rgba(5,150,105,0.03);}
+
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+
+/* ─── CARD ─── */
+.card{background:var(--bg);border:1px solid var(--border-light);
+  border-radius:0 0 var(--r) var(--r);border-top:none;padding:1.5rem;
+  box-shadow:var(--shadow-md);}
+
+/* ─── UNIT GRID ─── */
+.unit-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(138px,1fr));
+  gap:0.75rem;margin-bottom:1.5rem;}
+.unit-card{background:var(--bg);border:1.5px solid var(--border-light);
+  border-radius:var(--r);padding:1rem 0.7rem;text-align:center;cursor:pointer;
+  transition:all 0.25s;position:relative;overflow:hidden;}
+.unit-card:hover{border-color:var(--green);transform:translateY(-3px);
+  box-shadow:var(--shadow-md);}
+.unit-card.selected{border-color:var(--green);background:var(--green-light);
+  box-shadow:0 2px 10px rgba(5,150,105,0.15);}
+.unit-icon{font-size:1.8rem;margin-bottom:0.35rem;display:block;transition:transform 0.25s;}
+.unit-card:hover .unit-icon{transform:scale(1.1);}
+.unit-name{font-family:'Inter',sans-serif;font-size:0.72rem;font-weight:600;
+  letter-spacing:0.3px;text-transform:uppercase;color:var(--text);}
+.unit-symbol{font-family:'JetBrains Mono',monospace;font-size:0.68rem;
+  color:var(--green);margin-top:0.2rem;font-weight:500;}
+
+/* ─── CONVERSION PANEL ─── */
+.conversion-panel{display:none;animation:fadeUp 0.35s ease;}
+.conversion-panel.active{display:block;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+
+/* ─── TOP ROW: SVG + DEF ─── */
+.def-image-row{display:flex;gap:1.2rem;align-items:flex-start;margin-bottom:1.3rem;flex-wrap:wrap;}
+.def-svg-box{width:170px;min-width:130px;height:130px;border-radius:var(--r);overflow:hidden;
+  border:1.5px solid var(--border);background:var(--surface);flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow);}
+.def-box{flex:1;background:var(--gradient-soft);
+  border-left:3px solid var(--green);border-radius:0 var(--r) var(--r) 0;
+  padding:0.9rem 1.1rem;min-width:200px;}
+.def-box h3{font-family:'Poppins',sans-serif;font-size:0.65rem;letter-spacing:1px;
+  color:var(--green);text-transform:uppercase;margin-bottom:0.4rem;font-weight:600;}
+.def-box p{font-family:'Roboto',sans-serif;font-size:0.85rem;line-height:1.65;color:var(--gray);}
+.fun-fact{margin-top:0.5rem;padding:0.45rem 0.7rem;background:rgba(8,145,178,0.07);
+  border-left:2px solid var(--teal);border-radius:0 6px 6px 0;
+  font-size:0.78rem;color:var(--teal);font-style:italic;font-family:'Roboto',sans-serif;}
+
+/* ─── CONVERTER UI ─── */
+.converter-title{font-family:'Poppins',sans-serif;font-size:0.9rem;font-weight:700;
+  color:var(--green);letter-spacing:0.5px;margin-bottom:1rem;
+  display:flex;align-items:center;gap:0.6rem;flex-wrap:wrap;}
+.conv-row{display:flex;gap:0.8rem;align-items:flex-end;flex-wrap:wrap;margin-bottom:0.9rem;}
+.conv-group{flex:1;min-width:130px;}
+.conv-group label{display:block;font-family:'Inter',sans-serif;font-size:0.68rem;
+  letter-spacing:0.5px;text-transform:uppercase;color:var(--text-dim);
+  margin-bottom:0.35rem;font-weight:600;}
+.conv-input,.conv-select{width:100%;background:var(--surface);border:1.5px solid var(--border-light);
+  color:var(--text);padding:0.72rem 0.9rem;border-radius:8px;
+  font-family:'Roboto',sans-serif;font-size:0.95rem;transition:border-color 0.25s,box-shadow 0.25s;
+  appearance:none;}
+.conv-input:focus,.conv-select:focus{outline:none;border-color:var(--green);
+  box-shadow:0 0 0 3px rgba(5,150,105,0.12);}
+.conv-select option{background:#fff;}
+.arrow-btn{background:rgba(5,150,105,0.08);border:1.5px solid var(--green);
+  color:var(--green);width:42px;height:42px;border-radius:50%;cursor:pointer;
+  font-size:1rem;transition:all 0.25s;flex-shrink:0;display:flex;
+  align-items:center;justify-content:center;}
+.arrow-btn:hover{background:var(--green);color:#fff;
+  box-shadow:0 2px 8px rgba(5,150,105,0.3);transform:rotate(180deg) scale(1.05);}
+
+/* ─── RESULT ─── */
+.result-display{background:var(--surface);border:1.5px solid var(--green);border-radius:10px;
+  padding:0.9rem 1.1rem;font-family:'JetBrains Mono',monospace;font-size:clamp(0.85rem,2vw,1.15rem);
+  color:var(--green-dark);text-align:center;font-weight:500;
+  box-shadow:0 2px 8px rgba(5,150,105,0.1);min-height:50px;
+  display:flex;align-items:center;justify-content:center;transition:all 0.3s;}
+.result-display.flash{animation:flashResult 0.3s ease;}
+@keyframes flashResult{0%,100%{opacity:1;}50%{opacity:0.4;}}
+
+/* ─── BUTTONS ROW ─── */
+.btn-row{display:flex;gap:0.7rem;flex-wrap:wrap;margin-top:0.9rem;align-items:center;}
+.proc-btn{background:var(--gradient);border:none;color:#fff;
+  padding:0.55rem 1.3rem;border-radius:50px;cursor:pointer;font-family:'Inter',sans-serif;
+  font-size:0.78rem;font-weight:600;letter-spacing:0.5px;
+  transition:all 0.25s;display:flex;align-items:center;gap:0.4rem;
+  box-shadow:0 2px 6px rgba(5,150,105,0.2);}
+.proc-btn:hover{box-shadow:0 4px 12px rgba(5,150,105,0.3);transform:translateY(-1px);}
+.hist-btn{background:transparent;border:1.5px solid var(--teal);color:var(--teal);
+  padding:0.55rem 1.3rem;border-radius:50px;cursor:pointer;font-family:'Inter',sans-serif;
+  font-size:0.78rem;font-weight:600;letter-spacing:0.5px;
+  transition:all 0.25s;display:flex;align-items:center;gap:0.4rem;}
+.hist-btn:hover{background:var(--teal);color:#fff;}
+.copy-btn{background:transparent;border:1.5px solid var(--gray-light);color:var(--gray);
+  padding:0.55rem 1rem;border-radius:50px;cursor:pointer;font-family:'Inter',sans-serif;
+  font-size:0.78rem;font-weight:600;letter-spacing:0.5px;transition:all 0.25s;}
+.copy-btn:hover{background:var(--gray);color:#fff;}
+
+/* ─── PROCEDURE BOX ─── */
+.procedure-box{background:rgba(5,150,105,0.03);border:1px solid rgba(5,150,105,0.15);
+  border-radius:var(--r);padding:1.2rem 1.3rem;margin-top:0.8rem;
+  display:none;animation:fadeUp 0.35s ease;font-family:'Roboto',sans-serif;
+  font-size:0.85rem;line-height:1.75;color:var(--gray);}
+.procedure-box.visible{display:block;}
+.procedure-box h4{font-family:'Poppins',sans-serif;font-size:0.7rem;letter-spacing:1px;
+  color:var(--green);margin-bottom:0.8rem;text-transform:uppercase;font-weight:600;}
+.step{display:flex;gap:0.7rem;align-items:flex-start;margin:0.45rem 0;}
+.step-num{background:var(--gradient);color:#fff;width:22px;height:22px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;font-size:0.68rem;
+  font-weight:700;flex-shrink:0;margin-top:2px;font-family:'Inter',sans-serif;}
+.formula{background:var(--surface);border-left:3px solid var(--green);padding:0.6rem 0.9rem;
+  border-radius:0 8px 8px 0;margin:0.6rem 0;font-family:'JetBrains Mono',monospace;
+  font-size:0.8rem;color:var(--text);overflow-x:auto;}
+.formula b{color:var(--green);}
+
+/* ─── HISTORY ─── */
+.history-box{background:rgba(8,145,178,0.04);border:1px solid rgba(8,145,178,0.15);
+  border-radius:var(--r);padding:1rem;margin-top:0.8rem;
+  display:none;animation:fadeUp 0.35s ease;}
+.history-box.visible{display:block;}
+.history-box h4{font-family:'Poppins',sans-serif;font-size:0.65rem;letter-spacing:1px;
+  color:var(--teal);margin-bottom:0.7rem;text-transform:uppercase;font-weight:600;
+  display:flex;justify-content:space-between;align-items:center;}
+.history-box h4 button{background:none;border:1px solid rgba(8,145,178,0.25);
+  color:var(--text-dim);padding:0.18rem 0.6rem;border-radius:4px;cursor:pointer;
+  font-size:0.65rem;font-family:'Inter',sans-serif;transition:all 0.2s;}
+.history-box h4 button:hover{border-color:var(--teal);color:var(--teal);}
+.hist-entry{display:flex;justify-content:space-between;align-items:center;
+  padding:0.4rem 0.6rem;border-radius:6px;font-size:0.8rem;transition:background 0.2s;
+  font-family:'Roboto',sans-serif;}
+.hist-entry:hover{background:rgba(8,145,178,0.06);}
+.hist-entry:nth-child(even){background:rgba(0,0,0,0.015);}
+.hist-val{color:var(--text);}
+.hist-result{color:var(--green);font-family:'JetBrains Mono',monospace;font-size:0.76rem;font-weight:500;}
+.hist-unit{color:var(--text-dim);font-size:0.73rem;}
+.hist-empty{text-align:center;color:var(--text-muted);font-size:0.8rem;padding:0.7rem;
+  font-family:'Roboto',sans-serif;}
+
+/* ─── EMPTY STATE ─── */
+.empty-state{text-align:center;padding:3rem;color:var(--text-dim);}
+.empty-state .big-icon{font-size:3rem;margin-bottom:0.8rem;opacity:0.3;display:block;
+  animation:float 3s ease-in-out infinite;}
+.empty-state p{font-family:'Roboto',sans-serif;font-size:0.85rem;letter-spacing:0.3px;}
+@keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);}}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.5;}}
+
+/* ─── SVG ANIMATIONS ─── */
+.svg-anim{width:100%;height:100%;}
+@keyframes rotateCog{from{transform-origin:50% 50%;transform:rotate(0);}
+  to{transform-origin:50% 50%;transform:rotate(360deg);}}
+@keyframes bounce{0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);}}
+
+/* ─── FOOTER ─── */
+footer{text-align:center;padding:1.5rem;color:var(--text-muted);font-size:0.72rem;
+  letter-spacing:0.5px;border-top:1px solid var(--border-light);margin-top:1rem;
+  font-family:'Roboto',sans-serif;}
+footer span{color:var(--green);font-weight:500;}
+
+/* ─── RESPONSIVE ─── */
+@media(max-width:650px){
+  header{padding:0 1rem;}
+  .header-inner{height:56px;}
+  .conv-row{flex-direction:column;}
+  .arrow-btn{transform:rotate(90deg);align-self:center;}
+  .def-svg-box{width:100%;height:90px;}
+  .main-tab{font-size:0.62rem;letter-spacing:0.3px;padding:0.7rem 0.3rem;}
+  main{padding:1rem 0.8rem 2rem;}
+  .card{padding:1rem;}
+  .unit-grid{grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:0.5rem;}
+}
+
+/* ─── BADGE ─── */
+.badge{display:inline-block;background:rgba(5,150,105,0.1);border:1px solid var(--green);
+  color:var(--green);font-size:0.6rem;padding:0.12rem 0.45rem;border-radius:4px;
+  letter-spacing:0.5px;vertical-align:middle;margin-left:0.3rem;
+  font-family:'JetBrains Mono',monospace;font-weight:500;}
+</style>
+</head>
+<body>
+
+<!-- ══════════ HEADER ══════════ -->
+<header>
+  <div class="header-inner">
+    <div class="header-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+        <path d="M2 17l10 5 10-5"/>
+        <path d="M2 12l10 5 10-5"/>
+      </svg>
+    </div>
+    <div class="header-center">
+      <h1>Conversión de Unidades</h1>
+      <p>Sistema Internacional (SI) &amp; Sistema Inglés · Física General</p>
+    </div>
+  </div>
+</header>
+
+<main>
+<!-- ══════════ SISTEMA ══════════ -->
+<div class="system-bar">
+  <label>Sistema de Unidades:</label>
+  <button class="sys-btn active-si" id="btnSI" onclick="setSystem('SI')">🌍 Internacional (SI)</button>
+  <button class="sys-btn" id="btnENG" onclick="setSystem('ENG')">🇺🇸 Inglés (Imperial)</button>
+</div>
+
+<!-- ══════════ TABS ══════════ -->
+<div class="main-tabs">
+  <div class="main-tab active" onclick="switchTab('fund',this)">⚛ Unidades Fundamentales</div>
+  <div class="main-tab" onclick="switchTab('deriv',this)">🔬 Unidades Derivadas</div>
+</div>
+
+<!-- ══════════ FUNDAMENTALES ══════════ -->
+<div id="tab-fund" class="tab-panel active">
+  <div class="card">
+    <div class="unit-grid" id="grid-fund"></div>
+    <div class="conversion-panel" id="panel-fund">
+      <div class="def-image-row">
+        <div class="def-svg-box" id="svg-fund"></div>
+        <div class="def-box">
+          <h3>📖 Definición</h3>
+          <p id="def-fund">—</p>
+          <div class="fun-fact" id="fact-fund"></div>
+        </div>
+      </div>
+      <div class="converter-title">
+        <span id="icon-fund">⚙️</span>
+        <span id="title-fund">Conversor</span>
+        <span class="badge" id="badge-fund">SI</span>
+      </div>
+      <div class="conv-row">
+        <div class="conv-group">
+          <label>Valor a convertir</label>
+          <input type="number" class="conv-input" id="val-fund" placeholder="Ingresa un valor…" step="any" oninput="convert('fund')">
+        </div>
+        <div class="conv-group">
+          <label>Unidad de origen</label>
+          <select class="conv-select" id="from-fund" onchange="convert('fund')"></select>
+        </div>
+        <button class="arrow-btn" onclick="swapUnits('fund')" title="Intercambiar unidades">⇄</button>
+        <div class="conv-group">
+          <label>Unidad destino</label>
+          <select class="conv-select" id="to-fund" onchange="convert('fund')"></select>
+        </div>
+      </div>
+      <div class="result-display" id="result-fund">— ingresa un valor para convertir —</div>
+      <div class="btn-row">
+        <button class="proc-btn" onclick="toggleProc('fund')">📐 Ver Procedimiento</button>
+        <button class="hist-btn" onclick="toggleHist('fund')">🕓 Historial</button>
+        <button class="copy-btn" onclick="copyResult('fund')">📋 Copiar</button>
+      </div>
+      <div class="procedure-box" id="proc-fund"></div>
+      <div class="history-box" id="hist-fund">
+        <h4>🕓 Historial de Conversiones <button onclick="clearHist('fund')">Limpiar</button></h4>
+        <div id="hist-list-fund"><p class="hist-empty">Sin conversiones aún.</p></div>
+      </div>
+    </div>
+    <div class="empty-state" id="empty-fund">
+      <span class="big-icon">⚛️</span>
+      <p>Selecciona una magnitud fundamental para comenzar</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ DERIVADAS ══════════ -->
+<div id="tab-deriv" class="tab-panel">
+  <div class="card">
+    <div class="unit-grid" id="grid-deriv"></div>
+    <div class="conversion-panel" id="panel-deriv">
+      <div class="def-image-row">
+        <div class="def-svg-box" id="svg-deriv"></div>
+        <div class="def-box">
+          <h3>📖 Definición</h3>
+          <p id="def-deriv">—</p>
+          <div class="fun-fact" id="fact-deriv"></div>
+        </div>
+      </div>
+      <div class="converter-title">
+        <span id="icon-deriv">⚙️</span>
+        <span id="title-deriv">Conversor</span>
+        <span class="badge" id="badge-deriv">SI</span>
+      </div>
+      <div class="conv-row">
+        <div class="conv-group">
+          <label>Valor a convertir</label>
+          <input type="number" class="conv-input" id="val-deriv" placeholder="Ingresa un valor…" step="any" oninput="convert('deriv')">
+        </div>
+        <div class="conv-group">
+          <label>Unidad de origen</label>
+          <select class="conv-select" id="from-deriv" onchange="convert('deriv')"></select>
+        </div>
+        <button class="arrow-btn" onclick="swapUnits('deriv')" title="Intercambiar unidades">⇄</button>
+        <div class="conv-group">
+          <label>Unidad destino</label>
+          <select class="conv-select" id="to-deriv" onchange="convert('deriv')"></select>
+        </div>
+      </div>
+      <div class="result-display" id="result-deriv">— ingresa un valor para convertir —</div>
+      <div class="btn-row">
+        <button class="proc-btn" onclick="toggleProc('deriv')">📐 Ver Procedimiento</button>
+        <button class="hist-btn" onclick="toggleHist('deriv')">🕓 Historial</button>
+        <button class="copy-btn" onclick="copyResult('deriv')">📋 Copiar</button>
+      </div>
+      <div class="procedure-box" id="proc-deriv"></div>
+      <div class="history-box" id="hist-deriv">
+        <h4>🕓 Historial de Conversiones <button onclick="clearHist('deriv')">Limpiar</button></h4>
+        <div id="hist-list-deriv"><p class="hist-empty">Sin conversiones aún.</p></div>
+      </div>
+    </div>
+    <div class="empty-state" id="empty-deriv">
+      <span class="big-icon">🔬</span>
+      <p>Selecciona una magnitud derivada para comenzar</p>
+    </div>
+  </div>
+</div>
+</main>
+
+<footer>
+  <p><span>Física General</span> · Conversión de Unidades · Sistema Internacional &amp; Sistema Inglés</p>
+</footer>
+
+<script>
+// ══════════════════════════════════════════════════════
+//  SVG ILLUSTRATIONS (updated palette)
+// ══════════════════════════════════════════════════════
+const C = {bg:'#f0f5f4',line:'#059669',accent:'#0891b2',dim:'#64748b',hi:'#047857',warn:'#f59e0b'};
+
+const SVGS = {
+  longitud:`<svg viewBox="0 0 180 140" class="svg-anim" xmlns="http://www.w3.org/2000/svg">
+    <rect width="180" height="140" fill="${C.bg}" rx="8"/>
+    <line x1="20" y1="70" x2="160" y2="70" stroke="${C.line}" stroke-width="2.5"/>
+    <line x1="20" y1="55" x2="20" y2="85" stroke="${C.line}" stroke-width="2"/>
+    <line x1="160" y1="55" x2="160" y2="85" stroke="${C.line}" stroke-width="2"/>
+    <text x="90" y="52" text-anchor="middle" fill="${C.line}" font-family="monospace" font-size="10">1 metro</text>
+    <g>
+      ${[0,14.4,28.8,43.2,57.6,72,86.4,100.8,115.2,129.6,144].map(x=>`<rect x="${20+x}" y="62" width="1.5" height="${x%72===0?16:8}" fill="${x%72===0?C.line:C.accent}"/>`).join('')}
+    </g>
+    <text x="90" y="105" text-anchor="middle" fill="${C.dim}" font-family="monospace" font-size="9">L = d(A,B)</text>
+    <circle cx="20" cy="70" r="4" fill="${C.accent}"><animate attributeName="r" values="4;6;4" dur="2s" repeatCount="indefinite"/></circle>
+    <circle cx="160" cy="70" r="4" fill="${C.accent}"><animate attributeName="r" values="4;6;4" dur="2s" begin="1s" repeatCount="indefinite"/></circle>
+  </svg>`,
+  masa:`<svg viewBox="0 0 180 140" class="svg-anim" xmlns="http://www.w3.org/2000/svg">
+    <rect width="180" height="140" fill="${C.bg}" rx="8"/>
+    <line x1="90" y1="25" x2="90" y2="45" stroke="${C.line}" stroke-width="2"/>
+    <line x1="40" y1="45" x2="140" y2="45" stroke="${C.line}" stroke-width="2.5"/>
+    <line x1="40" y1="45" x2="55" y2="95" stroke="${C.line}" stroke-width="1.5"/>
+    <line x1="140" y1="45" x2="125" y2="95" stroke="${C.line}" stroke-width="1.5"/>
+    <rect x="38" y="95" width="38" height="25" rx="4" fill="#fff" stroke="${C.line}" stroke-width="1.5"/>
+    <rect x="104" y="95" width="38" height="25" rx="4" fill="#fff" stroke="${C.accent}" stroke-width="1.5"/>
+    <text x="57" y="113" text-anchor="middle" fill="${C.line}" font-family="monospace" font-size="10">1 kg</text>
+    <text x="123" y="113" text-anchor="middle" fill="${C.accent}" font-family="monospace" font-size="10">? lb</text>
+    <circle cx="90" cy="22" r="5" fill="${C.line}"/>
+    <animateTransform attributeName="transform" attributeType="XML" type="rotate"
+      values="0 90 45;2 90 45;-2 90 45;0 90 45" dur="3s" repeatCount="indefinite"/>
+  </svg>`,
+  tiempo:`<svg viewBox="0 0 180 140" class="svg-anim" xmlns="http://www.w3.org/2000/svg">
+    <rect width="180" height="140" fill="${C.bg}" rx="8"/>
+    <circle cx="90" cy="70" r="50" fill="none" stroke="${C.line}" stroke-width="2"/>
+    <circle cx="90" cy="70" r="45" fill="none" stroke="#e2e8f0" stroke-width="8"/>
+    ${[0,30,60,90,120,150,180,210,240,270,300,330].map((a,i)=>{
+      const r=a*Math.PI/180,x=90+42*Math.sin(r),y=70-42*Math.cos(r);
+      return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${i%3===0?3:1.5}" fill="${i%3===0?C.line:'#94a3b8'}"/>`;
+    }).join('')}
+    <line x1="90" y1="70" x2="90" y2="32" stroke="${C.line}" stroke-width="2" stroke-linecap="round">
+      <animateTransform attributeName="transform" attributeType="XML" type="rotate"
+        from="0 90 70" to="360 90 70" dur="10s" repeatCount="indefinite"/>
+    </line>
+    <line x1="90" y1="70" x2="118" y2="70" stroke="${C.accent}" stroke-width="2.5" stroke-linecap="round">
+      <animateTransform attributeName="transform" attributeType="XML" type="rotate"
+        from="0 90 70" to="360 90 70" dur="120s" repeatCount="indefinite"/>
+    </line>
+    <circle cx="90" cy="70" r="4" fill="${C.line}"/>
+  </svg>`,
+  temperatura:`<svg viewBox="0 0 180 140" class="svg-anim" xmlns="http://www.w3.org/2000/svg">
+    <rect width="180" height="140" fill="${C.bg}" rx="8"/>
+    <rect x="82" y="15" width="16" height="90" rx="8" fill="#e2e8f0" stroke="${C.line}" stroke-width="1.5"/>
+    <rect x="84" y="17" width="12" height="80" rx="6" fill="#f0f5f4"/>
+    <rect x="84.5" y="60" width="11" height="37" rx="5" fill="url(#tgrad2)">
+      <animate attributeName="height" values="37;55;37" dur="3s" repeatCount="indefinite"/>
+      <animate attributeName="y" values="60;42;60" dur="3s" repeatCount="indefinite"/>
+    </rect>
+    <circle cx="90" cy="110" r="13" fill="${C.accent}"/>
+    <circle cx="90" cy="110" r="9" fill="#0e7490"/>
+    <defs><linearGradient id="tgrad2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="${C.accent}"/><stop offset="100%" stop-color="#dc2626"/>
+    </linearGradient></defs>
+    <text x="107" y="30" fill="${C.dim}" font-family="monospace" font-size="8">100°C</text>
+    <text x="107" y="85" fill="${C.dim}" font-family="monospace" font-size="8">0°C</text>
+    <line x1="98" y1="28" x2="106" y2="28" stroke="${C.dim}" stroke-width="1"/>
+    <line x1="98" y1="82" x2="106" y2="82" stroke="${C.dim}" stroke-width="1"/>
+  </svg>`,
+  corriente:`<svg viewBox="0 0 180 140" class="svg-anim" xmlns="http://www.w3.org/2000/svg">
+    <rect width="180" height="140" fill="${C.bg}" rx="8"/>
+    <path d="M20,70 Q50,20 90,70 Q130,120 160,70" fill="none" stroke="${C.line}" stroke-width="2.5">
+      <animate attributeName="stroke-dashoffset" values="200;0" dur="1.5s" repeatCount="indefinite"/>
+      <animate attributeName="stroke-dasharray" values="200" dur="1.5s" repeatCount="indefinite"/>
+    </path>
+    <path d="M20,70 Q50,20 90,70 Q130,120 160,70" fill="none" stroke="${C.accent}" stroke-width="1" stroke-dasharray="5,15" opacity="0.5">
+      <animate attributeName="stroke-dashoffset" values="0;-200" dur="1s" repeatCount="indefinite"/>
+    </path>
+    <text x="90" y="30" text-anchor="middle" fill="${C.line}" font-family="monospace" font-size="9">⚡ A = C/s</text>
+    <text x="90" y="120" text-anchor="middle" fill="${C.dim}" font-family="monospace" font-size="8">I = Q / t</text>
+    <circle cx="20" cy="70" r="5" fill="${C.accent}"/>
+    <circle cx="160" cy="70" r="5" fill="${C.line}"/>
+  </svg>`,
+  cantidad:`<svg viewBox="0 0 180 140" class="svg-anim" xmlns="http://www.w3.org/2000/svg">
+    <rect width="180" height="140" fill="${C.bg}" rx="8"/>
+    ${Array.from({length:18},(_,i)=>{
+      const col=i%6,row=Math.floor(i/6);
+      const x=25+col*22,y=35+row*32;
+      const delay=(i*0.15).toFixed(2);
+      return `<circle cx="${x}" cy="${y}" r="8" fill="#fff" stroke="${C.line}" stroke-width="1.2">
+        <animate attributeName="fill" values="#fff;rgba(5,150,105,0.2);#fff" dur="3s" begin="${delay}s" repeatCount="indefinite"/>
+      </circle>
+      <text x="${x}" y="${y+4}" text-anchor="middle" fill="${C.dim}" font-family="monospace" font-size="6">He</text>`;
+    }).join('')}
+    <text x="90" y="128" text-anchor="middle" fill="${C.line}" font-family="monospace" font-size="9">1 mol = 6.022×10²³</text>
+  </svg>`,
+  intensidad_lum:`<svg viewBox="0 0 180 140" class="svg-anim" xmlns="http://www.w3.org/2000/svg">
+    <rect width="180" height="140" fill="${C.bg}" rx="8"/>
+    <circle cx="90" cy="70" r="18" fill="#fef9c3" stroke="#eab308" stroke-width="2">
+      <animate attributeName="r" values="18;21;18" dur="2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.7;1" dur="2s" repeatCount="indefinite"/>
+    </circle>
+    ${[0,45,90,135,180,225,270,315].map(a=>{
+      const r=a*Math.PI/180,x1=90+22*Math.sin(r),y1=70-22*Math.cos(r),
+            x2=90+38*Math.sin(r),y2=70-38*Math.cos(r);
+      return `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}"
+        stroke="#eab308" stroke-width="2" stroke-linecap="round" opacity="0.7">
+        <animate attributeName="opacity" values="0.7;0.2;0.7" dur="2s" begin="${(a/45*0.25).toFixed(2)}s" repeatCount="indefinite"/>
+      </line>`;
+    }).join('')}
+    <text x="90" y="128" text-anchor="middle" fill="#ca8a04" font-family="monospace" font-size="9">1 cd = 1 lm/sr</text>
+  </svg>`,
+  fuerza:`<svg viewBox="0 0 180 140" class="svg-anim" xmlns="http://www.w3.org/2000/svg">
+    <rect width="180" height="140" fill="${C.bg}" rx="8"/>
+    <rect x="65" y="55" width="50" height="40" rx="4" fill="#fff" stroke="${C.line}" stroke-width="1.5"/>
+    <text x="90" y="81" text-anchor="middle" fill="${C.dim}" font-family="monospace" font-size="8">m = 1kg</text>
+    <line x1="20" y1="75" x2="65" y2="75" stroke="${C.accent}" stroke-width="2.5" marker-end="url(#arrowF2)">
+      <animate attributeName="x1" values="20;30;20" dur="1.5s" repeatCount="indefinite"/>
+    </line>
+    <defs><marker id="arrowF2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="${C.accent}"/>
+    </marker></defs>
+    <text x="42" y="65" text-anchor="middle" fill="${C.accent}" font-family="monospace" font-size="9" font-weight="bold">F</text>
+    <text x="90" y="128" text-anchor="middle" fill="${C.dim}" font-family="monospace" font-size="8">F = m × a</text>
+    <line x1="90" y1="95" x2="90" y2="120" stroke="${C.line}" stroke-width="1.5" marker-end="url(#arrowG2)"/>
+    <defs><marker id="arrowG2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="${C.line}"/>
+    </marker></defs>
+    <text x="100" y="113" fill="${C.line}" font-family="monospace" font-size="8">g</text>
+  </svg>`,
+  energia:`<svg viewBox="0 0 180 140" class="svg-anim" xmlns="http://www.w3.org/2000/svg">
+    <rect width="180" height="140" fill="${C.bg}" rx="8"/>
+    <path d="M90,15 L75,65 L88,65 L72,125 L108,55 L93,55 Z" fill="${C.line}" opacity="0.8">
+      <animate attributeName="opacity" values="0.8;0.35;0.8" dur="1.2s" repeatCount="indefinite"/>
+    </path>
+    <text x="90" y="135" text-anchor="middle" fill="${C.line}" font-family="monospace" font-size="9">E = F × d [J]</text>
+  </svg>`,
+  potencia:`<svg viewBox="0 0 180 140" class="svg-anim" xmlns="http://www.w3.org/2000/svg">
+    <rect width="180" height="140" fill="${C.bg}" rx="8"/>
+    <circle cx="90" cy="70" r="45" fill="none" stroke="#e2e8f0" stroke-width="14"/>
+    <circle cx="90" cy="70" r="45" fill="none" stroke="${C.line}" stroke-width="4"
+      stroke-dasharray="283" stroke-dashoffset="283" stroke-linecap="round"
+      transform="rotate(-90 90 70)">
+      <animate attributeName="stroke-dashoffset" values="283;70;283" dur="3s" repeatCount="indefinite"/>
+    </circle>
+    <text x="90" y="66" text-anchor="middle" fill="${C.line}" font-family="monospace" font-size="14" font-weight="bold">W</text>
+    <text x="90" y="82" text-anchor="middle" fill="${C.dim}" font-family="monospace" font-size="8">P = E/t</text>
+    <text x="90" y="128" text-anchor="middle" fill="${C.dim}" font-family="monospace" font-size="8">1 W = 1 J/s</text>
+  </svg>`,
+  presion:`<svg viewBox="0 0 180 140" class="svg-anim" xmlns="http://www.w3.org/2000/svg">
+    <rect width="180" height="140" fill="${C.bg}" rx="8"/>
+    <rect x="30" y="30" width="120" height="60" rx="4" fill="#fff" stroke="${C.line}" stroke-width="1.5"/>
+    <rect x="30" y="30" width="120" height="60" rx="4" fill="url(#wgrad2)" opacity="0.5">
+      <animate attributeName="height" values="60;45;60" dur="2s" repeatCount="indefinite"/>
+    </rect>
+    <defs><linearGradient id="wgrad2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="${C.accent}" stop-opacity="0.05"/>
+      <stop offset="100%" stop-color="${C.accent}" stop-opacity="0.35"/>
+    </linearGradient></defs>
+    <path d="M60,30 L60,20 L120,20 L120,30" fill="none" stroke="${C.accent}" stroke-width="2"/>
+    <line x1="90" y1="20" x2="90" y2="8" stroke="${C.accent}" stroke-width="2"/>
+    <polygon points="82,12 90,0 98,12" fill="${C.accent}"/>
+    <text x="90" y="115" text-anchor="middle" fill="${C.line}" font-family="monospace" font-size="9">P = F / A [Pa]</text>
+    <text x="42" y="65" fill="${C.dim}" font-family="monospace" font-size="8">P↑</text>
+  </svg>`,
+  velocidad:`<svg viewBox="0 0 180 140" class="svg-anim" xmlns="http://www.w3.org/2000/svg">
+    <rect width="180" height="140" fill="${C.bg}" rx="8"/>
+    <ellipse cx="50" cy="95" rx="18" ry="8" fill="none" stroke="${C.dim}" stroke-width="1.5"/>
+    <ellipse cx="130" cy="95" rx="18" ry="8" fill="none" stroke="${C.dim}" stroke-width="1.5"/>
+    <rect x="30" y="72" width="120" height="28" rx="8" fill="#fff" stroke="${C.line}" stroke-width="1.5"/>
+    <polygon points="148,72 165,80 148,88" fill="${C.accent}"/>
+    <text x="90" y="85" text-anchor="middle" fill="${C.dim}" font-family="monospace" font-size="8">v = Δx/Δt</text>
+    <line x1="20" y1="58" x2="158" y2="58" stroke="${C.line}" stroke-width="1" stroke-dasharray="4,6" opacity="0.5">
+      <animate attributeName="stroke-dashoffset" values="0;-50" dur="0.8s" repeatCount="indefinite"/>
+    </line>
+    <text x="90" y="125" text-anchor="middle" fill="${C.dim}" font-family="monospace" font-size="8">m/s · km/h · mph</text>
+  </svg>`,
+  area:`<svg viewBox="0 0 180 140" class="svg-anim" xmlns="http://www.w3.org/2000/svg">
+    <rect width="180" height="140" fill="${C.bg}" rx="8"/>
+    <rect x="35" y="25" width="110" height="90" rx="3" fill="rgba(5,150,105,0.05)" stroke="${C.line}" stroke-width="1.8"/>
+    ${[1,2,3,4].map(i=>`<line x1="${35+i*22}" y1="25" x2="${35+i*22}" y2="115" stroke="${C.line}" stroke-width="0.4" opacity="0.2"/>`).join('')}
+    ${[1,2,3].map(i=>`<line x1="35" y1="${25+i*22.5}" x2="145" y2="${25+i*22.5}" stroke="${C.line}" stroke-width="0.4" opacity="0.2"/>`).join('')}
+    <text x="90" y="73" text-anchor="middle" fill="${C.line}" font-family="monospace" font-size="14" opacity="0.6">A</text>
+    <line x1="35" y1="120" x2="145" y2="120" stroke="${C.accent}" stroke-width="1.5" marker-end="url(#aW2)"/>
+    <line x1="150" y1="25" x2="150" y2="115" stroke="${C.line}" stroke-width="1.5" marker-end="url(#aH2)"/>
+    <defs>
+      <marker id="aW2" markerWidth="6" markerHeight="6" refX="5" refY="2" orient="auto"><path d="M0,0 L0,4 L6,2 z" fill="${C.accent}"/></marker>
+      <marker id="aH2" markerWidth="6" markerHeight="6" refX="5" refY="2" orient="auto"><path d="M0,0 L0,4 L6,2 z" fill="${C.line}"/></marker>
+    </defs>
+    <text x="90" y="130" text-anchor="middle" fill="${C.accent}" font-family="monospace" font-size="8">ancho</text>
+    <text x="164" y="73" text-anchor="middle" fill="${C.line}" font-family="monospace" font-size="8" transform="rotate(90,164,73)">alto</text>
+  </svg>`,
+  volumen:`<svg viewBox="0 0 180 140" class="svg-anim" xmlns="http://www.w3.org/2000/svg">
+    <rect width="180" height="140" fill="${C.bg}" rx="8"/>
+    <polygon points="50,90 50,40 110,40 110,90" fill="rgba(5,150,105,0.04)" stroke="${C.line}" stroke-width="1.5"/>
+    <polygon points="50,40 75,20 135,20 110,40" fill="rgba(5,150,105,0.08)" stroke="${C.line}" stroke-width="1.5"/>
+    <polygon points="110,40 135,20 135,70 110,90" fill="rgba(5,150,105,0.06)" stroke="${C.line}" stroke-width="1.5"/>
+    <text x="80" y="68" fill="${C.line}" font-family="monospace" font-size="10" opacity="0.7">V</text>
+    <clipPath id="cubeClip2"><polygon points="50,90 50,40 110,40 110,90"/></clipPath>
+    <rect x="50" y="65" width="60" height="25" fill="rgba(8,145,178,0.2)" clip-path="url(#cubeClip2)">
+      <animate attributeName="y" values="65;55;65" dur="2.5s" repeatCount="indefinite"/>
+      <animate attributeName="height" values="25;35;25" dur="2.5s" repeatCount="indefinite"/>
+    </rect>
+    <text x="90" y="125" text-anchor="middle" fill="${C.dim}" font-family="monospace" font-size="8">V = l × a × h [m³]</text>
+  </svg>`,
+  aceleracion:`<svg viewBox="0 0 180 140" class="svg-anim" xmlns="http://www.w3.org/2000/svg">
+    <rect width="180" height="140" fill="${C.bg}" rx="8"/>
+    <circle r="10" fill="${C.accent}">
+      <animateMotion dur="2s" repeatCount="indefinite" calcMode="spline" keySplines="0.4 0 1 1">
+        <mpath href="#track2"/>
+      </animateMotion>
+    </circle>
+    <path id="track2" d="M20,80 Q60,80 100,60 Q140,40 160,30" fill="none" stroke="${C.line}" stroke-width="1.5" stroke-dasharray="4,4"/>
+    ${[30,60,100,140].map((x,i)=>{
+      const len=[15,22,30,38][i];
+      const y=[80,73,62,38][i];
+      return `<line x1="${x}" y1="${y}" x2="${x+len}" y2="${y}" stroke="${C.line}" stroke-width="1.5" marker-end="url(#aA2)"/>`;
+    }).join('')}
+    <defs><marker id="aA2" markerWidth="6" markerHeight="6" refX="5" refY="2" orient="auto">
+      <path d="M0,0 L0,4 L6,2 z" fill="${C.line}"/>
+    </marker></defs>
+    <text x="90" y="128" text-anchor="middle" fill="${C.dim}" font-family="monospace" font-size="8">a = Δv/Δt [m/s²]</text>
+  </svg>`,
+};
+SVGS.default = `<svg viewBox="0 0 180 140" xmlns="http://www.w3.org/2000/svg"><rect width="180" height="140" fill="${C.bg}" rx="8"/>
+  <text x="90" y="75" text-anchor="middle" fill="${C.line}" font-family="monospace" font-size="32">⚛</text></svg>`;
+
+// ══════════════════════════════════════════════════════
+//  DATA
+// ══════════════════════════════════════════════════════
+const DATA = {
+  fund:[
+    {id:'longitud',name:'Longitud',icon:'📏',symbol:'m · ft',
+     def:'Extensión o magnitud de algo a lo largo de una de sus dimensiones. En física, magnitud escalar que representa la distancia entre dos puntos en el espacio.',
+     fact:'💡 La luz recorre aproximadamente 300,000 km en un segundo, equivalente a dar 7.5 vueltas a la Tierra.',
+     SI:[{n:'metro',s:'m',f:1},{n:'centímetro',s:'cm',f:0.01},{n:'milímetro',s:'mm',f:0.001},
+         {n:'kilómetro',s:'km',f:1000},{n:'micrón',s:'μm',f:1e-6},{n:'nanómetro',s:'nm',f:1e-9},
+         {n:'angstrom',s:'Å',f:1e-10},{n:'unidad astronómica',s:'UA',f:1.496e11}],
+     ENG:[{n:'pie',s:'ft',f:0.3048},{n:'pulgada',s:'in',f:0.0254},{n:'yarda',s:'yd',f:0.9144},
+          {n:'milla',s:'mi',f:1609.344},{n:'milla náutica',s:'nmi',f:1852},
+          {n:'metro',s:'m',f:1},{n:'fathom',s:'ftm',f:1.8288}],
+     formula:'v_dest = v_orig × (f_orig / f_dest)'},
+    {id:'masa',name:'Masa',icon:'⚖️',symbol:'kg · lb',
+     def:'Magnitud física que expresa la cantidad de materia contenida en un cuerpo. Es una propiedad intrínseca invariable ante cambios de posición o velocidad.',
+     fact:'💡 La masa del Sol es ≈ 2×10³⁰ kg, equivalente a 333,000 Tierras.',
+     SI:[{n:'kilogramo',s:'kg',f:1},{n:'gramo',s:'g',f:0.001},{n:'miligramo',s:'mg',f:1e-6},
+         {n:'tonelada métrica',s:'t',f:1000},{n:'microgramo',s:'μg',f:1e-9},{n:'nanogramo',s:'ng',f:1e-12}],
+     ENG:[{n:'libra',s:'lb',f:0.453592},{n:'onza',s:'oz',f:0.0283495},
+          {n:'tonelada corta',s:'ton',f:907.185},{n:'tonelada larga',s:'LT',f:1016.05},
+          {n:'stone',s:'st',f:6.35029},{n:'kilogramo',s:'kg',f:1}],
+     formula:'v_dest = v_orig × (f_orig / f_dest)'},
+    {id:'tiempo',name:'Tiempo',icon:'⏱️',symbol:'s · s',
+     def:'Magnitud física que permite ordenar la secuencia de los sucesos, estableciendo un pasado, presente y futuro. Unidad base SI: el segundo, definido por la radiación del átomo de cesio-133.',
+     fact:'💡 Un año luz = 9.46×10¹² km. El universo tiene ~13,800 millones de años.',
+     SI:[{n:'segundo',s:'s',f:1},{n:'milisegundo',s:'ms',f:0.001},{n:'microsegundo',s:'μs',f:1e-6},
+         {n:'nanosegundo',s:'ns',f:1e-9},{n:'minuto',s:'min',f:60},{n:'hora',s:'h',f:3600},
+         {n:'día',s:'d',f:86400},{n:'semana',s:'sem',f:604800},{n:'año',s:'yr',f:31557600}],
+     ENG:[{n:'segundo',s:'s',f:1},{n:'minuto',s:'min',f:60},{n:'hora',s:'hr',f:3600},
+          {n:'día',s:'day',f:86400},{n:'semana',s:'wk',f:604800},{n:'año',s:'yr',f:31557600}],
+     formula:'v_dest = v_orig × (f_orig / f_dest)'},
+    {id:'temperatura',name:'Temperatura',icon:'🌡️',symbol:'K · °F',
+     def:'Magnitud física que mide el nivel de calor o frío de un cuerpo, indicando la energía cinética promedio de sus partículas. Escala absoluta en el SI: kelvin (K).',
+     fact:'💡 El cero absoluto (0 K = −273.15 °C) es la temperatura más baja posible en el universo.',
+     SI:[{n:'kelvin',s:'K',base:'kelvin'},{n:'celsius',s:'°C',base:'celsius'},{n:'fahrenheit',s:'°F',base:'fahrenheit'}],
+     ENG:[{n:'fahrenheit',s:'°F',base:'fahrenheit'},{n:'celsius',s:'°C',base:'celsius'},
+          {n:'kelvin',s:'K',base:'kelvin'},{n:'rankine',s:'°R',base:'rankine'}],
+     isTemp:true,
+     formula:'°C=(°F−32)×5/9 · K=°C+273.15 · °R=°F+459.67'},
+    {id:'corriente',name:'Corriente Eléctrica',icon:'⚡',symbol:'A',
+     def:'Flujo de carga eléctrica por unidad de tiempo a través de un conductor. Su unidad SI es el ampere (A = C/s). Magnitud fundamental del Sistema Internacional.',
+     fact:'💡 El rayo descarga ~20,000 amperios en millonésimas de segundo.',
+     SI:[{n:'ampere',s:'A',f:1},{n:'miliampere',s:'mA',f:0.001},{n:'microampere',s:'μA',f:1e-6},
+         {n:'kiloampere',s:'kA',f:1000},{n:'nanoampere',s:'nA',f:1e-9}],
+     ENG:[{n:'ampere',s:'A',f:1},{n:'miliampere',s:'mA',f:0.001},{n:'microampere',s:'μA',f:1e-6}],
+     formula:'v_dest = v_orig × (f_orig / f_dest)'},
+    {id:'cantidad',name:'Cantidad de Sustancia',icon:'🧪',symbol:'mol',
+     def:'Magnitud que cuantifica el número de entidades elementales (átomos, moléculas, iones) de una muestra. Un mol contiene exactamente 6.02214076×10²³ entidades (número de Avogadro).',
+     fact:'💡 Si apilaras 1 mol de monedas, alcanzarías desde la Tierra hasta el Sol y de vuelta 10 millones de veces.',
+     SI:[{n:'mol',s:'mol',f:1},{n:'milimol',s:'mmol',f:0.001},{n:'micromol',s:'μmol',f:1e-6},{n:'kmol',s:'kmol',f:1000}],
+     ENG:[{n:'mol',s:'mol',f:1},{n:'milimol',s:'mmol',f:0.001},{n:'lbmol',s:'lbmol',f:453.592}],
+     formula:'v_dest = v_orig × (f_orig / f_dest)'},
+    {id:'intensidad_lum',name:'Intensidad Luminosa',icon:'💡',symbol:'cd',
+     def:'Magnitud fotométrica que mide la potencia luminosa emitida por una fuente de luz en una dirección específica por unidad de ángulo sólido. Unidad SI: candela (cd).',
+     fact:'💡 Una vela común emite aproximadamente 1 candela. El Sol emite ≈ 3.8×10²⁸ cd.',
+     SI:[{n:'candela',s:'cd',f:1},{n:'milicandela',s:'mcd',f:0.001},{n:'kilocandela',s:'kcd',f:1000}],
+     ENG:[{n:'candela',s:'cd',f:1},{n:'candlepower (int)',s:'cp',f:0.9810}],
+     formula:'v_dest = v_orig × (f_orig / f_dest)'},
+  ],
+  deriv:[
+    {id:'fuerza',name:'Fuerza',icon:'💪',symbol:'N · lbf',
+     def:'Interacción física capaz de cambiar el estado de reposo o de movimiento de un cuerpo, o de deformarlo. Segunda Ley de Newton: F = m × a. Unidad SI: newton (N = kg·m/s²).',
+     fact:'💡 La fuerza de gravedad en la Luna es ≈ 1/6 de la terrestre: un astronauta de 70 kg pesa solo ~11.5 kg allá.',
+     SI:[{n:'newton',s:'N',f:1},{n:'kilonewton',s:'kN',f:1000},{n:'meganewton',s:'MN',f:1e6},
+         {n:'dina',s:'dyn',f:1e-5},{n:'kilopondio',s:'kp',f:9.80665},{n:'milinewton',s:'mN',f:0.001}],
+     ENG:[{n:'libra-fuerza',s:'lbf',f:4.44822},{n:'onza-fuerza',s:'ozf',f:0.278014},
+          {n:'tonelada-fuerza',s:'tonf',f:8896.44},{n:'poundal',s:'pdl',f:0.138255},{n:'newton',s:'N',f:1}],
+     formula:'F = m × a  →  v_dest = v_orig × (f_orig / f_dest)'},
+    {id:'energia',name:'Energía / Trabajo',icon:'⚡',symbol:'J · BTU',
+     def:'Capacidad de un sistema para realizar trabajo o producir cambios en otros sistemas. El trabajo es la energía transferida cuando una fuerza desplaza un objeto. Unidad SI: joule (J = N·m).',
+     fact:'💡 Una kilocaloría (1 kcal) equivale a la energía necesaria para calentar 1 kg de agua 1 °C.',
+     SI:[{n:'joule',s:'J',f:1},{n:'kilojuoule',s:'kJ',f:1000},{n:'megajoule',s:'MJ',f:1e6},
+         {n:'gigajoule',s:'GJ',f:1e9},{n:'caloría',s:'cal',f:4.184},{n:'kilocaloría',s:'kcal',f:4184},
+         {n:'kWh',s:'kWh',f:3.6e6},{n:'electron-volt',s:'eV',f:1.602e-19},{n:'erg',s:'erg',f:1e-7}],
+     ENG:[{n:'BTU',s:'BTU',f:1055.06},{n:'pie-libra',s:'ft·lbf',f:1.35582},
+          {n:'termia',s:'thm',f:1.055e8},{n:'caloría',s:'cal',f:4.184},{n:'joule',s:'J',f:1}],
+     formula:'E = F × d  →  v_dest = v_orig × (f_orig / f_dest)'},
+    {id:'potencia',name:'Potencia',icon:'🔋',symbol:'W · hp',
+     def:'Cantidad de energía transferida o transformada por unidad de tiempo. Indica la rapidez con que se realiza trabajo. Unidad SI: vatio (W = J/s). Magnitud derivada fundamental en ingeniería.',
+     fact:'💡 El corazón humano genera una potencia promedio de ≈ 1.2 W. Un automóvil promedio tiene ≈ 130 hp.',
+     SI:[{n:'vatio',s:'W',f:1},{n:'kilovatio',s:'kW',f:1000},{n:'megavatio',s:'MW',f:1e6},
+         {n:'gigavatio',s:'GW',f:1e9},{n:'milivatio',s:'mW',f:0.001}],
+     ENG:[{n:'caballo de vapor (hp)',s:'hp',f:745.7},{n:'BTU/hora',s:'BTU/h',f:0.29307},
+          {n:'pie·lbf/s',s:'ft·lbf/s',f:1.35582},{n:'vatio',s:'W',f:1},{n:'caballo métrico',s:'CV',f:735.5}],
+     formula:'P = E / t  →  v_dest = v_orig × (f_orig / f_dest)'},
+    {id:'presion',name:'Presión',icon:'🌊',symbol:'Pa · psi',
+     def:'Fuerza aplicada perpendicularmente sobre una superficie por unidad de área. Determina el estado de esfuerzo en un punto de un fluido o sólido. Unidad SI: pascal (Pa = N/m²).',
+     fact:'💡 La presión atmosférica a nivel del mar ≈ 101,325 Pa, suficiente para sostener ≈ 10.3 m de agua.',
+     SI:[{n:'pascal',s:'Pa',f:1},{n:'kilopascal',s:'kPa',f:1000},{n:'megapascal',s:'MPa',f:1e6},
+         {n:'bar',s:'bar',f:1e5},{n:'milibar',s:'mbar',f:100},{n:'atm',s:'atm',f:101325},{n:'mmHg (torr)',s:'mmHg',f:133.322}],
+     ENG:[{n:'psi',s:'psi',f:6894.76},{n:'ksi',s:'ksi',f:6894760},{n:'atm',s:'atm',f:101325},
+          {n:'mmHg',s:'mmHg',f:133.322},{n:'pulgada H₂O',s:'inH₂O',f:249.089},{n:'pascal',s:'Pa',f:1}],
+     formula:'P = F / A  →  v_dest = v_orig × (f_orig / f_dest)'},
+    {id:'velocidad',name:'Velocidad',icon:'🚀',symbol:'m/s · mph',
+     def:'Magnitud vectorial que expresa el cambio de posición de un objeto por unidad de tiempo, indicando tanto la rapidez del movimiento como su dirección. Unidad SI: m/s.',
+     fact:'💡 La velocidad de la luz en el vacío es ≈ 299,792,458 m/s, el límite absoluto del universo.',
+     SI:[{n:'metro/segundo',s:'m/s',f:1},{n:'km/hora',s:'km/h',f:1/3.6},{n:'cm/segundo',s:'cm/s',f:0.01},
+         {n:'km/minuto',s:'km/min',f:16.6667},{n:'m/minuto',s:'m/min',f:1/60}],
+     ENG:[{n:'pie/segundo',s:'ft/s',f:0.3048},{n:'milla/hora',s:'mph',f:0.44704},
+          {n:'nudo',s:'kn',f:0.514444},{n:'metro/segundo',s:'m/s',f:1},{n:'pie/minuto',s:'ft/min',f:0.00508}],
+     formula:'v = Δx / Δt  →  v_dest = v_orig × (f_orig / f_dest)'},
+    {id:'area',name:'Área',icon:'▭',symbol:'m² · ft²',
+     def:'Medida de la extensión de una superficie bidimensional, obtenida multiplicando sus dimensiones de longitud. Unidad SI: metro cuadrado (m²). Fundamental en geometría, construcción y cartografía.',
+     fact:'💡 La superficie total de la Tierra es ≈ 510 millones de km². Los océanos cubren el 71%.',
+     SI:[{n:'metro cuadrado',s:'m²',f:1},{n:'cm cuadrado',s:'cm²',f:0.0001},{n:'km cuadrado',s:'km²',f:1e6},
+         {n:'hectárea',s:'ha',f:10000},{n:'mm cuadrado',s:'mm²',f:1e-6}],
+     ENG:[{n:'pie cuadrado',s:'ft²',f:0.092903},{n:'pulgada cuadrada',s:'in²',f:0.00064516},
+          {n:'yarda cuadrada',s:'yd²',f:0.836127},{n:'acre',s:'ac',f:4046.86},
+          {n:'milla cuadrada',s:'mi²',f:2.59e6},{n:'metro cuadrado',s:'m²',f:1}],
+     formula:'A = l × w  →  v_dest = v_orig × (f_orig / f_dest)'},
+    {id:'volumen',name:'Volumen',icon:'📦',symbol:'m³ · gal',
+     def:'Magnitud que expresa la extensión de un cuerpo en tres dimensiones espaciales. Mide el espacio que ocupa un objeto o la capacidad de un recipiente. Unidad SI: metro cúbico (m³).',
+     fact:'💡 El volumen de los océanos es ≈ 1.335×10⁹ km³, suficiente para llenar 535 cuatrillones de latas de refresco.',
+     SI:[{n:'metro cúbico',s:'m³',f:1},{n:'litro',s:'L',f:0.001},{n:'mililitro',s:'mL',f:1e-6},
+         {n:'centímetro³',s:'cm³',f:1e-6},{n:'decímetro³',s:'dm³',f:0.001},{n:'hectolitro',s:'hL',f:0.1}],
+     ENG:[{n:'galón EUA',s:'gal',f:0.00378541},{n:'galón UK',s:'gal UK',f:0.00454609},
+          {n:'pie cúbico',s:'ft³',f:0.0283168},{n:'pulgada cúbica',s:'in³',f:1.63871e-5},
+          {n:'barril',s:'bbl',f:0.158987},{n:'onza fluida EUA',s:'fl oz',f:2.9574e-5},
+          {n:'cuarto (quart)',s:'qt',f:9.46e-4},{n:'litro',s:'L',f:0.001}],
+     formula:'V = l × w × h  →  v_dest = v_orig × (f_orig / f_dest)'},
+    {id:'aceleracion',name:'Aceleración',icon:'🎯',symbol:'m/s² · g',
+     def:'Variación de la velocidad de un cuerpo por unidad de tiempo. Indica la rapidez con que cambia la velocidad en magnitud o dirección. Unidad SI: metro por segundo cuadrado (m/s²).',
+     fact:'💡 La aceleración de la gravedad en la Tierra es g = 9.80665 m/s². En Júpiter sería ≈ 24.8 m/s².',
+     SI:[{n:'m/s²',s:'m/s²',f:1},{n:'cm/s² (gal)',s:'Gal',f:0.01},{n:'km/s²',s:'km/s²',f:1000},
+         {n:'gravedad estándar',s:'g',f:9.80665}],
+     ENG:[{n:'pie/s²',s:'ft/s²',f:0.3048},{n:'pulgada/s²',s:'in/s²',f:0.0254},
+          {n:'gravedad estándar',s:'g',f:9.80665},{n:'m/s²',s:'m/s²',f:1}],
+     formula:'a = Δv / Δt  →  v_dest = v_orig × (f_orig / f_dest)'},
+  ]
+};
+
+// ══════════════════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════════════════
+let sys = 'SI';
+let sel = {fund:null, deriv:null};
+let histories = {fund:[], deriv:[]};
+
+// ══════════════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════════════
+(function init(){
+  renderGrid('fund');
+  renderGrid('deriv');
+})();
+
+function renderGrid(t){
+  const g = document.getElementById('grid-'+t);
+  g.innerHTML = '';
+  DATA[t].forEach(u=>{
+    const d=document.createElement('div');
+    d.className='unit-card'+(sel[t]===u.id?' selected':'');
+    d.innerHTML=`<span class="unit-icon">${u.icon}</span>
+      <div class="unit-name">${u.name}</div>
+      <div class="unit-symbol">${u.symbol}</div>`;
+    d.onclick=()=>selectUnit(t,u.id);
+    g.appendChild(d);
+  });
+}
+
+// ══════════════════════════════════════════════════════
+//  SYSTEM SWITCH
+// ══════════════════════════════════════════════════════
+function setSystem(s){
+  sys=s;
+  document.getElementById('btnSI').className='sys-btn'+(s==='SI'?' active-si':'');
+  document.getElementById('btnENG').className='sys-btn'+(s==='ENG'?' active-eng':'');
+  ['fund','deriv'].forEach(t=>{
+    if(sel[t]) selectUnit(t,sel[t]);
+  });
+}
+
+// ══════════════════════════════════════════════════════
+//  SELECT UNIT
+// ══════════════════════════════════════════════════════
+function selectUnit(t,id){
+  sel[t]=id;
+  const u=DATA[t].find(x=>x.id===id); if(!u) return;
+
+  document.querySelectorAll(`#grid-${t} .unit-card`).forEach((c,i)=>{
+    c.classList.toggle('selected', DATA[t][i].id===id);
+  });
+
+  document.getElementById('panel-'+t).classList.add('active');
+  document.getElementById('empty-'+t).style.display='none';
+
+  const svgEl=document.getElementById('svg-'+t);
+  svgEl.innerHTML = SVGS[id] || SVGS.default;
+
+  document.getElementById('def-'+t).textContent=u.def;
+  document.getElementById('fact-'+t).textContent=u.fact||'';
+  document.getElementById('title-'+t).textContent=u.name;
+  document.getElementById('icon-'+t).textContent=u.icon;
+  document.getElementById('badge-'+t).textContent=sys==='SI'?'SI':'Imperial';
+
+  const units=u[sys]||u.SI;
+  populateSel('from-'+t, units, 0);
+  populateSel('to-'+t,   units, Math.min(1,units.length-1));
+
+  document.getElementById('val-'+t).value='';
+  document.getElementById('result-'+t).textContent='— ingresa un valor para convertir —';
+  document.getElementById('proc-'+t).classList.remove('visible');
+  document.getElementById('hist-'+t).classList.remove('visible');
+}
+
+function populateSel(id, units, def){
+  const s=document.getElementById(id);
+  s.innerHTML=units.map((u,i)=>`<option value="${i}">${u.n} (${u.s})</option>`).join('');
+  s.value=def;
+}
+
+// ══════════════════════════════════════════════════════
+//  CONVERT
+// ══════════════════════════════════════════════════════
+function convert(t){
+  const id=sel[t]; if(!id) return;
+  const u=DATA[t].find(x=>x.id===id);
+  const val=parseFloat(document.getElementById('val-'+t).value);
+  if(isNaN(val)||document.getElementById('val-'+t).value===''){
+    document.getElementById('result-'+t).textContent='— ingresa un valor para convertir —';
+    return;
+  }
+  const units=u[sys]||u.SI;
+  const fi=+document.getElementById('from-'+t).value;
+  const ti=+document.getElementById('to-'+t).value;
+  const from=units[fi], to=units[ti];
+
+  let res;
+  if(u.isTemp){
+    const K=toKelvin(val,from.base);
+    res=fromKelvin(K,to.base);
+  } else {
+    res=val*(from.f/to.f);
+  }
+
+  const txt=`${fmtN(val)} ${from.s}  =  ${fmtN(res)} ${to.s}`;
+  const el=document.getElementById('result-'+t);
+  el.textContent=txt;
+  el.classList.remove('flash');
+  void el.offsetWidth;
+  el.classList.add('flash');
+
+  if(fi!==ti){
+    histories[t].unshift({val,from:from.s,res,to:to.s,fromN:from.n,toN:to.n,mag:u.name});
+    if(histories[t].length>10) histories[t].pop();
+    renderHist(t);
+  }
+}
+
+function toKelvin(v,b){
+  if(b==='kelvin')     return v;
+  if(b==='celsius')    return v+273.15;
+  if(b==='fahrenheit') return (v-32)*5/9+273.15;
+  if(b==='rankine')    return v*5/9;
+  return v;
+}
+function fromKelvin(K,b){
+  if(b==='kelvin')     return K;
+  if(b==='celsius')    return K-273.15;
+  if(b==='fahrenheit') return (K-273.15)*9/5+32;
+  if(b==='rankine')    return K*9/5;
+  return K;
+}
+function fmtN(n){
+  if(n===0) return '0';
+  if(Math.abs(n)<0.0001||Math.abs(n)>=1e9) return n.toExponential(6);
+  const s=parseFloat(n.toPrecision(8)).toString();
+  return s;
+}
+
+// ══════════════════════════════════════════════════════
+//  SWAP
+// ══════════════════════════════════════════════════════
+function swapUnits(t){
+  const f=document.getElementById('from-'+t);
+  const o=document.getElementById('to-'+t);
+  const tmp=f.value; f.value=o.value; o.value=tmp;
+  convert(t);
+}
+
+// ══════════════════════════════════════════════════════
+//  PROCEDURE
+// ══════════════════════════════════════════════════════
+function toggleProc(t){
+  const box=document.getElementById('proc-'+t);
+  if(box.classList.contains('visible')){box.classList.remove('visible');return;}
+  const id=sel[t]; if(!id) return;
+  const u=DATA[t].find(x=>x.id===id);
+  const val=parseFloat(document.getElementById('val-'+t).value);
+  const units=u[sys]||u.SI;
+  const fi=+document.getElementById('from-'+t).value;
+  const ti=+document.getElementById('to-'+t).value;
+  const from=units[fi], to=units[ti];
+
+  let html=`<h4>📐 Procedimiento de Conversión — ${u.name}</h4>`;
+  if(u.isTemp){
+    html+=`
+    <div class="step"><div class="step-num">1</div><div>Se identifica la escala de origen: <strong>${from.n}</strong> (${from.s}) y la escala destino: <strong>${to.n}</strong> (${to.s}).</div></div>
+    <div class="step"><div class="step-num">2</div><div>Se convierte el valor a la escala universal Kelvin como paso intermedio:</div></div>
+    <div class="formula">${getKFormula(from.base)} → K = ${isNaN(val)?'?':fmtN(toKelvin(val,from.base))} K</div>
+    <div class="step"><div class="step-num">3</div><div>Se convierte de Kelvin a la escala destino <strong>${to.n}</strong>:</div></div>
+    <div class="formula">${getFromKFormula(to.base)} ${isNaN(val)?'':' = <b>'+fmtN(fromKelvin(toKelvin(val,from.base),to.base))+'</b> '+to.s}</div>
+    <div class="step"><div class="step-num">4</div><div>Fórmula general: <strong>${u.formula}</strong></div></div>`;
+  } else {
+    const factor=from.f/to.f;
+    const result=isNaN(val)?null:val*factor;
+    html+=`
+    <div class="step"><div class="step-num">1</div><div>Se identifica la <strong>unidad origen</strong>: <b>${from.n}</b> (${from.s}) con factor de conversión a la unidad base SI = <b>${fmtN(from.f)}</b></div></div>
+    <div class="step"><div class="step-num">2</div><div>Se identifica la <strong>unidad destino</strong>: <b>${to.n}</b> (${to.s}) con factor de conversión a la unidad base SI = <b>${fmtN(to.f)}</b></div></div>
+    <div class="step"><div class="step-num">3</div><div>Se calcula el <strong>factor de conversión directo</strong>:</div></div>
+    <div class="formula">f = f_origen / f_destino = ${fmtN(from.f)} / ${fmtN(to.f)} = <b>${fmtN(factor)}</b></div>
+    <div class="step"><div class="step-num">4</div><div>Se aplica la conversión multiplicando:</div></div>
+    <div class="formula">v_dest = v_orig × f = ${isNaN(val)?'v_orig':fmtN(val)} × ${fmtN(factor)} ${result!==null?'= <b>'+fmtN(result)+'</b> '+to.s:''}</div>
+    <div class="step"><div class="step-num">5</div><div>Fórmula general: <code style="font-family:\'JetBrains Mono\',monospace;background:rgba(5,150,105,0.08);padding:2px 6px;border-radius:4px;">${u.formula}</code></div></div>`;
+  }
+  box.innerHTML=html;
+  box.classList.add('visible');
+}
+
+function getKFormula(b){
+  if(b==='celsius')    return 'K = °C + 273.15';
+  if(b==='fahrenheit') return 'K = (°F − 32) × 5/9 + 273.15';
+  if(b==='rankine')    return 'K = °R × 5/9';
+  return 'K = K';
+}
+function getFromKFormula(b){
+  if(b==='celsius')    return '°C = K − 273.15';
+  if(b==='fahrenheit') return '°F = (K − 273.15) × 9/5 + 32';
+  if(b==='rankine')    return '°R = K × 9/5';
+  return 'K = K';
+}
+
+// ══════════════════════════════════════════════════════
+//  HISTORY
+// ══════════════════════════════════════════════════════
+function toggleHist(t){
+  const box=document.getElementById('hist-'+t);
+  box.classList.toggle('visible');
+}
+function renderHist(t){
+  const list=document.getElementById('hist-list-'+t);
+  if(histories[t].length===0){
+    list.innerHTML='<p class="hist-empty">Sin conversiones aún.</p>'; return;
+  }
+  list.innerHTML=histories[t].map(h=>
+    `<div class="hist-entry">
+      <span class="hist-unit">${h.mag}</span>
+      <span class="hist-val">${fmtN(h.val)} ${h.from}</span>
+      <span style="color:var(--text-muted)">→</span>
+      <span class="hist-result">${fmtN(h.res)} ${h.to}</span>
+    </div>`
+  ).join('');
+}
+function clearHist(t){
+  histories[t]=[];
+  renderHist(t);
+}
+
+// ══════════════════════════════════════════════════════
+//  COPY
+// ══════════════════════════════════════════════════════
+function copyResult(t){
+  const txt=document.getElementById('result-'+t).textContent;
+  if(txt.includes('—')) return;
+  navigator.clipboard.writeText(txt).then(()=>{
+    const btn=document.querySelector(`#panel-${t} .copy-btn`);
+    const orig=btn.textContent;
+    btn.textContent='✅ Copiado';
+    setTimeout(()=>{btn.textContent=orig;},1800);
+  }).catch(()=>{});
+}
+
+// ══════════════════════════════════════════════════════
+//  TABS
+// ══════════════════════════════════════════════════════
+function switchTab(id,el){
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.main-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  el.classList.add('active');
+}
+</script>
+</body>
+</html>

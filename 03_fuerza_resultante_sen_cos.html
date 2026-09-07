@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fuerza Resultante — Ley de Senos y Cosenos</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&family=Roboto:wght@400;500&family=Roboto+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#ffffff;--surface:#f8fafa;--card:#ffffff;--border:#d4e4e8;
+  --green:#059669;--green-light:#d1fae5;--green-dark:#047857;
+  --teal:#0891b2;--teal-light:#cffafe;--teal-dark:#0e7490;
+  --gray:#555555;--gray-light:#94a3b8;--gray-muted:#78909c;
+  --text:#1e293b;--text-light:#475569;--radius:12px;
+  --shadow:0 1px 3px rgba(0,0,0,.06),0 4px 16px rgba(0,0,0,.06);
+  --shadow-lg:0 4px 12px rgba(0,0,0,.08),0 12px 40px rgba(0,0,0,.08);
+  --grad:linear-gradient(135deg,var(--green),var(--teal));
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Roboto",sans-serif;background:var(--bg);color:var(--text);min-height:100vh;
+  background-image:radial-gradient(circle at 0% 0%,rgba(5,150,105,.04) 0%,transparent 50%),
+    radial-gradient(circle at 100% 100%,rgba(8,145,178,.04) 0%,transparent 50%)}
+
+/* ── HEADER ── */
+header{
+  background:var(--bg);
+  border-bottom:1px solid var(--border);
+  padding:0 32px;display:flex;align-items:center;justify-content:center;gap:16px;min-height:72px;
+  position:relative;
+}
+header::after{content:"";position:absolute;bottom:0;left:0;right:0;height:3px;background:var(--grad)}
+.header-icon{width:44px;height:44px;border-radius:10px;background:var(--grad);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 2px 8px rgba(5,150,105,.25)}
+.header-icon svg{width:26px;height:26px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.header-title{text-align:center}
+.header-title h1{font-family:"Poppins",sans-serif;font-size:clamp(.95rem,2vw,1.35rem);font-weight:700;color:var(--text);line-height:1.3}
+.header-title h1 span{background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.header-title p{font-family:"Roboto",sans-serif;font-size:.78rem;color:var(--gray-muted);letter-spacing:.5px;margin-top:2px}
+
+/* ── LAYOUT ── */
+main{max-width:1520px;margin:0 auto;padding:24px 18px 56px;display:grid;grid-template-columns:380px 1fr 340px;gap:20px}
+@media(max-width:1200px){main{grid-template-columns:1fr 1fr;} .ref-panel{grid-column:1/-1}}
+@media(max-width:768px){main{grid-template-columns:1fr} .ref-panel{grid-column:auto}}
+
+/* ── CARD ── */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:22px 20px;box-shadow:var(--shadow);animation:fadeUp .4s ease both}
+.card:nth-child(2){animation-delay:.06s}.card:nth-child(3){animation-delay:.12s}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.card-title{font-family:"Poppins",sans-serif;font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--green);margin-bottom:16px;display:flex;align-items:center;gap:10px}
+.card-title svg{width:18px;height:18px;stroke:var(--green);stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+
+/* ── CONTROLS ── */
+label{display:block;font-size:.75rem;color:var(--gray-muted);margin-bottom:4px;font-weight:500;letter-spacing:.3px}
+select,input[type=number]{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:"Roboto",sans-serif;font-size:.88rem;padding:9px 12px;outline:none;transition:border-color .2s,box-shadow .2s;-webkit-appearance:none;appearance:none}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23059669' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;cursor:pointer}
+select option{background:#fff}
+select:focus,input:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(5,150,105,.12)}
+input[type=number]::-webkit-inner-spin-button{opacity:0.4}
+.form-row{margin-bottom:14px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+/* ── FORCE BLOCKS ── */
+.force-block{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 14px 12px;margin-bottom:10px;transition:border-color .2s,box-shadow .2s}
+.force-block:hover{border-color:rgba(5,150,105,.35);box-shadow:0 2px 8px rgba(5,150,105,.08)}
+.force-head{display:flex;align-items:center;gap:9px;margin-bottom:10px}
+.fdot{width:12px;height:12px;border-radius:50%;flex-shrink:0}
+.fname{font-family:"Poppins",sans-serif;font-size:.82rem;font-weight:700;letter-spacing:.5px}
+.fhint{font-size:.68rem;color:var(--gray-muted);margin-left:auto;font-family:"Roboto Mono",monospace}
+
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;font-family:"Inter",sans-serif;font-weight:600;font-size:.8rem;letter-spacing:.5px;text-transform:uppercase;padding:10px 18px;border-radius:8px;border:none;cursor:pointer;transition:all .2s}
+.btn-primary{background:var(--grad);color:#fff;box-shadow:0 2px 10px rgba(5,150,105,.25)}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 4px 18px rgba(5,150,105,.35)}
+.btn-graph{background:linear-gradient(135deg,var(--teal),#06b6d4);color:#fff;box-shadow:0 2px 10px rgba(8,145,178,.25)}
+.btn-graph:hover{transform:translateY(-1px);box-shadow:0 4px 18px rgba(8,145,178,.35)}
+.btn-danger{background:#fff;color:#ef4444;border:1px solid #fecaca;box-shadow:none}
+.btn-danger:hover{background:#fef2f2;border-color:#ef4444}
+.btn-steps{background:linear-gradient(135deg,#059669,#0891b2);color:#fff;box-shadow:0 2px 10px rgba(5,150,105,.2);width:100%;padding:12px 18px;font-size:.82rem;margin-top:12px;border-radius:10px;position:relative;overflow:hidden}
+.btn-steps::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.15),transparent);transform:translateX(-100%);transition:transform .5s}
+.btn-steps:hover::before{transform:translateX(100%)}
+.btn-steps:hover{transform:translateY(-1px);box-shadow:0 4px 18px rgba(5,150,105,.3)}
+.btn-download{background:var(--surface);color:var(--green);border:1px solid var(--border)}
+.btn-download:hover{background:var(--green-light);border-color:var(--green)}
+.btn-row{display:flex;flex-wrap:wrap;gap:9px;margin-top:16px}
+
+/* ── CANVAS ── */
+#triCanvas{width:100%;display:block;border-radius:10px;background:#f0fdfa;border:1px solid var(--border);cursor:grab}
+#triCanvas:active{cursor:grabbing}
+
+/* ── ZOOM ── */
+.zoom-bar{display:flex;align-items:center;gap:8px;margin-top:8px}
+.zoom-bar .zbtn{width:32px;height:32px;display:flex;align-items:center;justify-content:center;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--green);font-size:1.1rem;font-weight:700;cursor:pointer;transition:all .15s;font-family:"Roboto Mono",monospace}
+.zoom-bar .zbtn:hover{border-color:var(--green);background:var(--green-light);color:var(--green-dark)}
+.zoom-info{font-size:.7rem;color:var(--gray-muted);font-family:"Roboto Mono",monospace;margin-left:auto}
+
+/* ── RESULTS ── */
+.rbox-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-top:10px}
+.rbox{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;position:relative;overflow:hidden;transition:box-shadow .2s}
+.rbox:hover{box-shadow:0 2px 12px rgba(0,0,0,.06)}
+.rbox::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:var(--ba,var(--green))}
+.rbox .rl{font-size:.62rem;color:var(--gray-muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:5px;font-weight:600}
+.rbox .rv{font-family:"Roboto Mono",monospace;font-size:1.1rem;color:var(--text);font-weight:600}
+.rbox .ru{font-size:.62rem;color:var(--gray-muted);margin-top:3px}
+
+/* ── EQ BOX (Reference Panel) ── */
+.eq-card{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--green);border-radius:2px 10px 10px 2px;padding:14px 16px;margin-bottom:10px;transition:box-shadow .2s}
+.eq-card:hover{box-shadow:0 2px 10px rgba(5,150,105,.08)}
+.eq-label{font-family:"Poppins",sans-serif;font-size:.68rem;font-weight:600;color:var(--gray-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.eq-label svg{width:14px;height:14px;stroke:var(--green);fill:none;stroke-width:2}
+.eq-formula{font-family:"Roboto Mono",monospace;font-size:.88rem;color:var(--green-dark);font-weight:500;line-height:1.6;word-break:break-all}
+
+/* ── TRIANGLE DIAGRAM ── */
+.tri-diagram{text-align:center;padding:16px 8px;margin:14px 0;background:var(--surface);border-radius:10px;border:1px solid var(--border)}
+.tri-diagram svg{max-width:100%}
+
+/* ── STEP BY STEP ── */
+.step{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:10px;font-size:.82rem;line-height:1.6;color:var(--text-light)}
+.step-num{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:var(--green-light);color:var(--green);font-family:"Poppins",sans-serif;font-size:.72rem;font-weight:700;margin-right:8px;flex-shrink:0}
+.step-title{color:var(--green);font-family:"Poppins",sans-serif;font-weight:600;font-size:.75rem;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;display:flex;align-items:center}
+.step-math{font-family:"Roboto Mono",monospace;color:var(--green-dark);font-size:.78rem;margin:4px 0;padding:6px 10px;background:rgba(5,150,105,.05);border:1px solid rgba(5,150,105,.12);border-radius:6px;display:block;word-break:break-all}
+
+/* ── TABLE ── */
+.tw{overflow-x:auto;margin-top:8px}
+table{width:100%;border-collapse:collapse;font-size:.8rem}
+thead th{background:var(--green-light);color:var(--green-dark);text-transform:uppercase;letter-spacing:1px;padding:10px 12px;text-align:center;font-family:"Poppins",sans-serif;font-size:.68rem;font-weight:600;border-bottom:2px solid rgba(5,150,105,.2)}
+tbody td{padding:8px 12px;text-align:center;border-bottom:1px solid var(--border);font-family:"Roboto Mono",monospace;font-size:.78rem;color:var(--text-light)}
+tbody tr:hover{background:rgba(5,150,105,.03)}
+.tc{width:10px;height:10px;border-radius:50%;display:inline-block}
+
+.right-panel{display:flex;flex-direction:column;gap:18px}
+.ref-panel{display:flex;flex-direction:column;gap:18px}
+.badge{display:inline-block;font-family:"Roboto Mono",monospace;font-size:.65rem;font-weight:500;letter-spacing:.5px;padding:3px 10px;border-radius:20px;background:var(--green-light);color:var(--green-dark);border:1px solid rgba(5,150,105,.2)}
+
+/* ── MODE TOGGLE ── */
+.mode-toggle{display:flex;gap:0;border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:14px;background:var(--surface)}
+.mode-toggle button{flex:1;background:transparent;color:var(--gray-muted);border:none;padding:9px 10px;font-family:"Inter",sans-serif;font-size:.72rem;font-weight:600;letter-spacing:.3px;cursor:pointer;transition:all .2s;text-transform:uppercase}
+.mode-toggle button.active{background:var(--green-light);color:var(--green-dark);box-shadow:inset 0 -2px 0 var(--green)}
+.mode-toggle button:hover:not(.active){background:rgba(5,150,105,.04)}
+
+.info-note{font-family:"Roboto",sans-serif;font-size:.72rem;color:var(--gray);background:rgba(5,150,105,.04);border:1px solid rgba(5,150,105,.15);border-radius:8px;padding:10px 12px;margin-bottom:12px;line-height:1.55}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--green)}
+
+/* ── REF PANEL SPECIFICS ── */
+.ref-section-title{font-family:"Poppins",sans-serif;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--teal);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.ref-section-title svg{width:16px;height:16px;stroke:var(--teal);fill:none;stroke-width:2}
+.ref-note{font-size:.72rem;color:var(--gray);line-height:1.5;padding:8px 0}
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px){
+  header{padding:0 16px;min-height:60px}
+  .header-title h1{font-size:1rem}
+  main{padding:16px 12px 40px}
+  .card{padding:16px 14px}
+  .btn{padding:9px 14px;font-size:.75rem}
+  .rbox-grid{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-icon">
+    <svg viewBox="0 0 24 24"><path d="M12 2L2 22h20L12 2z"/><circle cx="12" cy="15" r="1.5" fill="#fff" stroke="none"/><line x1="12" y1="8" x2="12" y2="12"/></svg>
+  </div>
+  <div class="header-title">
+    <h1>Fuerza Resultante mediante <span>Ley de Senos y Cosenos</span></h1>
+    <p>Estática · Triángulo de Fuerzas · Método Cabeza-Cola</p>
+  </div>
+</header>
+
+<main>
+
+<!-- ══════════════════════════════════════ -->
+<!-- LEFT PANEL — Controls                 -->
+<!-- ══════════════════════════════════════ -->
+<div style="display:flex;flex-direction:column;gap:18px">
+
+  <!-- CONFIG -->
+  <div class="card">
+    <div class="card-title">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+      Configuración
+    </div>
+    <div class="form-row g2">
+      <div>
+        <label>Sistema de Unidades</label>
+        <select id="sysUnits">
+          <option value="SI">Internacional (SI)</option>
+          <option value="ING">Inglés (US)</option>
+        </select>
+      </div>
+      <div>
+        <label>Unidad de Fuerza</label>
+        <select id="forceUnit">
+          <option value="N">Newton (N)</option>
+          <option value="kN">Kilonewton (kN)</option>
+          <option value="MN">Meganewton (MN)</option>
+          <option value="kgf">Kilogramo-fuerza (kgf)</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <label>Modo de Entrada</label>
+      <div class="mode-toggle">
+        <button id="btn-mode-vec" class="active" onclick="setMode('vectors')">Vectores (Mag + θ)</button>
+        <button id="btn-mode-tri" onclick="setMode('triangle')">Fuerzas + Ángulo</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- INPUT -->
+  <div class="card">
+    <div class="card-title">
+      <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
+      Datos de Fuerzas
+    </div>
+
+    <!-- VECTOR MODE INPUTS -->
+    <div id="input-vectors">
+      <div class="force-block">
+        <div class="force-head">
+          <div class="fdot" style="background:var(--teal);box-shadow:0 0 6px var(--teal)"></div>
+          <span class="fname" style="color:var(--teal)">F₁</span>
+          <span class="fhint" id="hint-f1">[N] / [°]</span>
+        </div>
+        <div class="g2">
+          <div><label>Magnitud</label><input type="number" id="f1mag" placeholder="ej. 500" min="0" step="any"></div>
+          <div><label>Ángulo θ₁ (°)</label><input type="number" id="f1ang" placeholder="ej. 40" step="any"></div>
+        </div>
+      </div>
+      <div class="force-block">
+        <div class="force-head">
+          <div class="fdot" style="background:#d97706;box-shadow:0 0 6px #d97706"></div>
+          <span class="fname" style="color:#d97706">F₂</span>
+          <span class="fhint" id="hint-f2">[N] / [°]</span>
+        </div>
+        <div class="g2">
+          <div><label>Magnitud</label><input type="number" id="f2mag" placeholder="ej. 700" min="0" step="any"></div>
+          <div><label>Ángulo θ₂ (°)</label><input type="number" id="f2ang" placeholder="ej. 120" step="any"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TRIANGLE MODE INPUTS -->
+    <div id="input-triangle" style="display:none">
+      <div class="force-block">
+        <div class="force-head">
+          <div class="fdot" style="background:var(--teal);box-shadow:0 0 6px var(--teal)"></div>
+          <span class="fname" style="color:var(--teal)">F₁</span>
+          <span class="fhint" id="hint-tf1">[N]</span>
+        </div>
+        <div><label>Magnitud de F₁</label><input type="number" id="tf1mag" placeholder="ej. 500" min="0" step="any"></div>
+      </div>
+      <div class="force-block">
+        <div class="force-head">
+          <div class="fdot" style="background:#d97706;box-shadow:0 0 6px #d97706"></div>
+          <span class="fname" style="color:#d97706">F₂</span>
+          <span class="fhint" id="hint-tf2">[N]</span>
+        </div>
+        <div><label>Magnitud de F₂</label><input type="number" id="tf2mag" placeholder="ej. 700" min="0" step="any"></div>
+      </div>
+      <div class="force-block">
+        <div class="force-head">
+          <div class="fdot" style="background:var(--green);box-shadow:0 0 6px var(--green)"></div>
+          <span class="fname" style="color:var(--green)">Ángulo entre F₁ y F₂</span>
+        </div>
+        <div class="g2">
+          <div><label>Ángulo (°)</label><input type="number" id="tAngle" placeholder="ej. 80" min="0" max="360" step="any"></div>
+          <div><label>Orientación de F₁ (°)</label><input type="number" id="tF1dir" placeholder="0 = +x" value="0" step="any"></div>
+        </div>
+        <div class="info-note" style="margin-top:8px">El ángulo es el que forman las dos fuerzas en el punto de concurrencia. La orientación de F₁ ubica el triángulo en el plano.</div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="calculate()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        Calcular
+      </button>
+      <button class="btn btn-graph" onclick="plotOnly()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/></svg>
+        Graficar
+      </button>
+      <button class="btn btn-download" onclick="downloadProcedimiento()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        Procedimiento
+      </button>
+      <button class="btn btn-danger" onclick="clearAll()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+        Borrar
+      </button>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════ -->
+<!-- CENTER PANEL — Canvas + Table         -->
+<!-- ══════════════════════════════════════ -->
+<div class="right-panel">
+
+  <!-- CANVAS -->
+  <div class="card">
+    <div class="card-title" style="justify-content:space-between">
+      <span style="display:flex;align-items:center;gap:10px">
+        <svg viewBox="0 0 24 24"><polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2"/><line x1="12" y1="22" x2="12" y2="15.5"/><polyline points="22 8.5 12 15.5 2 8.5"/></svg>
+        Triángulo de Fuerzas
+      </span>
+      <span class="badge" id="sys-badge">SI — N</span>
+    </div>
+    <canvas id="triCanvas" width="800" height="500"></canvas>
+    <div class="zoom-bar">
+      <div class="zbtn" onclick="zoomIn()" title="Acercar">+</div>
+      <div class="zbtn" onclick="zoomOut()" title="Alejar">−</div>
+      <div class="zbtn" onclick="resetView()" title="Restablecer vista">⟲</div>
+      <span class="zoom-info" id="zoom-info">Zoom: 100%  · Scroll / pinch para zoom</span>
+    </div>
+    <div class="btn-row" style="margin-top:10px">
+      <button class="btn btn-download" onclick="downloadImage()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Descargar PNG
+      </button>
+    </div>
+  </div>
+
+  <!-- RESULTS -->
+  <div class="card" id="res-card" style="display:none">
+    <div class="card-title">
+      <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      Fuerza Resultante
+    </div>
+    <div class="rbox-grid">
+      <div class="rbox" style="--ba:var(--green)">
+        <div class="rl">|R| — Magnitud</div>
+        <div class="rv" id="res-R">—</div>
+        <div class="ru" id="u-R">—</div>
+      </div>
+      <div class="rbox" style="--ba:var(--teal)">
+        <div class="rl">θ_R — Dirección</div>
+        <div class="rv" id="res-thR">—</div>
+        <div class="ru">grados (°)</div>
+      </div>
+      <div class="rbox" style="--ba:#6366f1">
+        <div class="rl">Rx — Componente X</div>
+        <div class="rv" id="res-Rx">—</div>
+        <div class="ru" id="u-Rx">—</div>
+      </div>
+      <div class="rbox" style="--ba:#d97706">
+        <div class="rl">Ry — Componente Y</div>
+        <div class="rv" id="res-Ry">—</div>
+        <div class="ru" id="u-Ry">—</div>
+      </div>
+    </div>
+    <div class="rbox-grid" style="margin-top:10px">
+      <div class="rbox" style="--ba:var(--teal)">
+        <div class="rl">α — Áng. opuesto a F₂</div>
+        <div class="rv" id="res-alpha">—</div>
+        <div class="ru">grados (°)</div>
+      </div>
+      <div class="rbox" style="--ba:var(--green)">
+        <div class="rl">β — Áng. opuesto a R</div>
+        <div class="rv" id="res-beta">—</div>
+        <div class="ru">grados (°)</div>
+      </div>
+      <div class="rbox" style="--ba:#d97706">
+        <div class="rl">γ — Áng. opuesto a F₁</div>
+        <div class="rv" id="res-gamma">—</div>
+        <div class="ru">grados (°)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TRIANGLE SUMMARY TABLE -->
+  <div class="card" id="table-card" style="display:none">
+    <div class="card-title">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
+      Resumen del Triángulo
+    </div>
+    <div class="tw">
+      <table>
+        <thead><tr><th>Elemento</th><th>Color</th><th>Magnitud</th><th>Ángulo Opuesto</th></tr></thead>
+        <tbody id="tri-table"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════ -->
+<!-- RIGHT PANEL — Reference / Equations   -->
+<!-- ══════════════════════════════════════ -->
+<div class="ref-panel">
+
+  <!-- FUNDAMENTAL EQUATIONS -->
+  <div class="card">
+    <div class="card-title">
+      <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
+      Ecuaciones Fundamentales
+    </div>
+
+    <div class="eq-card">
+      <div class="eq-label">
+        <svg viewBox="0 0 24 24"><path d="M12 2L2 22h20L12 2z"/></svg>
+        Ley de Cosenos
+      </div>
+      <div class="eq-formula">R² = F₁² + F₂² − 2·F₁·F₂·cos(β)</div>
+    </div>
+
+    <div class="eq-card" style="border-left-color:var(--teal)">
+      <div class="eq-label">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10"/></svg>
+        Ley de Senos
+      </div>
+      <div class="eq-formula">F₁/sen(α) = F₂/sen(γ) = R/sen(β)</div>
+    </div>
+
+    <div class="eq-card" style="border-left-color:#d97706">
+      <div class="eq-label">
+        <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Suma de Ángulos
+      </div>
+      <div class="eq-formula">α + β + γ = 180°</div>
+    </div>
+
+    <div class="eq-card" style="border-left-color:#6366f1">
+      <div class="eq-label">
+        <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        Magnitud Resultante
+      </div>
+      <div class="eq-formula">R = √(Rx² + Ry²)</div>
+    </div>
+
+    <div class="eq-card" style="border-left-color:#059669">
+      <div class="eq-label">
+        <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        Dirección Resultante
+      </div>
+      <div class="eq-formula">θ_R = atan2(Ry, Rx)</div>
+    </div>
+  </div>
+
+  <!-- TRIANGLE REFERENCE -->
+  <div class="card">
+    <div class="card-title">
+      <svg viewBox="0 0 24 24"><polygon points="12 2 2 22 22 22"/></svg>
+      Referencia del Triángulo
+    </div>
+
+    <!-- SVG Diagram -->
+    <div class="tri-diagram">
+      <svg viewBox="0 0 260 180" xmlns="http://www.w3.org/2000/svg">
+        <!-- Triangle -->
+        <polygon points="30,155 230,155 150,30" fill="none" stroke="#059669" stroke-width="1.5" stroke-dasharray="4,3" opacity=".3"/>
+        <!-- Sides -->
+        <line x1="30" y1="155" x2="230" y2="155" stroke="#0891b2" stroke-width="2.5"/>
+        <line x1="230" y1="155" x2="150" y2="30" stroke="#d97706" stroke-width="2.5"/>
+        <line x1="150" y1="30" x2="30" y2="155" stroke="#059669" stroke-width="2.5" stroke-dasharray="6,4"/>
+        <!-- Arrows -->
+        <polygon points="230,155 220,150 220,160" fill="#0891b2"/>
+        <polygon points="150,30 156,42 146,42" fill="#d97706"/>
+        <polygon points="30,155 42,146 42,156" fill="#059669"/>
+        <!-- Labels -->
+        <text x="130" y="172" text-anchor="middle" font-family="Poppins,sans-serif" font-size="12" font-weight="700" fill="#0891b2">F₁</text>
+        <text x="200" y="85" text-anchor="middle" font-family="Poppins,sans-serif" font-size="12" font-weight="700" fill="#d97706">F₂</text>
+        <text x="78" y="85" text-anchor="middle" font-family="Poppins,sans-serif" font-size="12" font-weight="700" fill="#059669">R</text>
+        <!-- Vertices -->
+        <circle cx="30" cy="155" r="4" fill="#1e293b"/>
+        <circle cx="230" cy="155" r="4" fill="#0891b2"/>
+        <circle cx="150" cy="30" r="4" fill="#d97706"/>
+        <text x="20" y="148" text-anchor="middle" font-family="Roboto Mono,monospace" font-size="11" font-weight="600" fill="#1e293b">O</text>
+        <text x="244" y="160" font-family="Roboto Mono,monospace" font-size="11" font-weight="600" fill="#0891b2">A</text>
+        <text x="150" y="22" text-anchor="middle" font-family="Roboto Mono,monospace" font-size="11" font-weight="600" fill="#d97706">B</text>
+        <!-- Angle labels -->
+        <path d="M 50,155 A 20,20 0 0,0 42,140" fill="none" stroke="#0891b2" stroke-width="1.2"/>
+        <text x="58" y="140" font-family="Roboto Mono,monospace" font-size="9" fill="#0891b2">α</text>
+        <path d="M 218,148 A 14,14 0 0,0 222,137" fill="none" stroke="#059669" stroke-width="1.2"/>
+        <text x="215" y="132" font-family="Roboto Mono,monospace" font-size="9" fill="#059669">β</text>
+        <path d="M 145,45 A 14,14 0 0,0 155,46" fill="none" stroke="#d97706" stroke-width="1.2"/>
+        <text x="148" y="55" font-family="Roboto Mono,monospace" font-size="9" fill="#d97706">γ</text>
+      </svg>
+    </div>
+
+    <div style="font-size:.74rem;color:var(--gray);line-height:1.65;padding:4px 0">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+        <span style="width:14px;height:3px;background:var(--teal);border-radius:2px;flex-shrink:0"></span>
+        <span><b style="color:var(--teal)">F₁</b> → Lado del triángulo (O→A)</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+        <span style="width:14px;height:3px;background:#d97706;border-radius:2px;flex-shrink:0"></span>
+        <span><b style="color:#d97706">F₂</b> → Lado del triángulo (A→B)</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+        <span style="width:14px;height:3px;background:var(--green);border-radius:2px;flex-shrink:0;border-top:1px dashed var(--green)"></span>
+        <span><b style="color:var(--green)">R</b> → Resultante (O→B), cierre del triángulo</span>
+      </div>
+      <div style="margin-top:8px;padding:8px 10px;background:rgba(5,150,105,.04);border-radius:6px;border:1px solid rgba(5,150,105,.1)">
+        <b style="color:var(--green-dark)">α</b> opuesto a F₂ &nbsp;·&nbsp;
+        <b style="color:var(--green-dark)">β</b> opuesto a R &nbsp;·&nbsp;
+        <b style="color:var(--green-dark)">γ</b> opuesto a F₁
+      </div>
+    </div>
+  </div>
+
+
+
+</div>
+
+</main>
+
+<script>
+// ══════════════════════════════════════
+//  CONSTANTS & STATE
+// ══════════════════════════════════════
+const UNIT_OPTIONS = {
+  SI:  [
+    { value:'N',   label:'Newton (N)' },
+    { value:'kN',  label:'Kilonewton (kN)' },
+    { value:'MN',  label:'Meganewton (MN)' },
+    { value:'kgf', label:'Kilogramo-fuerza (kgf)' },
+    { value:'daN', label:'Decanewton (daN)' },
+    { value:'mN',  label:'Milinewton (mN)' }
+  ],
+  ING: [
+    { value:'lbf',  label:'Libra-fuerza (lbf)' },
+    { value:'kip',  label:'Kip (1000 lbf)' },
+    { value:'ozf',  label:'Onza-fuerza (ozf)' },
+    { value:'tonf', label:'Tonelada-fuerza US (tonf)' }
+  ]
+};
+const COL_F1 = '#0891b2', COL_F2 = '#d97706', COL_R = '#059669';
+const DEG = Math.PI / 180, RAD = 180 / Math.PI;
+
+let mode = 'vectors';
+let result = null;
+
+// Zoom & pan
+let zoomLevel = 1, panX = 0, panY = 0;
+let isPanning = false, panStartX = 0, panStartY = 0;
+
+// ══════════════════════════════════════
+//  MODE SWITCHING
+// ══════════════════════════════════════
+function setMode(m) {
+  mode = m;
+  document.getElementById('btn-mode-vec').classList.toggle('active', m==='vectors');
+  document.getElementById('btn-mode-tri').classList.toggle('active', m==='triangle');
+  document.getElementById('input-vectors').style.display = m==='vectors' ? 'block' : 'none';
+  document.getElementById('input-triangle').style.display = m==='triangle' ? 'block' : 'none';
+  updateHints();
+}
+
+function getUnit() {
+  return document.getElementById('forceUnit').value;
+}
+
+function populateForceUnits() {
+  const sys = document.getElementById('sysUnits').value;
+  const sel = document.getElementById('forceUnit');
+  const opts = UNIT_OPTIONS[sys];
+  sel.innerHTML = opts.map(o => `<option value="${o.value}">${o.label}</option>`).join('');
+  updateHints();
+}
+
+function updateHints() {
+  const u = getUnit();
+  document.getElementById('hint-f1').textContent = `[${u}] / [°]`;
+  document.getElementById('hint-f2').textContent = `[${u}] / [°]`;
+  document.getElementById('hint-tf1').textContent = `[${u}]`;
+  document.getElementById('hint-tf2').textContent = `[${u}]`;
+  document.getElementById('sys-badge').textContent = `${document.getElementById('sysUnits').value} — ${u}`;
+}
+document.getElementById('sysUnits').addEventListener('change', populateForceUnits);
+document.getElementById('forceUnit').addEventListener('change', updateHints);
+
+// ══════════════════════════════════════
+//  CANVAS SETUP
+// ══════════════════════════════════════
+const canvas = document.getElementById('triCanvas');
+const ctx = canvas.getContext('2d');
+
+function resizeCanvas() {
+  const w = Math.max(canvas.parentElement.getBoundingClientRect().width - 40, 300);
+  canvas.width = w;
+  canvas.height = Math.round(w * 0.6);
+}
+resizeCanvas();
+window.addEventListener('resize', () => { resizeCanvas(); redraw(); });
+
+// ── ZOOM & PAN ──
+canvas.addEventListener('wheel', e => {
+  e.preventDefault();
+  const rect = canvas.getBoundingClientRect();
+  const mx = (e.clientX - rect.left) * (canvas.width/rect.width);
+  const my = (e.clientY - rect.top) * (canvas.height/rect.height);
+  const oldZoom = zoomLevel;
+  const delta = e.deltaY > 0 ? 0.9 : 1.1;
+  zoomLevel = Math.max(0.15, Math.min(15, zoomLevel * delta));
+  panX = mx - (mx - panX) * (zoomLevel / oldZoom);
+  panY = my - (my - panY) * (zoomLevel / oldZoom);
+  updateZoomInfo(); redraw();
+}, {passive:false});
+
+canvas.addEventListener('mousedown', e => {
+  isPanning = true;
+  const rect = canvas.getBoundingClientRect();
+  panStartX = e.clientX - panX * (rect.width / canvas.width);
+  panStartY = e.clientY - panY * (rect.height / canvas.height);
+});
+window.addEventListener('mousemove', e => {
+  if (!isPanning) return;
+  const rect = canvas.getBoundingClientRect();
+  panX = (e.clientX - panStartX) * (canvas.width / rect.width);
+  panY = (e.clientY - panStartY) * (canvas.height / rect.height);
+  redraw();
+});
+window.addEventListener('mouseup', () => { isPanning = false; });
+
+// Touch
+canvas.addEventListener('touchstart', e => {
+  if (e.touches.length === 1) {
+    isPanning = true;
+    const rect = canvas.getBoundingClientRect();
+    const t = e.touches[0];
+    panStartX = t.clientX - panX * (rect.width / canvas.width);
+    panStartY = t.clientY - panY * (rect.height / canvas.height);
+  }
+}, {passive:true});
+canvas.addEventListener('touchmove', e => {
+  if (!isPanning || e.touches.length !== 1) return;
+  e.preventDefault();
+  const rect = canvas.getBoundingClientRect();
+  const t = e.touches[0];
+  panX = (t.clientX - panStartX) * (canvas.width / rect.width);
+  panY = (t.clientY - panStartY) * (canvas.height / rect.height);
+  redraw();
+}, {passive:false});
+canvas.addEventListener('touchend', () => { isPanning = false; });
+
+// Pinch zoom
+let lastPinchDist = 0;
+canvas.addEventListener('touchstart', e => {
+  if (e.touches.length === 2) {
+    isPanning = false;
+    const dx = e.touches[0].clientX - e.touches[1].clientX;
+    const dy = e.touches[0].clientY - e.touches[1].clientY;
+    lastPinchDist = Math.hypot(dx, dy);
+  }
+}, {passive:true});
+canvas.addEventListener('touchmove', e => {
+  if (e.touches.length === 2) {
+    e.preventDefault();
+    const dx = e.touches[0].clientX - e.touches[1].clientX;
+    const dy = e.touches[0].clientY - e.touches[1].clientY;
+    const dist = Math.hypot(dx, dy);
+    if (lastPinchDist > 0) {
+      const scale = dist / lastPinchDist;
+      zoomLevel = Math.max(0.15, Math.min(15, zoomLevel * scale));
+      updateZoomInfo(); redraw();
+    }
+    lastPinchDist = dist;
+  }
+}, {passive:false});
+canvas.addEventListener('touchend', e => {
+  if (e.touches.length < 2) lastPinchDist = 0;
+});
+
+function zoomIn()  { zoomLevel = Math.min(15, zoomLevel*1.3); updateZoomInfo(); redraw(); }
+function zoomOut() { zoomLevel = Math.max(0.15, zoomLevel/1.3); updateZoomInfo(); redraw(); }
+function resetView(){ zoomLevel=1; panX=0; panY=0; updateZoomInfo(); redraw(); }
+function updateZoomInfo() {
+  document.getElementById('zoom-info').textContent = `Zoom: ${Math.round(zoomLevel*100)}%  · Scroll / pinch para zoom`;
+}
+
+// ══════════════════════════════════════
+//  DRAWING HELPERS
+// ══════════════════════════════════════
+function worldToScreen(wx, wy) {
+  const cx = canvas.width/2 + panX;
+  const cy = canvas.height/2 + panY;
+  return [cx + wx * zoomLevel, cy - wy * zoomLevel];
+}
+
+function drawGrid() {
+  const W = canvas.width, H = canvas.height;
+  // Light background
+  ctx.fillStyle = '#f0fdfa';
+  ctx.fillRect(0, 0, W, H);
+
+  const [ox, oy] = worldToScreen(0, 0);
+  let step = 50 * zoomLevel;
+  while (step < 20) step *= 2;
+  while (step > 100) step /= 2;
+
+  // Grid lines
+  ctx.strokeStyle = 'rgba(5,150,105,0.07)'; ctx.lineWidth = 1;
+  for (let x = ox % step; x < W; x += step) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+  for (let y = oy % step; y < H; y += step) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+
+  // Axes
+  ctx.strokeStyle = 'rgba(5,150,105,0.35)'; ctx.lineWidth = 1.2;
+  ctx.beginPath(); ctx.moveTo(0,oy); ctx.lineTo(W,oy); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(ox,0); ctx.lineTo(ox,H); ctx.stroke();
+
+  ctx.font = 'bold 11px Inter,sans-serif'; ctx.fillStyle = 'rgba(5,150,105,0.5)';
+  ctx.fillText('+x', W-22, oy-6); ctx.fillText('+y', ox+6, 14);
+  ctx.fillText('O', ox+5, oy+14);
+
+  // Scale bar
+  const refLen = step;
+  const refVal = (refLen / zoomLevel).toFixed(0);
+  ctx.strokeStyle = 'rgba(5,150,105,0.2)'; ctx.lineWidth = 1;
+  const rx = 12, ry = H - 16;
+  ctx.beginPath(); ctx.moveTo(rx,ry); ctx.lineTo(rx+refLen,ry); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(rx,ry-3); ctx.lineTo(rx,ry+3); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(rx+refLen,ry-3); ctx.lineTo(rx+refLen,ry+3); ctx.stroke();
+  ctx.fillStyle = 'rgba(5,150,105,0.35)'; ctx.font = '10px Roboto Mono,monospace';
+  ctx.fillText(refVal, rx+refLen/2-8, ry-5);
+}
+
+function arrow(x1,y1,x2,y2,color,lbl,lw=2.5,dashed=false) {
+  const len = Math.hypot(x2-x1,y2-y1); if (len < 2) return;
+  const a = Math.atan2(y2-y1,x2-x1), hw = Math.min(14, len*.2);
+  ctx.save(); ctx.strokeStyle=color; ctx.fillStyle=color; ctx.lineWidth=lw;
+  ctx.shadowColor=color; ctx.shadowBlur=6;
+  if (dashed) { ctx.setLineDash([7,5]); ctx.shadowBlur=3; }
+  ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.beginPath(); ctx.moveTo(x2,y2);
+  ctx.lineTo(x2-hw*Math.cos(a-.35), y2-hw*Math.sin(a-.35));
+  ctx.lineTo(x2-hw*Math.cos(a+.35), y2-hw*Math.sin(a+.35));
+  ctx.closePath(); ctx.fill();
+  if (lbl) {
+    ctx.shadowBlur=0; ctx.font='bold 13px Inter,sans-serif'; ctx.fillStyle=color;
+    const offX = 14*Math.cos(a - Math.PI/2);
+    const offY = 14*Math.sin(a - Math.PI/2);
+    ctx.fillText(lbl, (x1+x2)/2 + offX, (y1+y2)/2 + offY);
+  }
+  ctx.restore();
+}
+
+function drawAngleArc(cx, cy, fromRad, toRad, radius, color, label) {
+  ctx.save();
+  const sA = -fromRad, eA = -toRad;
+  const ccw = toRad > fromRad;
+  ctx.strokeStyle = color; ctx.lineWidth = 1.5; ctx.globalAlpha = 0.7;
+  ctx.beginPath(); ctx.arc(cx, cy, radius, sA, eA, ccw); ctx.stroke();
+  const midA = -(fromRad + toRad) / 2;
+  const lx = cx + (radius + 14) * Math.cos(midA);
+  const ly = cy + (radius + 14) * Math.sin(midA);
+  ctx.globalAlpha = 0.95; ctx.fillStyle = color;
+  ctx.font = 'bold 11px Roboto Mono,monospace';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(label, lx, ly);
+  ctx.restore();
+}
+
+function drawDot(sx, sy, color, label, offsetX=8, offsetY=-10) {
+  ctx.save();
+  ctx.fillStyle = color; ctx.shadowColor = color; ctx.shadowBlur = 8;
+  ctx.beginPath(); ctx.arc(sx, sy, 5, 0, Math.PI*2); ctx.fill();
+  ctx.shadowBlur = 0; ctx.fillStyle = color;
+  ctx.font = 'bold 12px Inter,sans-serif';
+  ctx.fillText(label, sx+offsetX, sy+offsetY);
+  ctx.restore();
+}
+
+// ══════════════════════════════════════
+//  CORE COMPUTATION
+// ══════════════════════════════════════
+function readInputs() {
+  const u = getUnit();
+  if (mode === 'vectors') {
+    const F1 = parseFloat(document.getElementById('f1mag').value);
+    const F2 = parseFloat(document.getElementById('f2mag').value);
+    const th1 = parseFloat(document.getElementById('f1ang').value);
+    const th2 = parseFloat(document.getElementById('f2ang').value);
+    if ([F1,F2,th1,th2].some(isNaN) || F1 <= 0 || F2 <= 0) return null;
+    return { mode:'vectors', F1, F2, th1, th2, unit:u };
+  } else {
+    const F1 = parseFloat(document.getElementById('tf1mag').value);
+    const F2 = parseFloat(document.getElementById('tf2mag').value);
+    const angleBetween = parseFloat(document.getElementById('tAngle').value);
+    const f1dir = parseFloat(document.getElementById('tF1dir').value) || 0;
+    if ([F1,F2,angleBetween].some(isNaN) || F1 <= 0 || F2 <= 0 || angleBetween <= 0 || angleBetween >= 360) return null;
+    const th1 = f1dir;
+    const th2 = f1dir + angleBetween;
+    return { mode:'triangle', F1, F2, th1, th2, angleBetween, unit:u };
+  }
+}
+
+function solve(inp) {
+  const { F1, F2, th1, th2, unit } = inp;
+  const th1r = th1 * DEG, th2r = th2 * DEG;
+
+  const F1x = F1 * Math.cos(th1r), F1y = F1 * Math.sin(th1r);
+  const F2x = F2 * Math.cos(th2r), F2y = F2 * Math.sin(th2r);
+  const Rx = F1x + F2x, Ry = F1y + F2y;
+  const R = Math.hypot(Rx, Ry);
+  const thR = ((Math.atan2(Ry, Rx) * RAD) + 360) % 360;
+
+  let deltaTheta = Math.abs(th2 - th1) % 360;
+  if (deltaTheta > 180) deltaTheta = 360 - deltaTheta;
+  
+  const beta = 180 - deltaTheta;
+
+  let alpha, gamma;
+  if (R > 1e-10) {
+    const sinAlpha = Math.min(1, F2 * Math.sin(beta * DEG) / R);
+    alpha = Math.asin(sinAlpha) * RAD;
+    gamma = 180 - alpha - beta;
+    if (gamma < 0) {
+      alpha = 180 - alpha;
+      gamma = 180 - alpha - beta;
+    }
+  } else {
+    alpha = 0; gamma = 0;
+  }
+
+  return {
+    F1, F2, R, th1, th2, thR, Rx, Ry,
+    F1x, F1y, F2x, F2y,
+    alpha, beta, gamma, deltaTheta,
+    unit,
+    angleBetween: inp.angleBetween || deltaTheta
+  };
+}
+
+// ══════════════════════════════════════
+//  DRAWING THE TRIANGLE
+// ══════════════════════════════════════
+function drawTriangle(res, showResult) {
+  drawGrid();
+  if (!res) return;
+
+  const { F1, F2, R, th1, th2, thR } = res;
+  const th1r = th1*DEG, th2r = th2*DEG;
+
+  const maxDim = Math.max(F1, F2, R || 1);
+  const fitPx = Math.min(canvas.width, canvas.height) * 0.32;
+  const sc = fitPx / maxDim;
+
+  const Ox = 0, Oy = 0;
+  const Ax = F1 * Math.cos(th1r) * sc / zoomLevel;
+  const Ay = F1 * Math.sin(th1r) * sc / zoomLevel;
+  const Bx = (F1*Math.cos(th1r) + F2*Math.cos(th2r)) * sc / zoomLevel;
+  const By = (F1*Math.sin(th1r) + F2*Math.sin(th2r)) * sc / zoomLevel;
+
+  const [sOx, sOy] = worldToScreen(Ox, Oy);
+  const [sAx, sAy] = worldToScreen(Ax, Ay);
+  const [sBx, sBy] = worldToScreen(Bx, By);
+
+  arrow(sOx, sOy, sAx, sAy, COL_F1, `F₁ = ${F1.toFixed(2)}`, 2.8);
+  arrow(sAx, sAy, sBx, sBy, COL_F2, `F₂ = ${F2.toFixed(2)}`, 2.8);
+
+  if (showResult && R > 1e-6) {
+    arrow(sOx, sOy, sBx, sBy, COL_R, `R = ${R.toFixed(2)}`, 3.2, true);
+  }
+
+  if (showResult && R > 1e-6) {
+    const arcR = Math.min(35, Math.hypot(sAx-sOx, sAy-sOy)*0.2) * Math.sqrt(zoomLevel);
+    const arcR2 = Math.min(35, Math.hypot(sBx-sAx, sBy-sAy)*0.2) * Math.sqrt(zoomLevel);
+    const arcR3 = Math.min(35, Math.hypot(sBx-sOx, sBy-sOy)*0.2) * Math.sqrt(zoomLevel);
+
+    const thRr = Math.atan2(By-Oy, Bx-Ox);
+    const th1rr = Math.atan2(Ay-Oy, Ax-Ox);
+    const fromA = Math.min(th1rr, thRr), toA = Math.max(th1rr, thRr);
+    if (Math.abs(res.alpha) > 0.01) {
+      drawAngleArc(sOx, sOy, fromA, toA, arcR, COL_F1, `α=${res.alpha.toFixed(1)}°`);
+    }
+
+    const revF1 = Math.atan2(-Ay, -Ax);
+    const f2dir = Math.atan2(By-Ay, Bx-Ax);
+    let betaFrom = f2dir, betaTo = revF1;
+    let betaSpan = ((revF1 - f2dir) + 2*Math.PI) % (2*Math.PI);
+    if (betaSpan > Math.PI) { betaFrom = revF1; betaTo = f2dir; }
+    if (Math.abs(res.beta) > 0.01) {
+      drawAngleArc(sAx, sAy, betaFrom, betaTo, arcR2, COL_R, `β=${res.beta.toFixed(1)}°`);
+    }
+
+    const revF2 = Math.atan2(Ay-By, Ax-Bx);
+    const revR  = Math.atan2(Oy-By, Ox-Bx);
+    let gammaFrom = revR, gammaTo = revF2;
+    let gammaSpan = ((revF2 - revR) + 2*Math.PI) % (2*Math.PI);
+    if (gammaSpan > Math.PI) { gammaFrom = revF2; gammaTo = revR; }
+    if (Math.abs(res.gamma) > 0.01) {
+      drawAngleArc(sBx, sBy, gammaFrom, gammaTo, arcR3, COL_F2, `γ=${res.gamma.toFixed(1)}°`);
+    }
+  }
+
+  drawDot(sOx, sOy, '#1e293b', 'O (Origen)', 8, -10);
+  drawDot(sAx, sAy, COL_F1, 'A', 8, -10);
+  drawDot(sBx, sBy, COL_F2, 'B', 8, -10);
+
+  if (Math.abs(th1 % 360) > 0.01) {
+    const arcSmall = 22 * Math.sqrt(zoomLevel);
+    drawAngleArc(sOx, sOy, 0, th1*DEG, arcSmall, 'rgba(8,145,178,0.4)', `${th1.toFixed(1)}°`);
+  }
+
+  drawLegend(res, showResult);
+}
+
+function drawLegend(res, showResult) {
+  const items = [
+    { color:COL_F1, label:`F₁ = ${res.F1.toFixed(2)} ${res.unit}  θ₁ = ${res.th1.toFixed(1)}°` },
+    { color:COL_F2, label:`F₂ = ${res.F2.toFixed(2)} ${res.unit}  θ₂ = ${res.th2.toFixed(1)}°` }
+  ];
+  if (showResult) {
+    items.push({ color:COL_R, label:`R  = ${res.R.toFixed(2)} ${res.unit}  θR = ${res.thR.toFixed(1)}°` });
+  }
+  const lh=20, pad=10, w=260;
+  const h = items.length*lh+18, x = canvas.width-w-8, y = 8;
+  ctx.save();
+  ctx.fillStyle='rgba(255,255,255,0.92)'; ctx.strokeStyle='rgba(5,150,105,0.2)'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.roundRect(x,y,w,h,7); ctx.fill(); ctx.stroke();
+  items.forEach((it, i) => {
+    const ry = y+pad+i*lh;
+    ctx.strokeStyle=it.color; ctx.lineWidth=2.5; ctx.shadowColor=it.color; ctx.shadowBlur=4;
+    ctx.beginPath(); ctx.moveTo(x+8,ry+6); ctx.lineTo(x+30,ry+6); ctx.stroke();
+    ctx.shadowBlur=0; ctx.fillStyle='#1e293b'; ctx.font='11px Roboto Mono,monospace';
+    ctx.fillText(it.label, x+36, ry+10);
+  });
+  ctx.restore();
+}
+
+// ══════════════════════════════════════
+//  REDRAW
+// ══════════════════════════════════════
+function redraw() {
+  if (result) {
+    drawTriangle(result, result._showResult || false);
+  } else {
+    drawGrid();
+  }
+}
+
+function clearCanvas() {
+  ctx.fillStyle = '#f0fdfa';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  drawGrid();
+}
+
+// ══════════════════════════════════════
+//  CALCULATE & DISPLAY
+// ══════════════════════════════════════
+function plotOnly() {
+  const inp = readInputs();
+  if (!inp) { alert('Ingresa magnitudes positivas y ángulos válidos para ambas fuerzas.'); return; }
+  result = solve(inp);
+  result._showResult = false;
+  drawTriangle(result, false);
+}
+
+function calculate() {
+  const inp = readInputs();
+  if (!inp) { alert('Ingresa magnitudes positivas y ángulos válidos para ambas fuerzas.'); return; }
+  result = solve(inp);
+  result._showResult = true;
+  drawTriangle(result, true);
+  showResults(result);
+  showTable(result);
+}
+
+function showResults(r) {
+  document.getElementById('res-card').style.display = 'block';
+  document.getElementById('res-R').textContent = r.R.toFixed(4);
+  document.getElementById('res-thR').textContent = r.thR.toFixed(2) + '°';
+  document.getElementById('res-Rx').textContent = r.Rx.toFixed(4);
+  document.getElementById('res-Ry').textContent = r.Ry.toFixed(4);
+  document.getElementById('res-alpha').textContent = r.alpha.toFixed(2) + '°';
+  document.getElementById('res-beta').textContent = r.beta.toFixed(2) + '°';
+  document.getElementById('res-gamma').textContent = r.gamma.toFixed(2) + '°';
+  ['u-R','u-Rx','u-Ry'].forEach(id => document.getElementById(id).textContent = r.unit);
+}
+
+function showTable(r) {
+  document.getElementById('table-card').style.display = 'block';
+  const rows = `
+    <tr>
+      <td style="color:${COL_F1};font-weight:700">F₁ (lado c)</td>
+      <td><span class="tc" style="background:${COL_F1};box-shadow:0 0 5px ${COL_F1}"></span></td>
+      <td>${r.F1.toFixed(4)} ${r.unit}</td>
+      <td>γ = ${r.gamma.toFixed(2)}°</td>
+    </tr>
+    <tr>
+      <td style="color:${COL_F2};font-weight:700">F₂ (lado a)</td>
+      <td><span class="tc" style="background:${COL_F2};box-shadow:0 0 5px ${COL_F2}"></span></td>
+      <td>${r.F2.toFixed(4)} ${r.unit}</td>
+      <td>α = ${r.alpha.toFixed(2)}°</td>
+    </tr>
+    <tr style="background:rgba(5,150,105,.06);font-weight:700">
+      <td style="color:${COL_R}">R (lado b)</td>
+      <td><span class="tc" style="background:${COL_R};box-shadow:0 0 5px ${COL_R}"></span></td>
+      <td>${r.R.toFixed(4)} ${r.unit}</td>
+      <td>β = ${r.beta.toFixed(2)}°</td>
+    </tr>
+    <tr style="background:rgba(5,150,105,.04)">
+      <td colspan="2" style="color:var(--green);font-weight:700">Verificación Σ ángulos</td>
+      <td colspan="2" style="color:var(--green)">${(r.alpha+r.beta+r.gamma).toFixed(2)}° ✓</td>
+    </tr>`;
+  document.getElementById('tri-table').innerHTML = rows;
+}
+
+function clearAll() {
+  result = null;
+  document.querySelectorAll('input[type=number]').forEach(el => { if (el.id !== 'tF1dir') el.value = ''; });
+  document.getElementById('res-card').style.display = 'none';
+  document.getElementById('table-card').style.display = 'none';
+  zoomLevel=1; panX=0; panY=0; updateZoomInfo();
+  clearCanvas();
+}
+
+function downloadImage() {
+  const offscreen = document.createElement('canvas');
+  offscreen.width = canvas.width; offscreen.height = canvas.height;
+  const octx = offscreen.getContext('2d');
+  octx.fillStyle = '#f0fdfa'; octx.fillRect(0,0,offscreen.width,offscreen.height);
+  octx.drawImage(canvas, 0, 0);
+  octx.save(); octx.fillStyle = 'rgba(5,150,105,0.3)';
+  octx.font = 'bold 12px Inter,sans-serif';
+  octx.fillText('Fuerza Resultante — Ley de Senos y Cosenos', 12, offscreen.height-10);
+  octx.restore();
+  const a = document.createElement('a');
+  a.href = offscreen.toDataURL('image/png');
+  a.download = 'Triangulo_Fuerzas_Senos_Cosenos.png';
+  a.click();
+}
+
+function downloadProcedimiento() {
+  if (!result) { alert('Primero calcula la fuerza resultante para generar el procedimiento.'); return; }
+  const r = result;
+  const p = (n) => n.toFixed(4);
+  const p2 = (n) => n.toFixed(2);
+  const F1sq = r.F1*r.F1, F2sq = r.F2*r.F2;
+  const twoF1F2cosB = 2*r.F1*r.F2*Math.cos(r.beta*DEG);
+  const Rsq = F1sq + F2sq - twoF1F2cosB;
+  const sinBeta = Math.sin(r.beta * DEG);
+  const sinAlpha = r.F2 * sinBeta / r.R;
+  const sep = '═'.repeat(56);
+  const sep2 = '─'.repeat(56);
+
+  let txt = `${sep}
+  FUERZA RESULTANTE — LEY DE SENOS Y COSENOS
+  Procedimiento Paso a Paso
+${sep}
+
+PASO 1: IDENTIFICACIÓN DEL PROBLEMA
+${sep2}
+Se tienen dos fuerzas concurrentes:
+  F₁ = ${p(r.F1)} ${r.unit}   con dirección θ₁ = ${p2(r.th1)}°
+  F₂ = ${p(r.F2)} ${r.unit}   con dirección θ₂ = ${p2(r.th2)}°
+
+Se busca la fuerza resultante R usando el método
+del triángulo (cabeza-cola).
+
+PASO 2: ÁNGULO ENTRE LAS FUERZAS
+${sep2}
+Δθ = |θ₂ − θ₁| = |${p2(r.th2)} − ${p2(r.th1)}| = ${p2(r.deltaTheta)}°
+
+Ángulo interior del triángulo opuesto a R (vértice A):
+  β = 180° − Δθ = 180° − ${p2(r.deltaTheta)}° = ${p2(r.beta)}°
+
+PASO 3: LEY DE COSENOS → MAGNITUD DE R
+${sep2}
+R² = F₁² + F₂² − 2·F₁·F₂·cos(β)
+R² = (${p(r.F1)})² + (${p(r.F2)})² − 2(${p(r.F1)})(${p(r.F2)})cos(${p2(r.beta)}°)
+R² = ${p(F1sq)} + ${p(F2sq)} − ${p(twoF1F2cosB)}
+R² = ${p(Rsq)}
+
+  ► R = √${p(Rsq)} = ${p(r.R)} ${r.unit}
+
+PASO 4: LEY DE SENOS → ÁNGULOS DEL TRIÁNGULO
+${sep2}
+F₂ / sen(α) = R / sen(β)
+sen(α) = F₂ · sen(β) / R
+sen(α) = (${p(r.F2)}) · sen(${p2(r.beta)}°) / ${p(r.R)}
+sen(α) = (${p(r.F2)})(${p(sinBeta)}) / ${p(r.R)} = ${p(Math.min(1,sinAlpha))}
+
+  ► α = arcsen(${p(Math.min(1,sinAlpha))}) = ${p2(r.alpha)}°
+
+Tercer ángulo por suma:
+  ► γ = 180° − α − β = 180° − ${p2(r.alpha)}° − ${p2(r.beta)}° = ${p2(r.gamma)}°
+
+PASO 5: DIRECCIÓN DE LA RESULTANTE
+${sep2}
+Rx = F₁·cos(θ₁) + F₂·cos(θ₂) = ${p(r.F1x)} + ${p(r.F2x)} = ${p(r.Rx)} ${r.unit}
+Ry = F₁·sen(θ₁) + F₂·sen(θ₂) = ${p(r.F1y)} + ${p(r.F2y)} = ${p(r.Ry)} ${r.unit}
+
+  ► θ_R = atan2(Ry, Rx) = atan2(${p(r.Ry)}, ${p(r.Rx)}) = ${p2(r.thR)}°
+
+VERIFICACIÓN
+${sep2}
+α + β + γ = ${p2(r.alpha)}° + ${p2(r.beta)}° + ${p2(r.gamma)}° = ${p2(r.alpha+r.beta+r.gamma)}°  ✓
+R (ley cosenos) = ${p(Math.sqrt(F1sq+F2sq-twoF1F2cosB))} ${r.unit}  ✓
+R (componentes) = √(${p(r.Rx)}² + ${p(r.Ry)}²) = ${p(Math.hypot(r.Rx,r.Ry))} ${r.unit}  ✓
+
+${sep}
+  RESULTADOS FINALES
+${sep}
+  |R|  = ${p(r.R)} ${r.unit}
+  θ_R  = ${p2(r.thR)}°
+  Rx   = ${p(r.Rx)} ${r.unit}
+  Ry   = ${p(r.Ry)} ${r.unit}
+  α    = ${p2(r.alpha)}°  (opuesto a F₂)
+  β    = ${p2(r.beta)}°  (opuesto a R)
+  γ    = ${p2(r.gamma)}°  (opuesto a F₁)
+${sep}
+`;
+
+  const blob = new Blob([txt], { type:'text/plain;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'Procedimiento_Fuerza_Resultante.txt';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+// ══════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════
+clearCanvas();
+populateForceUnits();
+updateHints();
+</script>
+</body>
+</html>

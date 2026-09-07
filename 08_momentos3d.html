@@ -1,0 +1,1394 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Momentos en 3D — Estática</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@500;600;700&family=Roboto:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+:root{
+  --green:#059669;--green-light:#10b981;--green-dark:#047857;
+  --teal:#0891b2;--teal-light:#22d3ee;--teal-dark:#0e7490;
+  --gray:#555;--gray-light:#9ca3af;--gray-lighter:#e5e7eb;--gray-bg:#f9fafb;
+  --white:#ffffff;--black:#111827;
+  --surface:#ffffff;--surface2:#f8fafb;--surface3:#f1f5f4;
+  --text:#1f2937;--text2:#6b7280;--text3:#9ca3af;
+  --border:#d1d5db;--border-light:#e5e7eb;--border-green:rgba(5,150,105,.25);
+  --gold:#d97706;--gold-light:#fffbeb;--red:#dc2626;--purple:#7c3aed;
+  --radius:10px;--radius2:14px;
+  --shadow:0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+  --shadow-md:0 4px 12px rgba(0,0,0,.07), 0 2px 4px rgba(0,0,0,.04);
+  --shadow-lg:0 10px 25px rgba(0,0,0,.08), 0 4px 10px rgba(0,0,0,.04);
+  --grad:linear-gradient(135deg, var(--green) 0%, var(--teal) 100%);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--gray-bg);color:var(--text);font-family:'Roboto',sans-serif;font-size:15px;min-height:100vh;overflow-x:hidden;}
+
+/* ── HEADER ── */
+header{
+  background:var(--white);
+  border-bottom:1px solid var(--border-light);
+  padding:0 28px;
+  display:flex;align-items:center;justify-content:space-between;height:60px;
+  box-shadow:var(--shadow);position:relative;z-index:10;
+}
+.hd-brand{display:flex;align-items:center;gap:10px;}
+.hd-icon{
+  width:36px;height:36px;border-radius:10px;
+  background:var(--grad);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 2px 8px rgba(5,150,105,.25);
+}
+.hd-icon svg{width:20px;height:20px;color:#fff;}
+.hd-title{font-family:'Poppins',sans-serif;font-size:17px;font-weight:700;color:var(--black);letter-spacing:-.3px;}
+.hd-subtitle{font-family:'Roboto',sans-serif;font-size:12px;color:var(--text2);font-weight:400;margin-top:-1px;}
+.hd-badge{
+  font-family:'Inter',sans-serif;font-size:10px;font-weight:700;
+  padding:3px 10px;border-radius:20px;letter-spacing:.5px;
+  background:linear-gradient(135deg,rgba(5,150,105,.08),rgba(8,145,178,.08));
+  color:var(--green);border:1px solid var(--border-green);
+}
+
+/* ── LAYOUT ── */
+.main{display:grid;grid-template-columns:360px 1fr;gap:0;height:calc(100vh - 60px);}
+
+.panel-left{
+  background:var(--surface2);border-right:1px solid var(--border-light);
+  overflow-y:auto;padding:20px 18px;
+  box-shadow:2px 0 12px rgba(0,0,0,.03);
+}
+.panel-right-viz{background:var(--white);display:flex;flex-direction:column;overflow:hidden;}
+
+/* ── SECTIONS ── */
+.sec{margin-bottom:16px;}
+.sec-title{
+  font-family:'Inter',sans-serif;font-size:11px;font-weight:700;letter-spacing:1.2px;color:var(--green);
+  text-transform:uppercase;padding-bottom:6px;margin-bottom:10px;
+  display:flex;align-items:center;gap:8px;
+  border-bottom:1px solid var(--border-light);
+}
+.sec-title .sec-icon{width:18px;height:18px;color:var(--green);flex-shrink:0;opacity:.75;}
+
+/* ── TABS ── */
+.unit-tabs{display:flex;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:10px;background:var(--white);}
+.unit-tab{
+  flex:1;padding:8px 4px;text-align:center;
+  font-family:'Inter',sans-serif;font-weight:600;font-size:11px;letter-spacing:.3px;
+  cursor:pointer;background:var(--white);color:var(--text2);
+  transition:all .2s;border:none;outline:none;line-height:1.4;
+}
+.unit-tab:hover{background:var(--surface3);}
+.unit-tab.active{background:var(--green);color:#fff;}
+
+/* ── INPUTS ── */
+label{font-family:'Inter',sans-serif;font-size:11px;color:var(--text2);display:block;margin-bottom:3px;font-weight:500;}
+select,input[type=number]{
+  width:100%;background:var(--white);border:1px solid var(--border);border-radius:8px;
+  color:var(--text);font-family:'Roboto',sans-serif;font-size:14px;padding:7px 10px;
+  outline:none;transition:all .2s;
+}
+select:focus,input[type=number]:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(5,150,105,.1);}
+select option{background:var(--white);}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;}
+
+/* ── FORCE BLOCK ── */
+.force-block{
+  background:var(--white);border:1px solid var(--border-light);border-radius:var(--radius2);
+  padding:14px 15px;margin-bottom:10px;transition:all .25s;
+  box-shadow:var(--shadow);border-left:3px solid var(--border-light);
+}
+.force-block:hover{box-shadow:var(--shadow-md);}
+.force-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:5px;}
+.force-name{
+  font-family:'Poppins',sans-serif;font-size:15px;font-weight:700;letter-spacing:.3px;
+  display:flex;align-items:center;gap:8px;color:var(--black);
+}
+.fdot{width:10px;height:10px;border-radius:50%;flex-shrink:0;box-shadow:0 1px 3px rgba(0,0,0,.15);}
+.fblock-label{font-size:11px;color:var(--text3);margin-bottom:7px;font-weight:500;font-family:'Inter',sans-serif;}
+
+.btn-del-force{
+  background:var(--white);border:1px solid rgba(220,38,38,.25);color:var(--red);border-radius:6px;
+  font-size:11px;font-family:'Inter',sans-serif;font-weight:600;letter-spacing:.2px;
+  padding:3px 9px;cursor:pointer;transition:all .2s;white-space:nowrap;flex-shrink:0;
+}
+.btn-del-force:hover{background:rgba(220,38,38,.06);}
+
+/* ── MODE TABS (force input mode) ── */
+.mode-tabs{display:flex;background:var(--surface3);border-radius:8px;padding:2px;margin-bottom:10px;border:1px solid var(--border-light);}
+.mode-tab{
+  flex:1;padding:6px 4px;text-align:center;font-family:'Inter',sans-serif;font-weight:600;font-size:10.5px;
+  letter-spacing:.2px;cursor:pointer;background:transparent;color:var(--text3);transition:all .2s;
+  border:none;outline:none;border-radius:6px;
+}
+.mode-tab.active{background:var(--white);color:var(--green);box-shadow:var(--shadow);}
+.mode-tab:hover:not(.active){color:var(--text2);}
+
+/* ── MAG ROW ── */
+.mag-row{display:flex;align-items:center;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border-light);}
+.mag-label{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:500;color:var(--text2);white-space:nowrap;min-width:40px;}
+.mag-input-wrap{flex:1;max-width:100px;}
+.mag-input-wrap input{width:100%;}
+.mag-unit{font-size:12px;color:var(--text2);white-space:nowrap;}
+
+/* ── OPTION BOX (advanced options) ── */
+.option-box{background:var(--gold-light);border:1px solid rgba(217,119,6,.15);border-radius:var(--radius2);padding:12px 14px;margin-bottom:10px;}
+.chk-row{display:flex;align-items:center;gap:10px;margin-bottom:4px;}
+.chk-row input[type=checkbox]{accent-color:var(--green);width:16px;height:16px;flex-shrink:0;cursor:pointer;}
+.chk-label{margin:0;font-weight:700;color:var(--gold);font-family:'Inter',sans-serif;font-size:12px;letter-spacing:.3px;cursor:pointer;}
+
+/* ── PILL ── */
+.pill{font-size:9px;padding:2px 8px;border-radius:12px;font-family:'Inter',sans-serif;font-weight:700;letter-spacing:.6px;white-space:nowrap;}
+.pill-dato{background:rgba(5,150,105,.08);color:var(--green);border:1px solid var(--border-green);}
+
+/* ── INFO BAR ── */
+.info-bar{
+  background:rgba(5,150,105,.05);border:1px solid var(--border-green);border-radius:var(--radius);
+  padding:8px 12px;font-size:12px;color:var(--green-dark);margin-bottom:12px;
+  font-family:'Inter',sans-serif;font-weight:500;letter-spacing:.2px;
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+}
+.info-bar.warn{background:rgba(220,38,38,.05);border-color:rgba(220,38,38,.25);color:var(--red);}
+
+/* ── BUTTONS ── */
+.actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;}
+.btn{
+  flex:1;min-width:0;padding:10px 6px;border-radius:var(--radius);border:none;
+  font-family:'Inter',sans-serif;font-weight:700;font-size:11px;letter-spacing:.6px;
+  cursor:pointer;transition:all .2s;text-transform:uppercase;
+  display:flex;align-items:center;justify-content:center;gap:5px;
+}
+.btn-calc{background:var(--grad);color:#fff;box-shadow:0 2px 8px rgba(5,150,105,.25);}
+.btn-calc:hover{filter:brightness(1.08);box-shadow:0 4px 14px rgba(5,150,105,.3);}
+.btn-graph{background:var(--teal);color:#fff;box-shadow:0 2px 8px rgba(8,145,178,.2);}
+.btn-graph:hover{background:var(--teal-dark);}
+.btn-steps{background:var(--white);color:var(--green-dark);border:1px solid var(--border-green);}
+.btn-steps:hover{background:rgba(5,150,105,.05);}
+.btn-dl{background:var(--white);color:var(--teal-dark);border:1px solid rgba(8,145,178,.3);}
+.btn-dl:hover{background:rgba(8,145,178,.05);}
+.btn-clear{background:var(--white);color:var(--red);border:1px solid rgba(220,38,38,.25);}
+.btn-clear:hover{background:rgba(220,38,38,.04);}
+.btn-add{
+  background:var(--grad);color:#fff;width:100%;padding:11px 16px;border-radius:var(--radius);border:none;
+  font-family:'Inter',sans-serif;font-weight:700;font-size:12.5px;letter-spacing:.5px;
+  cursor:pointer;transition:all .25s;text-transform:uppercase;
+  display:flex;align-items:center;justify-content:center;gap:7px;
+  box-shadow:0 2px 8px rgba(5,150,105,.2);margin-top:2px;
+}
+.btn-add:hover{box-shadow:0 4px 16px rgba(5,150,105,.35);transform:translateY(-1px);}
+
+/* ── LEFT PANEL TABS (right viz panel) ── */
+.rtabs{display:flex;border-bottom:1px solid var(--border-light);background:var(--white);}
+.rtab{
+  padding:12px 20px;font-family:'Inter',sans-serif;font-weight:600;font-size:12px;
+  letter-spacing:.5px;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;
+  transition:all .2s;text-transform:uppercase;
+}
+.rtab:hover{color:var(--green);}
+.rtab.active{color:var(--green);border-bottom-color:var(--green);}
+
+/* ── CANVAS ── */
+.canvas-wrap{flex:1;position:relative;overflow:hidden;background:var(--surface3);}
+#panelResults{padding:22px;overflow-y:auto;flex:1;background:var(--white);}
+#panelSteps{padding:22px;overflow-y:auto;flex:1;background:var(--white);}
+
+/* ── RESULT CARDS ── */
+.result-card{
+  background:var(--white);border:1px solid var(--border-light);border-radius:var(--radius2);
+  padding:16px 18px;margin-bottom:12px;box-shadow:var(--shadow);
+}
+.result-title{
+  font-family:'Poppins',sans-serif;font-size:13px;font-weight:700;letter-spacing:.5px;
+  color:var(--green);text-transform:uppercase;margin-bottom:10px;
+  display:flex;align-items:center;gap:6px;
+}
+.result-title::before{content:'';width:4px;height:14px;border-radius:2px;background:var(--grad);}
+.rrow{
+  display:flex;justify-content:space-between;align-items:center;padding:6px 0;
+  border-bottom:1px solid var(--border-light);font-size:13px;color:var(--text2);
+}
+.rrow:last-child{border:none;}
+.rval{font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:500;color:var(--teal-dark);}
+.rval.ans{color:var(--green);font-size:18px;font-weight:700;}
+.check-row{margin-top:10px;padding:8px 12px;border-radius:var(--radius);font-size:12px;font-family:'Inter',sans-serif;font-weight:600;letter-spacing:.3px;}
+.check-ok{background:rgba(5,150,105,.06);color:var(--green);border:1px solid var(--border-green);}
+.check-fail{background:rgba(220,38,38,.06);color:var(--red);border:1px solid rgba(220,38,38,.25);}
+
+/* ── RESULTS TABLE ── */
+.res-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:4px;}
+.res-table th{
+  background:rgba(5,150,105,.06);color:var(--green);font-family:'Inter',sans-serif;font-weight:700;
+  padding:8px 6px;text-align:center;border:1px solid var(--border-light);font-size:10px;letter-spacing:.4px;text-transform:uppercase;
+}
+.res-table td{padding:7px 6px;text-align:center;border:1px solid var(--border-light);color:var(--text);font-size:11.5px;font-family:'JetBrains Mono',monospace;}
+.res-table tr:nth-child(even){background:var(--surface2);}
+.res-table .row-total{background:rgba(5,150,105,.05);font-weight:600;}
+
+/* ── CONV INFO ── */
+.conv-info{margin-top:4px;padding:5px 10px;background:rgba(217,119,6,.05);border-radius:8px;font-size:10.5px;color:var(--gold);line-height:1.5;font-family:'Roboto',sans-serif;}
+
+/* ── STEPS ── */
+.step-item{display:flex;gap:14px;margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid var(--border-light);}
+.step-num{
+  width:32px;height:32px;border-radius:50%;background:var(--grad);color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Poppins',sans-serif;font-weight:700;font-size:14px;flex-shrink:0;
+  box-shadow:0 2px 6px rgba(5,150,105,.2);
+}
+.step-body h4{font-family:'Poppins',sans-serif;font-size:14px;font-weight:700;color:var(--green-dark);margin-bottom:5px;}
+.step-body p{font-size:13px;color:var(--text2);line-height:1.7;font-family:'Roboto',sans-serif;}
+.math-block{
+  background:var(--surface3);border-left:3px solid var(--green);padding:10px 14px;
+  margin:8px 0;border-radius:0 var(--radius) var(--radius) 0;
+  font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--green-dark);white-space:pre-wrap;
+  box-shadow:var(--shadow);
+}
+
+/* ── PLACEHOLDER ── */
+.placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--text3);gap:14px;}
+.placeholder .ph-icon{
+  width:80px;height:80px;border-radius:20px;
+  background:linear-gradient(135deg,rgba(5,150,105,.06),rgba(8,145,178,.06));
+  display:flex;align-items:center;justify-content:center;
+}
+.placeholder .ph-icon svg{opacity:.35;color:var(--green);}
+.placeholder p{font-size:13px;text-align:center;max-width:280px;line-height:1.6;color:var(--text2);}
+.placeholder p strong{color:var(--green);font-weight:600;}
+.tip{font-size:11px;color:var(--text3);margin-top:4px;font-style:italic;}
+
+/* ── UNIT DISPLAY ── */
+.unit-display{
+  margin-top:6px;padding:6px 10px;background:rgba(5,150,105,.04);
+  border-radius:8px;font-size:11px;color:var(--green-dark);
+  font-family:'Inter',sans-serif;font-weight:500;
+  border:1px solid rgba(5,150,105,.1);
+}
+
+/* ── LEGEND (3D graph) ── */
+.canvas-overlay{
+  position:absolute;top:12px;right:12px;
+  background:rgba(255,255,255,.92);backdrop-filter:blur(8px);
+  border:1px solid var(--border-light);border-radius:var(--radius2);
+  padding:12px 14px;display:flex;flex-direction:column;gap:6px;
+  max-width:220px;box-shadow:var(--shadow-md);
+}
+.leg-title{font-family:'Inter',sans-serif;font-size:10px;font-weight:700;letter-spacing:1px;color:var(--text2);text-transform:uppercase;margin-bottom:2px;}
+.leg-item{display:flex;align-items:center;gap:7px;font-size:11px;color:var(--gray);font-family:'Roboto',sans-serif;}
+.leg-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;box-shadow:0 1px 2px rgba(0,0,0,.15);}
+.canvas-tip{
+  position:absolute;bottom:14px;left:14px;font-size:11px;color:var(--text2);
+  font-family:'Inter',sans-serif;letter-spacing:.2px;pointer-events:none;
+  background:rgba(255,255,255,.85);backdrop-filter:blur(6px);
+  padding:5px 10px;border-radius:8px;box-shadow:var(--shadow);
+}
+.lbl3d{position:absolute;color:var(--gray);font-size:13px;font-family:'Poppins',sans-serif;font-weight:700;pointer-events:none;}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:5px;}
+::-webkit-scrollbar-track{background:var(--surface2);}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+::-webkit-scrollbar-thumb:hover{background:var(--green);}
+
+/* ── MOBILE TOGGLE ── */
+.sidebar-toggle{
+  display:none;position:fixed;bottom:20px;left:20px;z-index:100;
+  width:52px;height:52px;border-radius:50%;border:none;
+  background:var(--grad);color:#fff;cursor:pointer;
+  box-shadow:0 4px 16px rgba(5,150,105,.35);font-size:20px;
+}
+.sidebar-toggle svg{width:22px;height:22px;}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  .main{grid-template-columns:1fr;}
+  .panel-left{
+    position:fixed;top:60px;left:0;bottom:0;width:340px;z-index:50;
+    transform:translateX(-100%);transition:transform .3s ease;
+    box-shadow:var(--shadow-lg);
+  }
+  .panel-left.open{transform:translateX(0);}
+  .sidebar-toggle{display:flex;align-items:center;justify-content:center;}
+  .panel-right-viz{min-height:480px;}
+  .overlay-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:40;}
+  .overlay-bg.open{display:block;}
+}
+@media(max-width:480px){
+  header{padding:0 14px;height:54px;}
+  .hd-title{font-size:14px;}
+  .hd-subtitle{font-size:10px;}
+  .hd-badge{display:none;}
+  .panel-left{width:100%;}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ HEADER ═══ -->
+<header>
+  <div class="hd-brand">
+    <div class="hd-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 12a9 9 0 11-3-6.7"/><polyline points="21 3 21 9 15 9"/>
+      </svg>
+    </div>
+    <div>
+      <div class="hd-title">Momentos en 3D</div>
+      <div class="hd-subtitle">Fuerzas múltiples · Estática Vectorial</div>
+    </div>
+  </div>
+  <div class="hd-badge">⚡ Calculadora Vectorial</div>
+</header>
+
+<!-- ═══ OVERLAY BG (mobile) ═══ -->
+<div class="overlay-bg" id="overlayBg" onclick="toggleSidebar()"></div>
+
+<!-- ═══ MAIN LAYOUT ═══ -->
+<div class="main">
+
+<!-- ═══ LEFT: SIDEBAR ═══ -->
+<div class="panel-left" id="sidebarPanel">
+
+  <!-- Sistema de Unidades -->
+  <div class="sec">
+    <div class="sec-title">
+      <svg class="sec-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+      Sistema de Unidades
+    </div>
+    <div class="unit-tabs">
+      <button class="unit-tab active" id="btnSI" onclick="setSystem('SI')">Internacional (SI)</button>
+      <button class="unit-tab" id="btnENG" onclick="setSystem('ENG')">Inglés</button>
+    </div>
+    <div class="g2">
+      <div>
+        <label>Longitud</label>
+        <select id="selLen" onchange="updateUnits()">
+          <option value="m">m (metros)</option>
+          <option value="cm">cm (centímetros)</option>
+          <option value="mm">mm (milímetros)</option>
+        </select>
+      </div>
+      <div>
+        <label>Fuerza</label>
+        <select id="selForce" onchange="updateUnits()">
+          <option value="N">N (Newtons)</option>
+          <option value="kN">kN (Kilonewtons)</option>
+        </select>
+      </div>
+    </div>
+    <div style="margin-top:8px;">
+      <label>Unidad del resultado</label>
+      <select id="selMomUnit" onchange="updateResultUnit()">
+        <option value="auto">Automático (fu · lu)</option>
+        <option value="N·m">N·m</option><option value="N·cm">N·cm</option><option value="N·mm">N·mm</option>
+        <option value="kN·m">kN·m</option><option value="lb·ft">lb·ft</option><option value="lb·in">lb·in</option>
+        <option value="kip·ft">kip·ft</option><option value="kip·in">kip·in</option>
+      </select>
+    </div>
+    <div class="unit-display">Unidad de momento: <strong id="momentUnit">N·m</strong></div>
+    <div class="conv-info" id="convInfo">✓ Unidad base — 1 N·m = 1 N·m</div>
+  </div>
+
+  <!-- Convención de Signos -->
+  <div class="sec">
+    <div class="sec-title">
+      <svg class="sec-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 11-3-6.7"/><polyline points="21 3 21 9 15 9"/></svg>
+      Convención de Signos
+    </div>
+    <div class="unit-tabs">
+      <button class="unit-tab active" id="signDex" onclick="setSignConv('dex')">🔄 Dextrógiro (+)</button>
+      <button class="unit-tab" id="signLev" onclick="setSignConv('lev')">🔃 Levógiro (+)</button>
+    </div>
+    <div class="tip" id="signTip">Regla de la mano derecha: M = r × F (convención estándar)</div>
+  </div>
+
+  <!-- Punto de Referencia O -->
+  <div class="sec">
+    <div class="sec-title">
+      <svg class="sec-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v4m0 12v4M2 12h4m12 0h4"/></svg>
+      Punto de Referencia O
+    </div>
+    <div class="g3">
+      <div><label>Ox (<span class="ulen">m</span>)</label><input type="number" id="ox" value="0" step="any"></div>
+      <div><label>Oy (<span class="ulen">m</span>)</label><input type="number" id="oy" value="0" step="any"></div>
+      <div><label>Oz (<span class="ulen">m</span>)</label><input type="number" id="oz" value="0" step="any"></div>
+    </div>
+    <div class="tip">Punto respecto al cual se calculan todos los momentos</div>
+  </div>
+
+  <!-- Fuerzas -->
+  <div class="sec">
+    <div class="sec-title">
+      <svg class="sec-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      Fuerzas Aplicadas
+    </div>
+    <div id="forceList"></div>
+    <button class="btn-add" onclick="addForce()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>Agregar Fuerza
+    </button>
+  </div>
+
+  <!-- Eje L opcional -->
+  <div class="option-box">
+    <div class="chk-row">
+      <input type="checkbox" id="chkEje" onchange="toggleEje()">
+      <label for="chkEje" class="chk-label">Proyección sobre eje L (producto mixto)</label>
+    </div>
+    <div id="ejeFields" style="display:none">
+      <div class="tip" style="margin-bottom:8px;font-family:'JetBrains Mono',monospace;font-style:normal;font-size:11px;color:var(--gray-light);">M_L = û_L · (r × F) — se normalizará automáticamente</div>
+      <div class="g3">
+        <div><label>u<sub>x</sub></label><input type="number" id="ux" value="0" step="any"></div>
+        <div><label>u<sub>y</sub></label><input type="number" id="uy" value="0" step="any"></div>
+        <div><label>u<sub>z</sub></label><input type="number" id="uz" value="1" step="any"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Par de fuerzas -->
+  <div class="option-box">
+    <div class="chk-row">
+      <input type="checkbox" id="chkPar" onchange="togglePar()">
+      <label for="chkPar" class="chk-label">Modo par de fuerzas (vector libre)</label>
+    </div>
+    <div class="tip">La 2ª fuerza se genera como −F en el punto O; M = r × F independiente del punto</div>
+  </div>
+
+  <!-- Info Bar -->
+  <div class="info-bar" id="infoBar">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+    </svg>
+    <span id="infoTxt">Agrega al menos una fuerza para calcular</span>
+  </div>
+
+  <!-- Botones -->
+  <div class="actions">
+    <button class="btn btn-calc" onclick="calculate()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="16" y2="10"/></svg>Calcular
+    </button>
+    <button class="btn btn-graph" onclick="graficar()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><line x1="12" y1="3" x2="12" y2="12"/><line x1="12" y1="12" x2="19" y2="12"/></svg>Graficar
+    </button>
+  </div>
+  <div class="actions" style="margin-top:0;">
+    <button class="btn btn-steps" onclick="showSteps()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>Procedimiento
+    </button>
+    <button class="btn btn-dl" onclick="downloadSolution()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Descargar
+    </button>
+    <button class="btn btn-clear" onclick="clearAll()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3,6 5,6 21,6"/><path d="M19,6l-1,14a2,2,0,0,1-2,2H8a2,2,0,0,1-2-2L5,6"/></svg>Limpiar
+    </button>
+  </div>
+
+</div><!-- end panel-left -->
+
+<!-- ═══ RIGHT: VISUALIZATION PANEL ═══ -->
+<div class="panel-right-viz">
+  <div class="rtabs">
+    <div class="rtab active" id="tabGraph" onclick="switchTab('graph')">
+      <svg style="width:13px;height:13px;vertical-align:-2px;margin-right:4px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><line x1="12" y1="3" x2="12" y2="12"/><line x1="12" y1="12" x2="19" y2="12"/></svg>Gráfica 3D
+    </div>
+    <div class="rtab" id="tabResults" onclick="switchTab('results')">
+      <svg style="width:13px;height:13px;vertical-align:-2px;margin-right:4px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="16" y2="10"/></svg>Resultados
+    </div>
+    <div class="rtab" id="tabSteps" onclick="switchTab('steps')">
+      <svg style="width:13px;height:13px;vertical-align:-2px;margin-right:4px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>Procedimiento
+    </div>
+  </div>
+
+  <!-- Gráfica -->
+  <div id="panelGraph" class="canvas-wrap">
+    <div class="placeholder" id="graphPH">
+      <div class="ph-icon">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+        </svg>
+      </div>
+      <p>Agrega las fuerzas en el panel lateral, presiona <strong>Calcular</strong> y luego <strong>Graficar</strong> para visualizar en 3D.</p>
+    </div>
+    <canvas id="graphCanvas" style="display:none;width:100%;height:100%;cursor:grab;"></canvas>
+    <div class="canvas-overlay" id="graphLeg" style="display:none;"></div>
+    <div class="canvas-tip" id="graphTip" style="display:none;">🖱 Arrastra = rotar · Rueda = zoom</div>
+  </div>
+
+  <!-- Resultados -->
+  <div id="panelResults" style="display:none;">
+    <div class="placeholder" id="resultsPH">
+      <div class="ph-icon">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="12" y2="14"/>
+        </svg>
+      </div>
+      <p>Presiona <strong>Calcular</strong> para obtener los resultados numéricos.</p>
+    </div>
+    <div id="resultsContent" style="display:none;"></div>
+  </div>
+
+  <!-- Procedimiento -->
+  <div id="panelSteps" style="display:none;overflow-y:auto;flex:1;padding:22px;">
+    <div class="placeholder" id="stepsPH">
+      <div class="ph-icon">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
+        </svg>
+      </div>
+      <p>Presiona <strong>Calcular</strong> y luego <strong>Procedimiento</strong> para ver el paso a paso.</p>
+    </div>
+    <div id="stepsContent" style="display:none;"></div>
+  </div>
+</div><!-- end panel-right-viz -->
+
+</div><!-- end main -->
+
+<!-- Mobile toggle button -->
+<button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()" aria-label="Abrir panel de fuerzas">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+    <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+  </svg>
+</button>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════════
+const LEN_TO_M   = { m:1, cm:0.01, mm:0.001, ft:0.3048, 'in':0.0254 };
+const FORCE_TO_N = { N:1, kN:1000, lb:4.44822, kip:4448.22 };
+const MU_TO_NM   = {
+  'N·m':1,'N·cm':0.01,'N·mm':0.001,'kN·m':1000,
+  'lb·ft':1.35582,'lb·in':0.112985,'kip·ft':1355.82,'kip·in':112.985
+};
+const UNIT_OPTIONS = {
+  SI: { len:[['m','m (metros)'],['cm','cm (centímetros)'],['mm','mm (milímetros)']], force:[['N','N (Newtons)'],['kN','kN (Kilonewtons)']] },
+  ENG:{ len:[['ft','ft (pies)'],['in','in (pulgadas)']], force:[['lb','lb (libras)'],['kip','kip (kilopound)']] }
+};
+const FORCE_COLORS = [
+  '#059669','#0891b2','#d97706','#dc2626','#7c3aed',
+  '#0284c7','#db2777','#65a30d','#ea580c','#6366f1'
+];
+
+let forceCounter = 0;
+let forceIds     = [];
+let lastResult   = null;
+let signConv     = 'dex';
+let lu = 'm', fu = 'N';
+let muOverride   = 'auto';
+
+let threeRenderer = null, threeScene = null, threeCamera = null;
+let threeLabels   = [];
+let mouse = { down:false, x:0, y:0 };
+let spherical = { theta:Math.PI/4, phi:Math.PI/3, radius:3.2 };
+
+// ═══════════════════════════════════════════════════════════════
+// MOBILE SIDEBAR TOGGLE
+// ═══════════════════════════════════════════════════════════════
+function toggleSidebar() {
+  const panel = document.getElementById('sidebarPanel');
+  const overlay = document.getElementById('overlayBg');
+  const isOpen = panel.classList.contains('open');
+  panel.classList.toggle('open', !isOpen);
+  overlay.classList.toggle('open', !isOpen);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// UNITS
+// ═══════════════════════════════════════════════════════════════
+function setSystem(sys) {
+  document.getElementById('btnSI').classList.toggle('active',  sys === 'SI');
+  document.getElementById('btnENG').classList.toggle('active', sys === 'ENG');
+  const selL = document.getElementById('selLen');
+  const selF = document.getElementById('selForce');
+  const prevL = selL.value, prevF = selF.value;
+  selL.innerHTML = UNIT_OPTIONS[sys].len.map(o => `<option value="${o[0]}"${o[0]===prevL?' selected':''}>${o[1]}</option>`).join('');
+  selF.innerHTML = UNIT_OPTIONS[sys].force.map(o => `<option value="${o[0]}"${o[0]===prevF?' selected':''}>${o[1]}</option>`).join('');
+  updateUnits();
+}
+
+function updateUnits() {
+  lu = document.getElementById('selLen').value;
+  fu = document.getElementById('selForce').value;
+  document.querySelectorAll('.ulen').forEach(el => el.textContent = lu);
+  document.querySelectorAll('.uforce').forEach(el => el.textContent = fu);
+  updateResultUnit();
+}
+
+function updateResultUnit() {
+  muOverride = document.getElementById('selMomUnit').value;
+  const autoMu = fu + '·' + lu;
+  const mu = (muOverride === 'auto') ? autoMu : muOverride;
+  document.getElementById('momentUnit').textContent = mu;
+  const kM_auto = (LEN_TO_M[lu] || 1) * (FORCE_TO_N[fu] || 1);
+  const kM_res  = MU_TO_NM[mu] || kM_auto;
+  const info = document.getElementById('convInfo');
+  if (kM_res === 1 && kM_auto === 1) {
+    info.innerHTML = '✓ Entrada y resultado en unidades base (1 N·m = 1 N·m)';
+    info.style.color = 'var(--green)';
+  } else {
+    const kM_autoStr = kM_auto < 0.001 ? kM_auto.toExponential(3) : Number.isInteger(kM_auto) ? kM_auto : kM_auto.toPrecision(4);
+    const kM_resStr  = kM_res  < 0.001 ? kM_res.toExponential(3)  : Number.isInteger(kM_res)  ? kM_res  : kM_res.toPrecision(4);
+    let lines = [];
+    if (kM_auto !== 1) lines.push(`1 ${autoMu} = ${kM_autoStr} N·m (entrada)`);
+    if (mu !== autoMu) lines.push(`1 ${mu} = ${kM_resStr} N·m (resultado)`);
+    info.innerHTML = `⚙ ${lines.join(' | ')} · Cálculo interno en SI`;
+    info.style.color = 'var(--gold)';
+  }
+}
+
+function getMu() { return document.getElementById('momentUnit').textContent; }
+function getKmInput() { return (LEN_TO_M[lu] || 1) * (FORCE_TO_N[fu] || 1); }
+function getKmResult() { return MU_TO_NM[getMu()] || getKmInput(); }
+
+// ═══════════════════════════════════════════════════════════════
+// SIGN CONVENTION
+// ═══════════════════════════════════════════════════════════════
+function setSignConv(c) {
+  signConv = c;
+  document.getElementById('signDex').classList.toggle('active', c === 'dex');
+  document.getElementById('signLev').classList.toggle('active', c === 'lev');
+  document.getElementById('signTip').textContent = c === 'dex'
+    ? 'Regla de la mano derecha: M = r × F (convención estándar)'
+    : 'Regla de la mano izquierda: M = F × r = −(r × F)';
+}
+
+// ═══════════════════════════════════════════════════════════════
+// FORCE MANAGEMENT
+// ═══════════════════════════════════════════════════════════════
+function getPointLetter(forceNum) { return String.fromCharCode(65 + forceNum); }
+
+function addForce(preset) {
+  const id = ++forceCounter;
+  forceIds.push(id);
+  const color = FORCE_COLORS[(id-1) % FORCE_COLORS.length];
+  const p = preset || {};
+  const ax=p.ax||0, ay=p.ay||0, az=p.az||0;
+  const fx=p.fx||0, fy=p.fy||0, fz=p.fz||0;
+  const ptLetter = getPointLetter(id);
+
+  const div = document.createElement('div');
+  div.className = 'force-block';
+  div.id = 'fb_'+id;
+  div.setAttribute('data-ptletter', ptLetter);
+  div.style.borderLeftColor = color;
+  div.innerHTML =
+    '<div class="force-head">' +
+      '<span class="force-name"><span class="fdot" style="background:'+color+'"></span>F<sub>'+id+'</sub></span>' +
+      '<span class="pill pill-dato" id="pill_'+id+'">F'+id+' = DATO</span>' +
+      '<button class="btn-del-force" onclick="removeForce('+id+')" title="Eliminar fuerza">✕</button>' +
+    '</div>' +
+    '<div class="fblock-label">Punto de aplicación A</div>' +
+    '<div class="g3">' +
+      '<div><label>Ax (<span class="ulen">'+lu+'</span>)</label><input type="number" id="ax_'+id+'" value="'+ax+'" step="any"></div>' +
+      '<div><label>Ay (<span class="ulen">'+lu+'</span>)</label><input type="number" id="ay_'+id+'" value="'+ay+'" step="any"></div>' +
+      '<div><label>Az (<span class="ulen">'+lu+'</span>)</label><input type="number" id="az_'+id+'" value="'+az+'" step="any"></div>' +
+    '</div>' +
+    '<div style="margin-top:10px;margin-bottom:8px;">' +
+      '<label>Modo de entrada</label>' +
+      '<div class="mode-tabs">' +
+        '<button class="mode-tab active" id="mCart_'+id+'" onclick="setForceMode('+id+',\'cart\')">Componentes</button>' +
+        '<button class="mode-tab" id="mAng_'+id+'" onclick="setForceMode('+id+',\'ang\')">Áng. Directores</button>' +
+        '<button class="mode-tab" id="mPts_'+id+'" onclick="setForceMode('+id+',\'pts\')">|F| + 2 Puntos</button>' +
+      '</div>' +
+    '</div>' +
+    '<div id="fCart_'+id+'">' +
+      '<div class="g3">' +
+        '<div><label>Fx (<span class="uforce">'+fu+'</span>)</label><input type="number" id="fx_'+id+'" value="'+fx+'" step="any"></div>' +
+        '<div><label>Fy (<span class="uforce">'+fu+'</span>)</label><input type="number" id="fy_'+id+'" value="'+fy+'" step="any"></div>' +
+        '<div><label>Fz (<span class="uforce">'+fu+'</span>)</label><input type="number" id="fz_'+id+'" value="'+fz+'" step="any"></div>' +
+      '</div>' +
+    '</div>' +
+    '<div id="fAng_'+id+'" style="display:none">' +
+      '<div class="g2" style="margin-bottom:8px">' +
+        '<div><label>|F| (<span class="uforce">'+fu+'</span>)</label><input type="number" id="fmag_'+id+'" value="0" step="any"></div>' +
+        '<div></div>' +
+      '</div>' +
+      '<div class="g3">' +
+        '<div><label>α (°)</label><input type="number" id="fa_'+id+'" value="0" step="any"></div>' +
+        '<div><label>β (°)</label><input type="number" id="fb_'+id+'" value="0" step="any"></div>' +
+        '<div><label>γ (°)</label><input type="number" id="fg_'+id+'" value="0" step="any"></div>' +
+      '</div>' +
+      '<div class="tip" style="font-family:\'JetBrains Mono\',monospace;font-style:normal;font-size:10px;">cos²α + cos²β + cos²γ = 1</div>' +
+    '</div>' +
+    '<div id="fPts_'+id+'" style="display:none">' +
+      '<div class="fblock-label">Segundo punto <strong style="color:var(--green);">'+ptLetter+'</strong> sobre la línea de acción</div>' +
+      '<div class="g3">' +
+        '<div><label>'+ptLetter+'x (<span class="ulen">'+lu+'</span>)</label><input type="number" id="bx_'+id+'" value="0" step="any"></div>' +
+        '<div><label>'+ptLetter+'y (<span class="ulen">'+lu+'</span>)</label><input type="number" id="by_'+id+'" value="0" step="any"></div>' +
+        '<div><label>'+ptLetter+'z (<span class="ulen">'+lu+'</span>)</label><input type="number" id="bz_'+id+'" value="0" step="any"></div>' +
+      '</div>' +
+      '<div class="tip" style="font-family:\'JetBrains Mono\',monospace;font-style:normal;font-size:10px;margin-top:5px;">û = ('+ptLetter+' − A) / |'+ptLetter+' − A|  ·  F = |F| · û</div>' +
+      '<div class="mag-row">' +
+        '<span class="mag-label">|F'+id+'| =</span>' +
+        '<div class="mag-input-wrap"><input type="number" id="fmag2_'+id+'" value="0" step="any"></div>' +
+        '<span class="mag-unit uforce">'+fu+'</span>' +
+      '</div>' +
+    '</div>';
+  document.getElementById('forceList').appendChild(div);
+  updateInfoBar();
+}
+
+function removeForce(id) {
+  const idx = forceIds.indexOf(id);
+  if (idx > -1) forceIds.splice(idx, 1);
+  const el = document.getElementById('fb_'+id);
+  if (el) el.remove();
+  updateInfoBar();
+}
+
+function setForceMode(id, mode) {
+  document.getElementById('mCart_'+id).classList.toggle('active', mode === 'cart');
+  document.getElementById('mAng_'+id).classList.toggle('active',  mode === 'ang');
+  document.getElementById('mPts_'+id).classList.toggle('active',  mode === 'pts');
+  document.getElementById('fCart_'+id).style.display = mode === 'cart' ? '' : 'none';
+  document.getElementById('fAng_'+id).style.display  = mode === 'ang'  ? '' : 'none';
+  document.getElementById('fPts_'+id).style.display   = mode === 'pts' ? '' : 'none';
+}
+
+function toggleEje() { document.getElementById('ejeFields').style.display = document.getElementById('chkEje').checked ? '' : 'none'; }
+function togglePar() { }
+
+function updateInfoBar() {
+  const n = forceIds.length;
+  const txt = document.getElementById('infoTxt');
+  const bar = document.getElementById('infoBar');
+  bar.className = 'info-bar';
+  txt.textContent = n === 0
+    ? 'Agrega al menos una fuerza para calcular'
+    : n + ' fuerza(s) definida(s) — cálculo de momento resultante en 3D';
+}
+
+// ═══════════════════════════════════════════════════════════════
+// MATH UTILITIES
+// ═══════════════════════════════════════════════════════════════
+function cross3(a, b) { return [a[1]*b[2]-a[2]*b[1], a[2]*b[0]-a[0]*b[2], a[0]*b[1]-a[1]*b[0]]; }
+function dot3(a, b)   { return a[0]*b[0]+a[1]*b[1]+a[2]*b[2]; }
+function mag3(v)      { return Math.sqrt(v[0]*v[0]+v[1]*v[1]+v[2]*v[2]); }
+function norm3(v)     { const m=mag3(v); return m<1e-12?[0,0,0]:[v[0]/m,v[1]/m,v[2]/m]; }
+function sub3(a,b)    { return [a[0]-b[0],a[1]-b[1],a[2]-b[2]]; }
+function add3(a,b)    { return [a[0]+b[0],a[1]+b[1],a[2]+b[2]]; }
+function scale3(v,s)  { return [v[0]*s,v[1]*s,v[2]*s]; }
+function degToRad(d)  { return d*Math.PI/180; }
+function radToDeg(r)  { return r*180/Math.PI; }
+
+function f4(v) { return parseFloat(v.toFixed(4)); }
+function fS(v) {
+  if (Math.abs(v) < 1e-10) return '0';
+  if (Math.abs(v) >= 10000 || (Math.abs(v) < 0.001 && Math.abs(v) > 0)) return v.toExponential(4);
+  return parseFloat(v.toFixed(5)).toString();
+}
+function fV(v) { return '(' + fS(v[0]) + ', ' + fS(v[1]) + ', ' + fS(v[2]) + ')'; }
+function pad8(s) { while(s.length < 8) s = ' ' + s; return s; }
+
+// ═══════════════════════════════════════════════════════════════
+// READ FORCES FROM DOM
+// ═══════════════════════════════════════════════════════════════
+function readForces() {
+  const kL = LEN_TO_M[lu] || 1;
+  const kF = FORCE_TO_N[fu] || 1;
+  const forces = [];
+  for (let i = 0; i < forceIds.length; i++) {
+    const id = forceIds[i];
+    const A = [
+      (parseFloat(document.getElementById('ax_'+id).value) || 0) * kL,
+      (parseFloat(document.getElementById('ay_'+id).value) || 0) * kL,
+      (parseFloat(document.getElementById('az_'+id).value) || 0) * kL
+    ];
+    const isCart = document.getElementById('mCart_'+id).classList.contains('active');
+    const isAng = document.getElementById('mAng_'+id).classList.contains('active');
+    let F, mode = isCart ? 'cart' : (isAng ? 'ang' : 'pts');
+    let Bpt = null;
+    if (isCart) {
+      F = [
+        (parseFloat(document.getElementById('fx_'+id).value) || 0) * kF,
+        (parseFloat(document.getElementById('fy_'+id).value) || 0) * kF,
+        (parseFloat(document.getElementById('fz_'+id).value) || 0) * kF
+      ];
+    } else if (isAng) {
+      const fm = (parseFloat(document.getElementById('fmag_'+id).value) || 0) * kF;
+      const alpha = degToRad(parseFloat(document.getElementById('fa_'+id).value) || 0);
+      const beta  = degToRad(parseFloat(document.getElementById('fb_'+id).value) || 0);
+      const gamma = degToRad(parseFloat(document.getElementById('fg_'+id).value) || 0);
+      F = [fm*Math.cos(alpha), fm*Math.cos(beta), fm*Math.cos(gamma)];
+    } else {
+      Bpt = [
+        (parseFloat(document.getElementById('bx_'+id).value) || 0) * kL,
+        (parseFloat(document.getElementById('by_'+id).value) || 0) * kL,
+        (parseFloat(document.getElementById('bz_'+id).value) || 0) * kL
+      ];
+      const fm2 = (parseFloat(document.getElementById('fmag2_'+id).value) || 0) * kF;
+      const AB = sub3(Bpt, A);
+      const abLen = mag3(AB);
+      if (abLen < 1e-12) {
+        const fbEl = document.getElementById('fb_'+id);
+        const errLetter = fbEl ? (fbEl.getAttribute('data-ptletter') || 'B') : 'B';
+        alert('F'+id+': Los puntos A y '+errLetter+' son idénticos. No se puede determinar la dirección.');
+        return { forces:[], kL:kL, kF:kF, error:true };
+      }
+      const uAB = norm3(AB);
+      F = scale3(uAB, fm2);
+    }
+    const fbEl = document.getElementById('fb_'+id);
+    const ptL = fbEl ? (fbEl.getAttribute('data-ptletter') || getPointLetter(id)) : getPointLetter(id);
+    forces.push({ id:id, A:A, F:F, Bpt:Bpt, mode:mode, ptLetter:ptL, color:FORCE_COLORS[(id-1)%FORCE_COLORS.length], label:'F'+id });
+  }
+  return { forces:forces, kL:kL, kF:kF };
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CALCULATE
+// ═══════════════════════════════════════════════════════════════
+function calculate() {
+  if (forceIds.length === 0) { alert('Agrega al menos una fuerza.'); return; }
+  const data = readForces();
+  if (data.error) return;
+  const kL = data.kL, kF = data.kF;
+  const kM = getKmResult();
+  const mu = getMu();
+  const sign = signConv === 'dex' ? 1 : -1;
+
+  const O = [
+    (parseFloat(document.getElementById('ox').value) || 0) * kL,
+    (parseFloat(document.getElementById('oy').value) || 0) * kL,
+    (parseFloat(document.getElementById('oz').value) || 0) * kL
+  ];
+
+  let workForces = data.forces.slice();
+  const parMode = document.getElementById('chkPar').checked;
+  if (parMode && workForces.length >= 1) {
+    const f1 = workForces[0];
+    workForces = [
+      f1,
+      { id:f1.id*100, A:O.slice(), F:scale3(f1.F,-1), color:'#f87171', label:'−F'+f1.id+' (par)', isPar:true }
+    ];
+  }
+
+  const items = [];
+  let M_total = [0,0,0];
+
+  for (let i = 0; i < workForces.length; i++) {
+    const wf = workForces[i];
+    const r = sub3(wf.A, O);
+    const Mcross = cross3(r, wf.F);
+    const M = sign === 1 ? Mcross : scale3(Mcross, -1);
+    const magM = mag3(M);
+    const anglesM = magM > 1e-12 ? [
+      radToDeg(Math.acos(Math.max(-1,Math.min(1,M[0]/magM)))),
+      radToDeg(Math.acos(Math.max(-1,Math.min(1,M[1]/magM)))),
+      radToDeg(Math.acos(Math.max(-1,Math.min(1,M[2]/magM))))
+    ] : [0,0,0];
+    items.push({ idx:i+1, id:wf.id, label:wf.label, r:r, F:wf.F, M:M, magM:magM, anglesM:anglesM, A:wf.A, Bpt:wf.Bpt, mode:wf.mode, ptLetter:wf.ptLetter, color:wf.color, isPar:wf.isPar });
+    M_total = add3(M_total, M);
+  }
+
+  const magTotal = mag3(M_total);
+  const anglesTot = magTotal > 1e-12 ? [
+    radToDeg(Math.acos(Math.max(-1,Math.min(1,M_total[0]/magTotal)))),
+    radToDeg(Math.acos(Math.max(-1,Math.min(1,M_total[1]/magTotal)))),
+    radToDeg(Math.acos(Math.max(-1,Math.min(1,M_total[2]/magTotal))))
+  ] : [0,0,0];
+
+  const ejeMode = document.getElementById('chkEje').checked;
+  let ejeVec = null, ML = null;
+  if (ejeMode) {
+    ejeVec = norm3([
+      parseFloat(document.getElementById('ux').value) || 0,
+      parseFloat(document.getElementById('uy').value) || 0,
+      parseFloat(document.getElementById('uz').value) || 0
+    ]);
+    ML = dot3(ejeVec, M_total);
+  }
+
+  lastResult = {
+    items:items, M_total:M_total, magTotal:magTotal, anglesTot:anglesTot,
+    ML:ML, ejeVec:ejeVec, ejeMode:ejeMode, parMode:parMode,
+    O:O, kL:kL, kF:kF, kM:kM, mu:mu, sign:sign
+  };
+
+  renderResults();
+  switchTab('results');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// DISPLAY RESULTS
+// ═══════════════════════════════════════════════════════════════
+function renderResults() {
+  if (!lastResult) return;
+  const R = lastResult;
+  const mu = R.mu, kM = R.kM, kL = R.kL, kF = R.kF;
+  const convLabel = R.sign === 1 ? 'Dextrógiro (mano derecha)' : 'Levógiro (mano izquierda)';
+  let html = '';
+
+  html += '<div class="result-card"><div class="result-title">Descomposición por fuerza</div>';
+  html += '<div style="overflow-x:auto"><table class="res-table"><thead><tr>';
+  html += '<th></th><th>r ('+lu+')</th><th>F ('+fu+')</th><th>M ('+mu+')</th><th>|M| ('+mu+')</th>';
+  html += '</tr></thead><tbody>';
+
+  for (let i = 0; i < R.items.length; i++) {
+    const it = R.items[i];
+    const rDisp = scale3(it.r, 1/kL);
+    const fDisp = scale3(it.F, 1/kF);
+    const mDisp = scale3(it.M, 1/kM);
+    const magDisp = it.magM / kM;
+    html += '<tr>';
+    html += '<td style="font-family:Poppins;font-weight:700;color:'+it.color+'">'+it.label+'</td>';
+    html += '<td>'+fV(rDisp)+'</td>';
+    html += '<td>'+fV(fDisp)+'</td>';
+    html += '<td>'+fV(mDisp)+'</td>';
+    html += '<td>'+fS(magDisp)+'</td>';
+    html += '</tr>';
+  }
+
+  if (R.items.length > 1) {
+    const mtDisp = scale3(R.M_total, 1/kM);
+    html += '<tr class="row-total">';
+    html += '<td style="font-family:Poppins;font-weight:700;color:var(--green)">Σ M<sub>R</sub></td>';
+    html += '<td>—</td><td>—</td>';
+    html += '<td>'+fV(mtDisp)+'</td>';
+    html += '<td>'+fS(R.magTotal/kM)+'</td>';
+    html += '</tr>';
+  }
+  html += '</tbody></table></div></div>';
+
+  const mtDisp2 = scale3(R.M_total, 1/kM);
+  html += '<div class="result-card"><div class="result-title">Momento Resultante M<sub>R</sub></div>';
+  html += '<div class="rrow"><span>M<sub>R</sub> = Σ(r × F)</span><span class="rval ans">'+fV(mtDisp2)+' '+mu+'</span></div>';
+  html += '<div class="rrow"><span>|M<sub>R</sub>|</span><span class="rval ans">'+fS(R.magTotal/kM)+' '+mu+'</span></div>';
+  html += '<div class="rrow"><span>Ángulos directores</span><span class="rval" style="font-size:12px">α='+fS(R.anglesTot[0])+'° β='+fS(R.anglesTot[1])+'° γ='+fS(R.anglesTot[2])+'°</span></div>';
+  html += '<div class="rrow"><span>Convención</span><span class="rval" style="font-size:12px;color:var(--gold)">'+convLabel+'</span></div>';
+
+  if (R.ejeMode && R.ML !== null) {
+    html += '<div class="rrow" style="background:rgba(124,58,237,0.05);padding:6px 10px;border-radius:8px;margin-top:6px;">';
+    html += '<span>M<sub>L</sub> = û<sub>L</sub> · M<sub>R</sub></span>';
+    html += '<span class="rval ans" style="color:var(--purple)">'+fS(R.ML/kM)+' '+mu+'</span></div>';
+    html += '<div style="font-size:11px;color:var(--text3);margin-top:4px;font-family:\'JetBrains Mono\',monospace;">û<sub>L</sub> = '+fV(R.ejeVec)+'</div>';
+  }
+
+  if (R.parMode) {
+    html += '<div class="check-row check-ok" style="margin-top:10px">Par de fuerzas — M es un vector libre (independiente del punto O)</div>';
+  }
+  html += '</div>';
+
+  document.getElementById('resultsContent').innerHTML = html;
+  document.getElementById('resultsContent').style.display = 'block';
+  document.getElementById('resultsPH').style.display = 'none';
+}
+
+// ═══════════════════════════════════════════════════════════════
+// STEP-BY-STEP PROCEDURE
+// ═══════════════════════════════════════════════════════════════
+function showSteps() {
+  if (!lastResult) { calculate(); }
+  if (!lastResult) return;
+
+  const R = lastResult;
+  const mu = R.mu, kM = R.kM, kL = R.kL, kF = R.kF;
+  const O_d = scale3(R.O, 1/kL);
+  const convLabel = R.sign === 1 ? 'dextrógiro (mano derecha, M = r × F)' : 'levógiro (mano izquierda, M = −(r × F))';
+
+  let html = '';
+  let step = 1;
+
+  const needsConv = (kM !== 1 || getKmInput() !== 1);
+  if (needsConv) {
+    const convLines = [];
+    convLines.push('Factor longitud  : 1 '+lu+' = '+(LEN_TO_M[lu]||1)+' m');
+    convLines.push('Factor fuerza    : 1 '+fu+' = '+(FORCE_TO_N[fu]||1)+' N');
+    convLines.push('Resultado momento: 1 '+mu+' = '+kM.toPrecision(4)+' N·m');
+    html += stepHtml(step++, 'Conversión de Unidades',
+      'Todos los valores se convierten a SI antes de calcular. El resultado se expresa en <strong>'+mu+'</strong>.' +
+      '<div class="math-block">'+convLines.join('\n')+'</div>');
+  }
+
+  html += stepHtml(step++, 'Identificación del Sistema',
+    'Punto de referencia <strong>O'+fV(O_d)+' '+lu+'</strong>. Convención: <strong>'+convLabel+'</strong>.' +
+    '<br>El momento de una fuerza respecto a O se calcula mediante el producto cruz:' +
+    '<div class="math-block">M₀ = r × F\n\ndonde  r = A − O  (vector de posición)\n       F = vector fuerza</div>');
+
+  for (let i = 0; i < R.items.length; i++) {
+    const it = R.items[i];
+    const r_d = scale3(it.r, 1/kL);
+    const F_d = scale3(it.F, 1/kF);
+    const A_d = scale3(it.A, 1/kL);
+    const M_d = scale3(it.M, 1/kM);
+
+    let txt = '<strong style="color:'+it.color+'">'+it.label+'</strong>' + (it.isPar ? ' (par, fuerza opuesta)' : '') + '<br>';
+
+    if (it.mode === 'pts' && it.Bpt) {
+      const ptL = it.ptLetter || 'B';
+      const B_d = scale3(it.Bpt, 1/kL);
+      const AB = sub3(it.Bpt, it.A);
+      const abLen = mag3(AB);
+      const uAB = norm3(AB);
+      const fMag = mag3(it.F) / kF;
+      txt += '<div class="math-block">Modo: Magnitud + 2 Puntos (A → '+ptL+')\n';
+      txt += 'A = '+fV(A_d)+' '+lu+'    '+ptL+' = '+fV(B_d)+' '+lu+'\n\n';
+      txt += 'A'+ptL+'⃗ = '+ptL+' − A = '+fV(scale3(AB,1/kL))+' '+lu+'\n';
+      txt += '|A'+ptL+'| = '+fS(abLen/kL)+' '+lu+'\n\n';
+      txt += 'û = A'+ptL+'⃗ / |A'+ptL+'| = '+fV(uAB)+'\n\n';
+      txt += it.label+' = |F| · û = '+fS(fMag)+' × '+fV(uAB)+'\n';
+      txt += it.label+' = '+fV(F_d)+' '+fu+'</div>';
+    }
+
+    txt += '<div class="math-block">r'+it.idx+' = A'+it.idx+' − O = '+fV(A_d)+' − '+fV(O_d)+'\nr'+it.idx+' = '+fV(r_d)+' '+lu+'</div>';
+
+    txt += '<div class="math-block">Determinante 3×3:\n';
+    txt += '     | î         ĵ         k̂      |\n';
+    txt += 'M = | '+pad8(fS(r_d[0]))+'  '+pad8(fS(r_d[1]))+'  '+pad8(fS(r_d[2]))+' |\n';
+    txt += '     | '+pad8(fS(F_d[0]))+'  '+pad8(fS(F_d[1]))+'  '+pad8(fS(F_d[2]))+' |\n\n';
+    txt += 'Mx = ('+fS(r_d[1])+')('+fS(F_d[2])+') − ('+fS(r_d[2])+')('+fS(F_d[1])+') = '+fS(M_d[0])+'\n';
+    txt += 'My = ('+fS(r_d[2])+')('+fS(F_d[0])+') − ('+fS(r_d[0])+')('+fS(F_d[2])+') = '+fS(M_d[1])+'\n';
+    txt += 'Mz = ('+fS(r_d[0])+')('+fS(F_d[1])+') − ('+fS(r_d[1])+')('+fS(F_d[0])+') = '+fS(M_d[2])+'</div>';
+
+    txt += 'M'+it.idx+' = <strong>'+fV(M_d)+' '+mu+'</strong> &nbsp; |M'+it.idx+'| = '+fS(it.magM/kM)+' '+mu;
+
+    html += stepHtml(step++, 'Fuerza '+it.label+' — Vector r y Producto Cruz', txt);
+  }
+
+  if (R.items.length > 1) {
+    const sumLine = R.items.map(it => fV(scale3(it.M, 1/kM))).join(' + ');
+    const MT_d = scale3(R.M_total, 1/kM);
+    html += stepHtml(step++, 'Momento Resultante (Teorema de Varignon 3D)',
+      'Suma vectorial de todos los momentos individuales:' +
+      '<div class="math-block">M_R = ΣM = '+sumLine+'\n\nM_R = '+fV(MT_d)+' '+mu+'\n|M_R| = '+fS(R.magTotal/kM)+' '+mu+
+      '\n\nÁngulos directores:\n  α = '+fS(R.anglesTot[0])+'°\n  β = '+fS(R.anglesTot[1])+'°\n  γ = '+fS(R.anglesTot[2])+'°</div>');
+  }
+
+  if (R.ejeMode && R.ML !== null) {
+    html += stepHtml(step++, 'Proyección sobre Eje L (Producto Mixto)',
+      '<div class="math-block">û_L = '+fV(R.ejeVec)+'\n\nM_L = û_L · M_R\n   = ('+fS(R.ejeVec[0])+')('+fS(R.M_total[0]/kM)+') + ('+
+      fS(R.ejeVec[1])+')('+fS(R.M_total[1]/kM)+') + ('+fS(R.ejeVec[2])+')('+fS(R.M_total[2]/kM)+')\n\nM_L = '+fS(R.ML/kM)+' '+mu+'</div>');
+  }
+
+  const MT_d2 = scale3(R.M_total, 1/kM);
+  let concl = 'El momento resultante respecto al punto O'+fV(O_d)+' es:' +
+    '<div class="math-block">M_R = '+fV(MT_d2)+' '+mu+'\n|M_R| = '+fS(R.magTotal/kM)+' '+mu+'</div>';
+  if (R.parMode) concl += 'Al ser un <strong>par de fuerzas</strong>, M es un vector libre independiente de O.';
+  html += '<div class="step-item" style="border:none;margin:0;padding:0;">' +
+    '<div class="step-num" style="background:var(--green);">✓</div>' +
+    '<div class="step-body"><h4>Conclusión</h4><p>'+concl+'</p></div></div>';
+
+  document.getElementById('stepsContent').innerHTML = html;
+  document.getElementById('stepsContent').style.display = 'block';
+  document.getElementById('stepsPH').style.display = 'none';
+  switchTab('steps');
+}
+
+function stepHtml(n, title, body) {
+  return '<div class="step-item"><div class="step-num">'+n+'</div>' +
+    '<div class="step-body"><h4>'+title+'</h4><p>'+body+'</p></div></div>';
+}
+
+// ═══════════════════════════════════════════════════════════════
+// DOWNLOAD
+// ═══════════════════════════════════════════════════════════════
+function downloadSolution() {
+  if (!lastResult) { calculate(); }
+  if (!lastResult) return;
+  const R = lastResult;
+  const mu = R.mu, kM = R.kM, kL = R.kL, kF = R.kF;
+  const O_d = scale3(R.O, 1/kL);
+  const now = new Date().toLocaleString('es-MX');
+  const convLabel = R.sign === 1 ? 'Dextrógiro (mano derecha)' : 'Levógiro (mano izquierda)';
+
+  const sep = '='.repeat(64);
+  let txt = 'MOMENTOS EN TRES DIMENSIONES — ESTÁTICA\n';
+  txt += 'Calculadora Vectorial de Momentos\nGenerado: '+now+'\n'+sep+'\n\n';
+  txt += 'CONFIGURACIÓN\n-------------\n';
+  txt += '  Sistema de unidades : '+lu+' / '+fu+'\n';
+  txt += '  Unidad de momento   : '+mu+'\n';
+  txt += '  Factor conversión   : 1 '+mu+' = '+kM.toFixed(6)+' N·m\n';
+  txt += '  Punto O             : '+fV(O_d)+' '+lu+'\n';
+  txt += '  Convención          : '+convLabel+'\n';
+  if (R.parMode) txt += '  Modo                : Par de fuerzas\n';
+  txt += '\n'+sep+'\nFUERZAS Y MOMENTOS INDIVIDUALES\n-------------------------------\n';
+
+  for (let i = 0; i < R.items.length; i++) {
+    const it = R.items[i];
+    const r_d = scale3(it.r, 1/kL);
+    const F_d = scale3(it.F, 1/kF);
+    const M_d = scale3(it.M, 1/kM);
+    txt += '\n  '+it.label+(it.isPar?' (par)':'')+'\n';
+    txt += '    Punto A    : '+fV(scale3(it.A,1/kL))+' '+lu+'\n';
+    txt += '    r          : '+fV(r_d)+' '+lu+'\n';
+    txt += '    F          : '+fV(F_d)+' '+fu+'\n';
+    txt += '    M          : '+fV(M_d)+' '+mu+'\n';
+    txt += '    |M|        : '+fS(it.magM/kM)+' '+mu+'\n';
+  }
+
+  const MT_d = scale3(R.M_total, 1/kM);
+  txt += '\n'+sep+'\nMOMENTO RESULTANTE\n------------------\n';
+  txt += '  M_R   = '+fV(MT_d)+' '+mu+'\n';
+  txt += '  |M_R| = '+fS(R.magTotal/kM)+' '+mu+'\n';
+  txt += '  α='+fS(R.anglesTot[0])+'°  β='+fS(R.anglesTot[1])+'°  γ='+fS(R.anglesTot[2])+'°\n';
+
+  if (R.ejeMode && R.ML !== null) {
+    txt += '\nPROYECCIÓN SOBRE EJE L\n';
+    txt += '  û_L = '+fV(R.ejeVec)+'\n';
+    txt += '  M_L = '+fS(R.ML/kM)+' '+mu+'\n';
+  }
+  txt += '\n'+sep+'\nEstática 3D — Calculadora Vectorial\n';
+
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([txt], {type:'text/plain;charset=utf-8'}));
+  a.download = 'solucion_momentos3D.txt';
+  a.click();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CLEAR
+// ═══════════════════════════════════════════════════════════════
+function clearAll() {
+  if (!confirm('¿Limpiar todo el formulario?')) return;
+  forceIds = [];
+  forceCounter = 0;
+  lastResult = null;
+  document.getElementById('forceList').innerHTML = '';
+  document.getElementById('ox').value = '0';
+  document.getElementById('oy').value = '0';
+  document.getElementById('oz').value = '0';
+  document.getElementById('chkEje').checked = false;
+  document.getElementById('chkPar').checked = false;
+  toggleEje();
+
+  document.getElementById('resultsContent').style.display = 'none';
+  document.getElementById('resultsPH').style.display = 'flex';
+  document.getElementById('stepsContent').style.display = 'none';
+  document.getElementById('stepsPH').style.display = 'flex';
+
+  const canvas = document.getElementById('graphCanvas');
+  canvas.style.display = 'none';
+  document.getElementById('graphLeg').style.display = 'none';
+  document.getElementById('graphTip').style.display = 'none';
+  document.getElementById('graphPH').style.display = 'flex';
+  if (threeRenderer) { threeRenderer.dispose(); threeRenderer=null; threeScene=null; threeCamera=null; }
+  canvas.parentElement.querySelectorAll('.lbl3d').forEach(el => el.remove());
+  threeLabels = [];
+
+  updateInfoBar();
+  switchTab('graph');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TABS
+// ═══════════════════════════════════════════════════════════════
+function switchTab(t) {
+  ['graph','results','steps'].forEach(id => {
+    const cap = id[0].toUpperCase()+id.slice(1);
+    document.getElementById('tab'+cap).classList.toggle('active', id===t);
+    const el = document.getElementById('panel'+cap);
+    el.style.display = id===t ? (id==='graph'?'flex':'block') : 'none';
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// THREE.JS — 3D GRAPH (light theme, matching cap. 7)
+// ═══════════════════════════════════════════════════════════════
+function graficar() {
+  if (forceIds.length === 0) { alert('Agrega al menos una fuerza.'); return; }
+  if (!lastResult) { calculate(); }
+  if (!lastResult) return;
+  switchTab('graph');
+
+  const R = lastResult;
+
+  document.getElementById('graphPH').style.display = 'none';
+  document.getElementById('graphTip').style.display = 'block';
+  const canvas = document.getElementById('graphCanvas');
+  canvas.style.display = 'block';
+
+  if (threeRenderer) { threeRenderer.dispose(); threeScene=null; threeCamera=null; }
+  canvas.parentElement.querySelectorAll('.lbl3d').forEach(el => el.remove());
+  threeLabels = [];
+
+  const cw = canvas.parentElement;
+  const w = cw.clientWidth, h = cw.clientHeight;
+  threeRenderer = new THREE.WebGLRenderer({ canvas:canvas, antialias:true, alpha:true });
+  threeRenderer.setSize(w, h);
+  threeRenderer.setPixelRatio(window.devicePixelRatio);
+  threeRenderer.setClearColor(0xf1f5f4, 1);
+  threeScene = new THREE.Scene();
+  threeCamera = new THREE.PerspectiveCamera(50, w/h, 0.01, 1000);
+
+  const allPts = [R.O];
+  R.items.forEach(it => allPts.push(it.A));
+  let maxR = 0.01;
+  allPts.forEach(p => p.forEach(v => { if (Math.abs(v) > maxR) maxR = Math.abs(v); }));
+  let maxMomR = 0.01;
+  R.items.forEach(it => { const m = mag3(it.M); if (m > maxMomR) maxMomR = m; });
+  const sc = 1 / maxR;
+  const mSc = maxR > 0 ? (0.6 * maxR / Math.max(maxMomR, 0.01)) : 1;
+
+  const vp = p => new THREE.Vector3(p[0]*sc, p[1]*sc, p[2]*sc);
+
+  function addArrow3(from, to, color, headScale) {
+    const mat = new THREE.LineBasicMaterial({ color:color, linewidth:2 });
+    threeScene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([from, to]), mat));
+    const dir = to.clone().sub(from);
+    const len = dir.length();
+    if (len > 0.005) {
+      dir.normalize();
+      const hs = headScale || 1;
+      threeScene.add(new THREE.ArrowHelper(dir, from, len, color, 0.08*hs, 0.05*hs));
+    }
+  }
+
+  function sph(pos, color, r) {
+    const m = new THREE.Mesh(new THREE.SphereGeometry(r, 16, 16),
+      new THREE.MeshStandardMaterial({ color:color, roughness:0.4, metalness:0.3 }));
+    m.position.copy(pos);
+    threeScene.add(m);
+  }
+
+  function lbl(text, pos, col) {
+    const d = document.createElement('div');
+    d.className = 'lbl3d';
+    if (col) d.style.color = col;
+    d.textContent = text;
+    cw.appendChild(d);
+    threeLabels.push({ div:d, pos:pos });
+  }
+
+  const axL = 1.3;
+  addArrow3(new THREE.Vector3(0,0,0), new THREE.Vector3(axL,0,0), 0xdc2626, 0.75);
+  addArrow3(new THREE.Vector3(0,0,0), new THREE.Vector3(0,axL,0), 0x16a34a, 0.75);
+  addArrow3(new THREE.Vector3(0,0,0), new THREE.Vector3(0,0,axL), 0x2563eb, 0.75);
+  lbl('x', new THREE.Vector3(axL+0.06, 0, 0), '#dc2626');
+  lbl('y', new THREE.Vector3(0, axL+0.06, 0), '#16a34a');
+  lbl('z', new THREE.Vector3(0, 0, axL+0.06), '#2563eb');
+
+  const oV = vp(R.O);
+  sph(oV, 0x059669, 0.045);
+  lbl('O', oV.clone().add(new THREE.Vector3(0.05, 0.05, 0)), '#047857');
+
+  let legHtml = '<div class="leg-title">Leyenda</div>';
+  legHtml += '<div class="leg-item"><span class="leg-dot" style="background:#dc2626"></span>Eje X</div>';
+  legHtml += '<div class="leg-item"><span class="leg-dot" style="background:#16a34a"></span>Eje Y</div>';
+  legHtml += '<div class="leg-item"><span class="leg-dot" style="background:#2563eb"></span>Eje Z</div>';
+
+  R.items.forEach(it => {
+    const aV = vp(it.A);
+    const colHex = parseInt(it.color.replace('#',''), 16);
+
+    addArrow3(oV, aV, 0x6b7280, 0.7);
+    sph(aV, colHex, 0.028);
+    lbl('A'+(it.isPar?'(par)':it.idx), aV.clone().add(new THREE.Vector3(0.04,0.04,0)), it.color);
+
+    const fEnd = aV.clone().add(new THREE.Vector3(it.F[0]*sc, it.F[1]*sc, it.F[2]*sc));
+    addArrow3(aV, fEnd, colHex);
+    lbl(it.label, fEnd.clone().add(new THREE.Vector3(0.04,0.03,0)), it.color);
+
+    const mEnd = oV.clone().add(new THREE.Vector3(it.M[0]*mSc*sc, it.M[1]*mSc*sc, it.M[2]*mSc*sc));
+    addArrow3(oV, mEnd, 0x0e7490, 0.8);
+    lbl('M'+it.idx, mEnd.clone().add(new THREE.Vector3(0.04,0.02,0)), '#0e7490');
+
+    legHtml += '<div class="leg-item"><span class="leg-dot" style="background:'+it.color+'"></span>'+it.label+'</div>';
+  });
+
+  legHtml += '<div class="leg-item"><span class="leg-dot" style="background:#0e7490"></span>M (por fuerza)</div>';
+
+  if (R.items.length > 1) {
+    const mrEnd = oV.clone().add(new THREE.Vector3(R.M_total[0]*mSc*sc, R.M_total[1]*mSc*sc, R.M_total[2]*mSc*sc));
+    addArrow3(oV, mrEnd, 0x059669, 1.1);
+    lbl('M_R', mrEnd.clone().add(new THREE.Vector3(0.05,0.04,0)), '#047857');
+    legHtml += '<div class="leg-item"><span class="leg-dot" style="background:#059669"></span>M<sub>R</sub> (resultante)</div>';
+  }
+
+  if (R.ejeMode && R.ejeVec) {
+    const eP = new THREE.Vector3(R.ejeVec[0]*1.5, R.ejeVec[1]*1.5, R.ejeVec[2]*1.5);
+    const eN = eP.clone().negate();
+    const dMat = new THREE.LineDashedMaterial({ color:0x7c3aed, dashSize:0.1, gapSize:0.06 });
+    const dGeo = new THREE.BufferGeometry().setFromPoints([eN, eP]);
+    const dLine = new THREE.Line(dGeo, dMat);
+    dLine.computeLineDistances();
+    threeScene.add(dLine);
+    lbl('L', eP.clone().add(new THREE.Vector3(0.05,0.03,0)), '#7c3aed');
+    legHtml += '<div class="leg-item"><span class="leg-dot" style="background:#7c3aed"></span>Eje û<sub>L</sub></div>';
+  }
+
+  document.getElementById('graphLeg').innerHTML = legHtml;
+  document.getElementById('graphLeg').style.display = 'flex';
+
+  threeScene.add(new THREE.AmbientLight(0xffffff, 0.85));
+  const dl = new THREE.DirectionalLight(0xffffff, 0.55);
+  dl.position.set(5, 10, 5);
+  threeScene.add(dl);
+
+  threeCamera.position.set(2, 2, 2);
+  threeCamera.lookAt(0, 0, 0);
+  spherical = { theta:Math.PI/4, phi:Math.PI/3, radius:3.2 };
+
+  cw.onmousedown = e => { mouse.down=true; mouse.x=e.clientX; mouse.y=e.clientY; canvas.style.cursor='grabbing'; };
+  cw.onmousemove = e => {
+    if (!mouse.down) return;
+    spherical.theta -= (e.clientX - mouse.x) * 0.01;
+    spherical.phi   -= (e.clientY - mouse.y) * 0.01;
+    spherical.phi = Math.max(0.1, Math.min(Math.PI-0.1, spherical.phi));
+    mouse.x = e.clientX; mouse.y = e.clientY;
+  };
+  cw.onmouseup = () => { mouse.down=false; canvas.style.cursor='grab'; };
+  cw.onmouseleave = () => { mouse.down=false; };
+  cw.onwheel = e => { spherical.radius = Math.max(0.5, Math.min(9, spherical.radius + e.deltaY*0.005)); e.preventDefault(); };
+
+  let lastTouchDist = null;
+  cw.ontouchstart = e => {
+    if (e.touches.length === 1) { mouse.down=true; mouse.x=e.touches[0].clientX; mouse.y=e.touches[0].clientY; }
+    if (e.touches.length === 2) {
+      mouse.down=false;
+      lastTouchDist = Math.hypot(e.touches[0].clientX-e.touches[1].clientX, e.touches[0].clientY-e.touches[1].clientY);
+    }
+    e.preventDefault();
+  };
+  cw.ontouchmove = e => {
+    if (e.touches.length === 1 && mouse.down) {
+      spherical.theta -= (e.touches[0].clientX - mouse.x) * 0.01;
+      spherical.phi   -= (e.touches[0].clientY - mouse.y) * 0.01;
+      spherical.phi = Math.max(0.1, Math.min(Math.PI-0.1, spherical.phi));
+      mouse.x = e.touches[0].clientX; mouse.y = e.touches[0].clientY;
+    }
+    if (e.touches.length === 2 && lastTouchDist) {
+      const d = Math.hypot(e.touches[0].clientX-e.touches[1].clientX, e.touches[0].clientY-e.touches[1].clientY);
+      spherical.radius = Math.max(0.5, Math.min(9, spherical.radius * lastTouchDist / d));
+      lastTouchDist = d;
+    }
+    e.preventDefault();
+  };
+  cw.ontouchend = () => { mouse.down=false; lastTouchDist=null; };
+
+  (function animate() {
+    if (!threeRenderer || !threeScene || !threeCamera) return;
+    requestAnimationFrame(animate);
+    threeCamera.position.set(
+      spherical.radius * Math.sin(spherical.phi) * Math.sin(spherical.theta),
+      spherical.radius * Math.cos(spherical.phi),
+      spherical.radius * Math.sin(spherical.phi) * Math.cos(spherical.theta)
+    );
+    threeCamera.lookAt(0, 0, 0);
+    threeRenderer.render(threeScene, threeCamera);
+    threeLabels.forEach(l => {
+      const v = l.pos.clone().project(threeCamera);
+      l.div.style.left = ((v.x * 0.5 + 0.5) * w + 5) + 'px';
+      l.div.style.top  = ((-0.5 * v.y + 0.5) * h - 10) + 'px';
+    });
+  })();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════
+(function init() {
+  setSystem('SI');
+  document.getElementById('selLen').value = 'm';
+  document.getElementById('selForce').value = 'N';
+  document.getElementById('selMomUnit').value = 'N·m';
+  updateUnits();
+  document.getElementById('ox').value = '0';
+  document.getElementById('oy').value = '0';
+  document.getElementById('oz').value = '0';
+  addForce({ ax:3, ay:4, az:0, fx:0, fy:0, fz:-500 });
+  updateInfoBar();
+})();
+</script>
+</body>
+</html>

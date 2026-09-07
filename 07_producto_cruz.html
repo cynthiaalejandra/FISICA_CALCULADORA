@@ -1,0 +1,1093 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Producto Cruz y Punto — Estática 3D</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@500;600;700&family=Roboto:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+:root{
+  --green:#059669;--green-light:#10b981;--green-dark:#047857;
+  --teal:#0891b2;--teal-light:#22d3ee;--teal-dark:#0e7490;
+  --gray:#555;--gray-light:#9ca3af;--gray-lighter:#e5e7eb;--gray-bg:#f9fafb;
+  --white:#ffffff;--black:#111827;
+  --surface:#ffffff;--surface2:#f8fafb;--surface3:#f1f5f4;
+  --text:#1f2937;--text2:#6b7280;--text3:#9ca3af;
+  --border:#d1d5db;--border-light:#e5e7eb;--border-green:rgba(5,150,105,.25);
+  --gold:#d97706;--red:#dc2626;--purple:#7c3aed;
+  --radius:10px;--radius2:14px;
+  --shadow:0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+  --shadow-md:0 4px 12px rgba(0,0,0,.07), 0 2px 4px rgba(0,0,0,.04);
+  --shadow-lg:0 10px 25px rgba(0,0,0,.08), 0 4px 10px rgba(0,0,0,.04);
+  --grad:linear-gradient(135deg, var(--green) 0%, var(--teal) 100%);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--gray-bg);color:var(--text);font-family:'Roboto',sans-serif;font-size:15px;min-height:100vh;overflow-x:hidden;}
+
+/* ── HEADER ── */
+header{
+  background:var(--white);
+  border-bottom:1px solid var(--border-light);
+  padding:0 28px;
+  display:flex;align-items:center;justify-content:space-between;height:60px;
+  box-shadow:var(--shadow);position:relative;z-index:10;
+}
+.hd-brand{display:flex;align-items:center;gap:10px;}
+.hd-icon{
+  width:36px;height:36px;border-radius:10px;
+  background:var(--grad);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 2px 8px rgba(5,150,105,.25);
+}
+.hd-icon svg{width:20px;height:20px;color:#fff;}
+.hd-title{font-family:'Poppins',sans-serif;font-size:17px;font-weight:700;color:var(--black);letter-spacing:-.3px;}
+.hd-subtitle{font-family:'Roboto',sans-serif;font-size:12px;color:var(--text2);font-weight:400;margin-top:-1px;}
+.hd-badge{
+  font-family:'Inter',sans-serif;font-size:10px;font-weight:700;
+  padding:3px 10px;border-radius:20px;letter-spacing:.5px;
+  background:linear-gradient(135deg,rgba(5,150,105,.08),rgba(8,145,178,.08));
+  color:var(--green);border:1px solid var(--border-green);
+}
+
+/* ── LAYOUT ── */
+.main{display:grid;grid-template-columns:360px 1fr;gap:0;height:calc(100vh - 60px);}
+
+/* ── LEFT: sidebar (vectors) ── */
+.panel-left{
+  background:var(--surface2);border-right:1px solid var(--border-light);
+  overflow-y:auto;padding:20px 18px;
+  box-shadow:2px 0 12px rgba(0,0,0,.03);
+  order:0;
+}
+
+/* ── RIGHT: visualization ── */
+.panel-right-viz{background:var(--white);display:flex;flex-direction:column;overflow:hidden;order:1;}
+
+/* ── SECTIONS ── */
+.sec{margin-bottom:16px;}
+.sec-title{
+  font-family:'Inter',sans-serif;font-size:11px;font-weight:700;letter-spacing:1.2px;color:var(--green);
+  text-transform:uppercase;padding-bottom:6px;margin-bottom:10px;
+  display:flex;align-items:center;gap:8px;
+  border-bottom:1px solid var(--border-light);
+}
+.sec-title .sec-icon{
+  width:18px;height:18px;color:var(--green);flex-shrink:0;opacity:.75;
+}
+
+/* ── TABS ── */
+.unit-tabs{display:flex;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:10px;background:var(--white);}
+.unit-tab{
+  flex:1;padding:8px 4px;text-align:center;
+  font-family:'Inter',sans-serif;font-weight:600;font-size:11px;letter-spacing:.3px;
+  cursor:pointer;background:var(--white);color:var(--text2);
+  transition:all .2s;border:none;outline:none;line-height:1.4;
+}
+.unit-tab:hover{background:var(--surface3);}
+.unit-tab.active{background:var(--green);color:#fff;}
+.unit-tab.op-active{background:var(--grad);color:#fff;}
+
+/* ── INPUTS ── */
+label{font-family:'Inter',sans-serif;font-size:11px;color:var(--text2);display:block;margin-bottom:3px;font-weight:500;}
+select,input[type=number]{
+  width:100%;background:var(--white);border:1px solid var(--border);border-radius:8px;
+  color:var(--text);font-family:'Roboto',sans-serif;font-size:14px;padding:7px 10px;
+  outline:none;transition:all .2s;
+}
+select:focus,input[type=number]:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(5,150,105,.1);}
+select option{background:var(--white);}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;}
+
+/* ── VECTOR CARD ── */
+.vec-block{
+  background:var(--white);border:1px solid var(--border-light);border-radius:var(--radius2);
+  padding:14px 15px;margin-bottom:10px;transition:all .25s;
+  box-shadow:var(--shadow);
+  border-left:3px solid transparent;
+}
+.vec-block:hover{border-left-color:var(--green);box-shadow:var(--shadow-md);}
+.vec-block.vec-r{border-left-color:var(--gray);}
+.vec-block.vec-f{border-left-color:var(--teal);}
+.vec-block.vec-ul{border-left-color:var(--purple);}
+.vec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:5px;}
+.vec-name{
+  font-family:'Poppins',sans-serif;font-size:15px;font-weight:700;letter-spacing:.3px;
+  display:flex;align-items:center;gap:8px;color:var(--black);
+}
+.vdot{width:10px;height:10px;border-radius:50%;flex-shrink:0;box-shadow:0 1px 3px rgba(0,0,0,.15);}
+.vec-role{font-family:'Roboto',sans-serif;font-size:12px;color:var(--text2);font-weight:400;}
+.fblock-label{font-size:11px;color:var(--text2);margin-bottom:7px;font-weight:500;font-family:'Inter',sans-serif;}
+
+/* ── PILL ── */
+.pill{
+  font-size:9px;padding:2px 8px;border-radius:12px;
+  font-family:'Inter',sans-serif;font-weight:700;letter-spacing:.6px;white-space:nowrap;
+}
+.pill-dato{background:rgba(5,150,105,.08);color:var(--green);border:1px solid var(--border-green);}
+
+/* ── INFO BAR ── */
+.info-bar{
+  background:rgba(5,150,105,.05);border:1px solid var(--border-green);border-radius:var(--radius);
+  padding:8px 12px;font-size:12px;color:var(--green-dark);margin-bottom:12px;
+  font-family:'Inter',sans-serif;font-weight:500;letter-spacing:.2px;
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+}
+.info-bar.warn{background:rgba(220,38,38,.05);border-color:rgba(220,38,38,.25);color:var(--red);}
+
+/* ── BUTTONS ── */
+.actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;}
+.btn{
+  flex:1;min-width:0;padding:10px 6px;border-radius:var(--radius);border:none;
+  font-family:'Inter',sans-serif;font-weight:700;font-size:11px;letter-spacing:.6px;
+  cursor:pointer;transition:all .2s;text-transform:uppercase;
+  display:flex;align-items:center;justify-content:center;gap:5px;
+}
+.btn-calc{background:var(--grad);color:#fff;box-shadow:0 2px 8px rgba(5,150,105,.25);}
+.btn-calc:hover{filter:brightness(1.08);box-shadow:0 4px 14px rgba(5,150,105,.3);}
+.btn-graph{background:var(--teal);color:#fff;box-shadow:0 2px 8px rgba(8,145,178,.2);}
+.btn-graph:hover{background:var(--teal-dark);}
+.btn-steps{background:var(--white);color:var(--green-dark);border:1px solid var(--border-green);}
+.btn-steps:hover{background:rgba(5,150,105,.05);}
+.btn-dl{background:var(--white);color:var(--teal-dark);border:1px solid rgba(8,145,178,.3);}
+.btn-dl:hover{background:rgba(8,145,178,.05);}
+.btn-clear{background:var(--white);color:var(--red);border:1px solid rgba(220,38,38,.25);}
+.btn-clear:hover{background:rgba(220,38,38,.04);}
+
+/* ── LEFT PANEL TABS ── */
+.rtabs{display:flex;border-bottom:1px solid var(--border-light);background:var(--white);}
+.rtab{
+  padding:12px 20px;font-family:'Inter',sans-serif;font-weight:600;font-size:12px;
+  letter-spacing:.5px;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;
+  transition:all .2s;text-transform:uppercase;
+}
+.rtab:hover{color:var(--green);}
+.rtab.active{color:var(--green);border-bottom-color:var(--green);}
+
+/* ── CANVAS ── */
+.canvas-wrap{flex:1;position:relative;overflow:hidden;background:var(--surface3);}
+#panelResults{padding:22px;overflow-y:auto;flex:1;background:var(--white);}
+#panelSteps{padding:22px;overflow-y:auto;flex:1;background:var(--white);}
+
+/* ── RESULT CARDS ── */
+.result-card{
+  background:var(--white);border:1px solid var(--border-light);border-radius:var(--radius2);
+  padding:16px 18px;margin-bottom:12px;box-shadow:var(--shadow);
+}
+.result-title{
+  font-family:'Poppins',sans-serif;font-size:13px;font-weight:700;letter-spacing:.5px;
+  color:var(--green);text-transform:uppercase;margin-bottom:10px;
+  display:flex;align-items:center;gap:6px;
+}
+.result-title::before{content:'';width:4px;height:14px;border-radius:2px;background:var(--grad);}
+.rrow{
+  display:flex;justify-content:space-between;align-items:center;padding:6px 0;
+  border-bottom:1px solid var(--border-light);font-size:13px;color:var(--text2);
+}
+.rrow:last-child{border:none;}
+.rval{font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:500;color:var(--teal-dark);}
+.rval.ans{color:var(--green);font-size:18px;font-weight:700;}
+.check-row{
+  margin-top:10px;padding:8px 12px;border-radius:var(--radius);font-size:12px;
+  font-family:'Inter',sans-serif;font-weight:600;letter-spacing:.3px;
+}
+.check-ok{background:rgba(5,150,105,.06);color:var(--green);border:1px solid var(--border-green);}
+.check-fail{background:rgba(220,38,38,.06);color:var(--red);border:1px solid rgba(220,38,38,.25);}
+
+/* ── STEPS ── */
+.step-item{display:flex;gap:14px;margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid var(--border-light);}
+.step-num{
+  width:32px;height:32px;border-radius:50%;background:var(--grad);color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Poppins',sans-serif;font-weight:700;font-size:14px;flex-shrink:0;
+  box-shadow:0 2px 6px rgba(5,150,105,.2);
+}
+.step-body h4{font-family:'Poppins',sans-serif;font-size:14px;font-weight:700;color:var(--green-dark);margin-bottom:5px;}
+.step-body p{font-size:13px;color:var(--text2);line-height:1.7;font-family:'Roboto',sans-serif;}
+.math-block{
+  background:var(--surface3);border-left:3px solid var(--green);padding:10px 14px;
+  margin:8px 0;border-radius:0 var(--radius) var(--radius) 0;
+  font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--green-dark);white-space:pre-wrap;
+  box-shadow:var(--shadow);
+}
+
+/* ── PLACEHOLDER ── */
+.placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--text3);gap:14px;}
+.placeholder .ph-icon{
+  width:80px;height:80px;border-radius:20px;
+  background:linear-gradient(135deg,rgba(5,150,105,.06),rgba(8,145,178,.06));
+  display:flex;align-items:center;justify-content:center;
+}
+.placeholder .ph-icon svg{opacity:.35;color:var(--green);}
+.placeholder p{font-size:13px;text-align:center;max-width:280px;line-height:1.6;color:var(--text2);}
+.placeholder p strong{color:var(--green);font-weight:600;}
+.tip{font-size:11px;color:var(--text3);margin-top:4px;font-style:italic;}
+
+/* ── UNIT DISPLAY ── */
+.unit-display{
+  margin-top:6px;padding:6px 10px;background:rgba(5,150,105,.04);
+  border-radius:8px;font-size:11px;color:var(--green-dark);
+  font-family:'Inter',sans-serif;font-weight:500;
+  border:1px solid rgba(5,150,105,.1);
+}
+
+/* ── LEGEND (3D graph) ── */
+.canvas-overlay{
+  position:absolute;top:12px;right:12px;
+  background:rgba(255,255,255,.92);backdrop-filter:blur(8px);
+  border:1px solid var(--border-light);border-radius:var(--radius2);
+  padding:12px 14px;display:flex;flex-direction:column;gap:6px;
+  max-width:220px;box-shadow:var(--shadow-md);
+}
+.leg-title{
+  font-family:'Inter',sans-serif;font-size:10px;font-weight:700;letter-spacing:1px;
+  color:var(--text2);text-transform:uppercase;margin-bottom:2px;
+}
+.leg-item{display:flex;align-items:center;gap:7px;font-size:11px;color:var(--gray);font-family:'Roboto',sans-serif;}
+.leg-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;box-shadow:0 1px 2px rgba(0,0,0,.15);}
+.leg-line{width:14px;height:2px;flex-shrink:0;}
+.canvas-tip{
+  position:absolute;bottom:14px;left:14px;font-size:11px;color:var(--text2);
+  font-family:'Inter',sans-serif;letter-spacing:.2px;pointer-events:none;
+  background:rgba(255,255,255,.85);backdrop-filter:blur(6px);
+  padding:5px 10px;border-radius:8px;box-shadow:var(--shadow);
+}
+.lbl3d{position:absolute;color:var(--gray);font-size:13px;font-family:'Poppins',sans-serif;font-weight:700;pointer-events:none;}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:5px;}
+::-webkit-scrollbar-track{background:var(--surface2);}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+::-webkit-scrollbar-thumb:hover{background:var(--green);}
+
+/* ── MOBILE TOGGLE ── */
+.sidebar-toggle{
+  display:none;position:fixed;bottom:20px;left:20px;z-index:100;
+  width:52px;height:52px;border-radius:50%;border:none;
+  background:var(--grad);color:#fff;cursor:pointer;
+  box-shadow:0 4px 16px rgba(5,150,105,.35);
+  font-size:20px;
+}
+.sidebar-toggle svg{width:22px;height:22px;}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  .main{grid-template-columns:1fr;}
+  .panel-left{
+    position:fixed;top:60px;left:0;bottom:0;width:340px;z-index:50;
+    transform:translateX(-100%);transition:transform .3s ease;
+    box-shadow:var(--shadow-lg);
+  }
+  .panel-left.open{transform:translateX(0);}
+  .sidebar-toggle{display:flex;align-items:center;justify-content:center;}
+  .panel-right-viz{min-height:480px;}
+  .overlay-bg{
+    display:none;position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:40;
+  }
+  .overlay-bg.open{display:block;}
+}
+@media(max-width:480px){
+  header{padding:0 14px;height:54px;}
+  .hd-title{font-size:14px;}
+  .hd-subtitle{font-size:10px;}
+  .hd-badge{display:none;}
+  .panel-left{width:100%;}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ HEADER ═══ -->
+<header>
+  <div class="hd-brand">
+    <div class="hd-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+        <path d="M2 17l10 5 10-5"/>
+        <path d="M2 12l10 5 10-5"/>
+      </svg>
+    </div>
+    <div>
+      <div class="hd-title">Producto Cruz y Punto</div>
+      <div class="hd-subtitle">Momentos en 3D — Estática</div>
+    </div>
+  </div>
+  <div class="hd-badge">⚡ Calculadora Vectorial</div>
+</header>
+
+<!-- ═══ OVERLAY BG (mobile) ═══ -->
+<div class="overlay-bg" id="overlayBg" onclick="toggleSidebar()"></div>
+
+<!-- ═══ MAIN LAYOUT ═══ -->
+<div class="main">
+
+<!-- ═══ LEFT: SIDEBAR (vectores) ═══ -->
+<div class="panel-left" id="sidebarPanel">
+
+  <!-- Operación -->
+  <div class="sec">
+    <div class="sec-title">
+      <svg class="sec-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+      Operación
+    </div>
+    <div class="unit-tabs">
+      <button class="unit-tab op-active" id="opCross" onclick="setOperation('cross')">Cruz<br><span style="font-size:10px;opacity:.8;">r × F</span></button>
+      <button class="unit-tab"           id="opDot"   onclick="setOperation('dot')">Punto<br><span style="font-size:10px;opacity:.8;">r · F</span></button>
+      <button class="unit-tab"           id="opMixed" onclick="setOperation('mixed')">Mixto<br><span style="font-size:10px;opacity:.8;">ûL·(r×F)</span></button>
+    </div>
+    <div class="tip" id="opTip">r × F = M (momento). Determinante 3×3, resultado vectorial perpendicular a r y F.</div>
+  </div>
+
+  <!-- Sistema de Unidades -->
+  <div class="sec">
+    <div class="sec-title">
+      <svg class="sec-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+      Unidades
+    </div>
+    <div class="unit-tabs">
+      <button class="unit-tab active" id="btnSI"  onclick="setSystem('SI')">Internacional (SI)</button>
+      <button class="unit-tab"        id="btnENG" onclick="setSystem('ENG')">Inglés</button>
+    </div>
+    <div class="g2">
+      <div>
+        <label>Longitud</label>
+        <select id="selLen" onchange="updateUnits()">
+          <option value="m">m (metros)</option>
+          <option value="cm">cm (centímetros)</option>
+          <option value="mm">mm (milímetros)</option>
+        </select>
+      </div>
+      <div>
+        <label>Fuerza</label>
+        <select id="selForce" onchange="updateUnits()">
+          <option value="N">N (Newtons)</option>
+          <option value="kN">kN (Kilonewtons)</option>
+        </select>
+      </div>
+    </div>
+    <div style="margin-top:8px;">
+      <label>Unidad del resultado</label>
+      <select id="selMomUnit" onchange="updateResultUnit()">
+        <option value="auto">Automático (fu · lu)</option>
+        <option value="N·m">N·m</option><option value="N·cm">N·cm</option><option value="N·mm">N·mm</option>
+        <option value="kN·m">kN·m</option><option value="lb·ft">lb·ft</option><option value="lb·in">lb·in</option>
+        <option value="kip·ft">kip·ft</option><option value="kip·in">kip·in</option>
+      </select>
+    </div>
+    <div class="unit-display">Unidad de resultado: <strong id="momentUnit">N·m</strong></div>
+  </div>
+
+  <!-- Vector r -->
+  <div class="sec">
+    <div class="sec-title">
+      <svg class="sec-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      Vector de posición
+    </div>
+    <div class="vec-block vec-r">
+      <div class="vec-head">
+        <span class="vec-name"><span class="vdot" style="background:#6b7280"></span>r <span class="vec-role">— posición</span></span>
+        <span class="pill pill-dato">DATO</span>
+      </div>
+      <div class="fblock-label">Componentes de r</div>
+      <div class="g3">
+        <div><label>rx (<span class="ulen">m</span>)</label><input type="number" id="rx" value="0.4" step="any"></div>
+        <div><label>ry (<span class="ulen">m</span>)</label><input type="number" id="ry" value="0.3" step="any"></div>
+        <div><label>rz (<span class="ulen">m</span>)</label><input type="number" id="rz" value="0" step="any"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Vector F -->
+  <div class="sec">
+    <div class="sec-title">
+      <svg class="sec-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      Vector de fuerza
+    </div>
+    <div class="vec-block vec-f">
+      <div class="vec-head">
+        <span class="vec-name"><span class="vdot" style="background:var(--teal)"></span>F <span class="vec-role">— fuerza</span></span>
+        <span class="pill pill-dato">DATO</span>
+      </div>
+      <div class="fblock-label">Componentes de F</div>
+      <div class="g3">
+        <div><label>Fx (<span class="uforce">N</span>)</label><input type="number" id="Fx" value="0" step="any"></div>
+        <div><label>Fy (<span class="uforce">N</span>)</label><input type="number" id="Fy" value="0" step="any"></div>
+        <div><label>Fz (<span class="uforce">N</span>)</label><input type="number" id="Fz" value="-500" step="any"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Vector ûL (solo Producto Mixto) -->
+  <div class="sec" id="secUL" style="display:none;">
+    <div class="sec-title">
+      <svg class="sec-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+      Eje unitario
+    </div>
+    <div class="vec-block vec-ul">
+      <div class="vec-head">
+        <span class="vec-name"><span class="vdot" style="background:var(--purple)"></span>ûL <span class="vec-role">— eje unitario</span></span>
+        <span class="pill pill-dato">DATO</span>
+      </div>
+      <div class="fblock-label">Componentes de ûL (se normaliza automáticamente)</div>
+      <div class="g3">
+        <div><label>ux</label><input type="number" id="ULx" value="0" step="any"></div>
+        <div><label>uy</label><input type="number" id="ULy" value="1" step="any"></div>
+        <div><label>uz</label><input type="number" id="ULz" value="0" step="any"></div>
+      </div>
+      <div class="tip">Se normaliza antes de calcular ML = ûL · (r × F)</div>
+    </div>
+  </div>
+
+  <!-- Info Bar -->
+  <div class="info-bar" id="infoBar">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+    </svg>
+    <span id="infoTxt">Ingresa r y F, y presiona Calcular</span>
+  </div>
+
+  <!-- Botones -->
+  <div class="actions">
+    <button class="btn btn-calc" onclick="calculate()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="16" y2="10"/></svg>Calcular
+    </button>
+    <button class="btn btn-graph" onclick="graficar()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><line x1="12" y1="3" x2="12" y2="12"/><line x1="12" y1="12" x2="19" y2="12"/></svg>3D
+    </button>
+  </div>
+  <div class="actions" style="margin-top:0;">
+    <button class="btn btn-steps" onclick="showSteps()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>Procedimiento
+    </button>
+    <button class="btn btn-dl" onclick="downloadSolution()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Descargar
+    </button>
+    <button class="btn btn-clear" onclick="clearAll()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3,6 5,6 21,6"/><path d="M19,6l-1,14a2,2,0,0,1-2,2H8a2,2,0,0,1-2-2L5,6"/></svg>Limpiar
+    </button>
+  </div>
+
+</div><!-- end panel-left (sidebar) -->
+
+<!-- ═══ RIGHT: VISUALIZATION PANEL ═══ -->
+<div class="panel-right-viz">
+  <div class="rtabs">
+    <div class="rtab active" id="tabGraph" onclick="switchTab('graph')">
+      <svg style="width:13px;height:13px;vertical-align:-2px;margin-right:4px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><line x1="12" y1="3" x2="12" y2="12"/><line x1="12" y1="12" x2="19" y2="12"/></svg>Gráfica 3D
+    </div>
+    <div class="rtab" id="tabResults" onclick="switchTab('results')">
+      <svg style="width:13px;height:13px;vertical-align:-2px;margin-right:4px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="16" y2="10"/></svg>Resultados
+    </div>
+    <div class="rtab" id="tabSteps" onclick="switchTab('steps')">
+      <svg style="width:13px;height:13px;vertical-align:-2px;margin-right:4px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>Procedimiento
+    </div>
+  </div>
+
+  <!-- Gráfica -->
+  <div id="panelGraph" class="canvas-wrap">
+    <div class="placeholder" id="graphPH">
+      <div class="ph-icon">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+          <path d="M2 17l10 5 10-5"/>
+          <path d="M2 12l10 5 10-5"/>
+        </svg>
+      </div>
+      <p>Ingresa los vectores <strong>r</strong> y <strong>F</strong> en el panel lateral, y presiona <strong>Graficar</strong> para visualizar en 3D.</p>
+    </div>
+    <canvas id="graphCanvas" style="display:none;width:100%;height:100%;cursor:grab;"></canvas>
+    <div class="canvas-overlay" id="graphLeg" style="display:none;"></div>
+    <div class="canvas-tip" id="graphTip" style="display:none;">🖱 Arrastra = rotar · Rueda = zoom</div>
+  </div>
+
+  <!-- Resultados -->
+  <div id="panelResults" style="display:none;">
+    <div class="placeholder" id="resultsPH">
+      <div class="ph-icon">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <rect x="4" y="2" width="16" height="20" rx="2"/>
+          <line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="12" y2="14"/>
+        </svg>
+      </div>
+      <p>Presiona <strong>Calcular</strong> para obtener los resultados numéricos.</p>
+    </div>
+    <div id="resultsContent" style="display:none;"></div>
+  </div>
+
+  <!-- Procedimiento -->
+  <div id="panelSteps" style="display:none;overflow-y:auto;flex:1;padding:22px;">
+    <div class="placeholder" id="stepsPH">
+      <div class="ph-icon">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
+        </svg>
+      </div>
+      <p>Presiona <strong>Calcular</strong> y luego <strong>Procedimiento</strong> para ver el paso a paso.</p>
+    </div>
+    <div id="stepsContent" style="display:none;"></div>
+  </div>
+</div><!-- end panel-right-viz -->
+
+</div><!-- end main -->
+
+<!-- Mobile toggle button -->
+<button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()" aria-label="Abrir panel de vectores">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+    <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+  </svg>
+</button>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════════
+let operation = 'cross';
+let fu = 'N', lu = 'm';
+let currentSystem = 'SI';
+let lastResult = null;
+
+const LEN_TO_M = { m:1, cm:0.01, mm:0.001, ft:0.3048, in:0.0254 };
+const FORCE_TO_N = { N:1, kN:1000, lb:4.44822, kip:4448.22 };
+
+const UNIT_OPTIONS = {
+  SI:  { len: [['m','m (metros)'],['cm','cm (centímetros)'],['mm','mm (milímetros)']], force: [['N','N (Newtons)'],['kN','kN (Kilonewtons)']] },
+  ENG: { len: [['ft','ft (pies)'],['in','in (pulgadas)']], force: [['lb','lb (libras)'],['kip','kip (kilopound)']] }
+};
+
+const MU_TO_NM = {
+  'N·m':1, 'N·cm':0.01, 'N·mm':0.001, 'kN·m':1000,
+  'lb·ft':1.35582, 'lb·in':0.112985, 'kip·ft':1355.82, 'kip·in':112.985
+};
+
+const OP_INFO = {
+  cross: { tip: 'r × F = M (momento). Determinante 3×3, resultado vectorial perpendicular a r y F.', tab:'opCross' },
+  dot:   { tip: 'r · F = escalar. Suma de productos componente a componente; mide cuánto se alinean r y F.', tab:'opDot' },
+  mixed: { tip: 'ûL · (r × F) = ML. Primero el cruz (momento M), luego se proyecta sobre el eje ûL.', tab:'opMixed' }
+};
+
+let muOverride = 'auto';
+let threeRenderer=null, threeScene=null, threeCamera=null;
+let mouse = {down:false, x:0, y:0};
+let spherical = {radius:3.2, theta:0.9, phi:1.05};
+
+// ═══════════════════════════════════════════════════════════════
+// MOBILE SIDEBAR TOGGLE
+// ═══════════════════════════════════════════════════════════════
+function toggleSidebar() {
+  const panel = document.getElementById('sidebarPanel');
+  const overlay = document.getElementById('overlayBg');
+  const isOpen = panel.classList.contains('open');
+  panel.classList.toggle('open', !isOpen);
+  overlay.classList.toggle('open', !isOpen);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// OPERATION SELECTOR
+// ═══════════════════════════════════════════════════════════════
+function setOperation(op) {
+  operation = op;
+  ['cross','dot','mixed'].forEach(o => {
+    document.getElementById(OP_INFO[o].tab).classList.toggle('op-active', o===op);
+  });
+  document.getElementById('opTip').textContent = OP_INFO[op].tip;
+  document.getElementById('secUL').style.display = (op==='mixed') ? 'block' : 'none';
+  updateInfoBar();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// UNITS
+// ═══════════════════════════════════════════════════════════════
+function setSystem(sys) {
+  currentSystem = sys;
+  document.getElementById('btnSI').classList.toggle('active',  sys === 'SI');
+  document.getElementById('btnENG').classList.toggle('active', sys === 'ENG');
+  const prevLen = document.getElementById('selLen').value;
+  const prevForce = document.getElementById('selForce').value;
+  const selLen = document.getElementById('selLen');
+  selLen.innerHTML = UNIT_OPTIONS[sys].len.map(([v,t]) => `<option value="${v}"${v===prevLen?' selected':''}>${t}</option>`).join('');
+  const selForce = document.getElementById('selForce');
+  selForce.innerHTML = UNIT_OPTIONS[sys].force.map(([v,t]) => `<option value="${v}"${v===prevForce?' selected':''}>${t}</option>`).join('');
+  updateUnits();
+}
+
+function updateUnits() {
+  lu = document.getElementById('selLen').value;
+  fu = document.getElementById('selForce').value;
+  document.querySelectorAll('.ulen').forEach(el => el.textContent = lu);
+  document.querySelectorAll('.uforce').forEach(el => el.textContent = fu);
+  updateResultUnit();
+}
+
+function updateResultUnit() {
+  muOverride = document.getElementById('selMomUnit').value;
+  const autoMu = fu + '·' + lu;
+  const mu = (muOverride === 'auto') ? autoMu : muOverride;
+  document.getElementById('momentUnit').textContent = mu;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// VECTOR MATH
+// ═══════════════════════════════════════════════════════════════
+function cross(a, b) { return [ a[1]*b[2]-a[2]*b[1], a[2]*b[0]-a[0]*b[2], a[0]*b[1]-a[1]*b[0] ]; }
+function dot(a,b){ return a[0]*b[0]+a[1]*b[1]+a[2]*b[2]; }
+function vnorm(v){ return Math.sqrt(dot(v,v)); }
+function unitVec(v){ const n = vnorm(v); if (n < 1e-12) return [0,0,0]; return [v[0]/n, v[1]/n, v[2]/n]; }
+
+// ═══════════════════════════════════════════════════════════════
+// INFO BAR
+// ═══════════════════════════════════════════════════════════════
+function updateInfoBar() {
+  const bar = document.getElementById('infoBar');
+  const txt = document.getElementById('infoTxt');
+  bar.className = 'info-bar';
+  if (operation === 'cross') txt.textContent = 'Se calculará M = r × F (vector momento, perpendicular a r y F)';
+  else if (operation === 'dot') txt.textContent = 'Se calculará el escalar r · F y el ángulo entre r y F';
+  else txt.textContent = 'Se calculará M = r × F y luego ML = ûL · M (proyección sobre el eje)';
+}
+
+// ═══════════════════════════════════════════════════════════════
+// READ + SOLVE
+// ═══════════════════════════════════════════════════════════════
+function readVectorsSI() {
+  const kL = LEN_TO_M[lu], kF = FORCE_TO_N[fu];
+  const r = [
+    (parseFloat(document.getElementById('rx').value)||0)*kL,
+    (parseFloat(document.getElementById('ry').value)||0)*kL,
+    (parseFloat(document.getElementById('rz').value)||0)*kL
+  ];
+  const F = [
+    (parseFloat(document.getElementById('Fx').value)||0)*kF,
+    (parseFloat(document.getElementById('Fy').value)||0)*kF,
+    (parseFloat(document.getElementById('Fz').value)||0)*kF
+  ];
+  let uL = null;
+  if (operation === 'mixed') {
+    const raw = [
+      parseFloat(document.getElementById('ULx').value)||0,
+      parseFloat(document.getElementById('ULy').value)||0,
+      parseFloat(document.getElementById('ULz').value)||0
+    ];
+    if (vnorm(raw) < 1e-10) throw new Error('El vector ûL es (0,0,0). Ingresa una dirección válida.');
+    uL = unitVec(raw);
+  }
+  return { r, F, uL, kL, kF };
+}
+
+function solveSystem() {
+  const { r, F, uL, kL, kF } = readVectorsSI();
+  const mu_display = document.getElementById('momentUnit').textContent;
+  const kM_input = kL * kF;
+  const kM = MU_TO_NM[mu_display] || kM_input;
+  const rmag = vnorm(r), Fmag = vnorm(F);
+  if (rmag < 1e-12) throw new Error('El vector r no puede ser (0,0,0).');
+  if (Fmag < 1e-12) throw new Error('El vector F no puede ser (0,0,0).');
+  const cosTheta = Math.max(-1, Math.min(1, dot(r,F)/(rmag*Fmag)));
+  const theta = Math.acos(cosTheta) * 180/Math.PI;
+  const out = { operation, r, F, uL, kL, kF, kM, mu: mu_display, rmag, Fmag, theta };
+  if (operation === 'cross' || operation === 'mixed') {
+    const M = cross(r, F);
+    out.M = M; out.Mmag = vnorm(M); out.perpR = dot(M, r); out.perpF = dot(M, F);
+    if (operation === 'mixed') out.ML = dot(uL, M);
+  }
+  if (operation === 'dot') out.dotVal = dot(r, F);
+  return out;
+}
+
+function calculate() {
+  try { lastResult = solveSystem(); } catch(e) { alert('Error: ' + e.message); return; }
+  displayResults(lastResult);
+  switchTab('results');
+}
+
+function toDisplay(res) {
+  const { kL, kF, kM } = res;
+  const dl = v => v.map(x=>x/kL);
+  const df = v => v.map(x=>x/kF);
+  const dm = v => v.map(x=>x/kM);
+  const out = { ...res, r: dl(res.r), F: df(res.F), rmag: res.rmag/kL, Fmag: res.Fmag/kF };
+  if (res.M) { out.M = dm(res.M); out.Mmag = res.Mmag/kM; out.perpR = res.perpR/(kM*kL); out.perpF = res.perpF/(kM*kF); }
+  if (res.ML !== undefined) out.ML = res.ML/kM;
+  if (res.dotVal !== undefined) out.dotVal = res.dotVal/kM;
+  return out;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RESULTS DISPLAY
+// ═══════════════════════════════════════════════════════════════
+function fmt(v){ return Math.abs(v)<1e-9 ? '0.0000' : v.toFixed(4); }
+
+function displayResults(res_si) {
+  const d = toDisplay(res_si);
+  const mu = d.mu;
+  let html = '';
+
+  html += `<div class="result-card">
+    <div class="result-title">Vectores de Entrada</div>
+    <div class="rrow"><span>r</span><span class="rval">(${fmt(d.r[0])}, ${fmt(d.r[1])}, ${fmt(d.r[2])}) <small>${lu}</small></span></div>
+    <div class="rrow"><span>|r|</span><span class="rval">${fmt(d.rmag)} <small>${lu}</small></span></div>
+    <div class="rrow"><span>F</span><span class="rval">(${fmt(d.F[0])}, ${fmt(d.F[1])}, ${fmt(d.F[2])}) <small>${fu}</small></span></div>
+    <div class="rrow"><span>|F|</span><span class="rval">${fmt(d.Fmag)} <small>${fu}</small></span></div>
+    <div class="rrow"><span>Ángulo θ entre r y F</span><span class="rval">${fmt(d.theta)}°</span></div>
+  </div>`;
+
+  if (d.operation === 'cross' || d.operation === 'mixed') {
+    html += `<div class="result-card">
+      <div class="result-title">Producto Cruz M = r × F</div>
+      <div class="rrow"><span>Mx</span><span class="rval">${fmt(d.M[0])} <small>${mu}</small></span></div>
+      <div class="rrow"><span>My</span><span class="rval">${fmt(d.M[1])} <small>${mu}</small></span></div>
+      <div class="rrow"><span>Mz</span><span class="rval">${fmt(d.M[2])} <small>${mu}</small></span></div>
+      <div class="rrow"><span>|M|</span><span class="rval ans">${fmt(d.Mmag)} <small>${mu}</small></span></div>
+    </div>`;
+    const okR = Math.abs(d.perpR) < 1e-4 * Math.max(1,d.Mmag);
+    const okF = Math.abs(d.perpF) < 1e-4 * Math.max(1,d.Mmag);
+    html += `<div class="result-card">
+      <div class="result-title">Verificación de Perpendicularidad</div>
+      <div class="rrow"><span>M · r</span><span class="rval">${d.perpR.toExponential(3)}</span></div>
+      <div class="rrow"><span>M · F</span><span class="rval">${d.perpF.toExponential(3)}</span></div>
+      <div class="check-row ${okR&&okF?'check-ok':'check-fail'}">${okR&&okF?'✓ M es perpendicular a r y a F':'⚠ Revisar datos'}</div>
+    </div>`;
+  }
+
+  if (d.operation === 'dot') {
+    html += `<div class="result-card">
+      <div class="result-title">Producto Punto r · F</div>
+      <div class="rrow"><span>r · F</span><span class="rval ans">${fmt(d.dotVal)} <small>${mu}</small></span></div>
+      <div class="rrow"><span>cos θ = (r·F)/(|r||F|)</span><span class="rval">${fmt(Math.cos(d.theta*Math.PI/180))}</span></div>
+    </div>`;
+  }
+
+  if (d.operation === 'mixed') {
+    html += `<div class="result-card">
+      <div class="result-title">Producto Mixto ML = ûL · (r × F)</div>
+      <div class="rrow"><span>ûL</span><span class="rval">(${fmt(d.uL[0])}, ${fmt(d.uL[1])}, ${fmt(d.uL[2])})</span></div>
+      <div class="rrow"><span>ML = ûL · M</span><span class="rval ans">${fmt(d.ML)} <small>${mu}</small></span></div>
+    </div>`;
+  }
+
+  const rc = document.getElementById('resultsContent');
+  rc.innerHTML = html; rc.style.display = 'block';
+  document.getElementById('resultsPH').style.display = 'none';
+}
+
+// ═══════════════════════════════════════════════════════════════
+// STEP-BY-STEP
+// ═══════════════════════════════════════════════════════════════
+function stepHtml(n, title, body) {
+  return `<div class="step-item"><div class="step-num">${n}</div><div class="step-body"><h4>${title}</h4><p>${body}</p></div></div>`;
+}
+
+function showSteps() {
+  if (!lastResult) { try { lastResult = solveSystem(); } catch(e) { alert('Error: '+e.message); return; } }
+  const d = toDisplay(lastResult);
+  const mu = d.mu;
+  const kM_input = d.kL * d.kF;
+  const autoMu = fu + '·' + lu;
+  let html = '';
+  let step = 1;
+
+  const needsConv = (kM_input !== 1 || d.kM !== 1 || mu !== 'N·m');
+  if (needsConv) {
+    let convLines = [];
+    convLines.push(`Factor longitud  : 1 ${lu} = ${LEN_TO_M[lu]} m`);
+    convLines.push(`Factor fuerza    : 1 ${fu} = ${FORCE_TO_N[fu]} N`);
+    convLines.push(`Entrada resultado: 1 ${autoMu} = ${kM_input.toPrecision(4)} N·m`);
+    if (mu !== autoMu) convLines.push(`Unidad final     : 1 ${mu} = ${d.kM.toPrecision(4)} N·m`);
+    html += stepHtml(step++, 'Conversión de Unidades',
+      `Todos los valores se convierten a SI antes de calcular. El resultado se expresa en <strong>${mu}</strong>.<br><div class="math-block">${convLines.join('\n')}</div>`);
+  }
+
+  html += stepHtml(step++, 'Datos de Entrada',
+    `Vector de posición <strong>r</strong> = (${fmt(d.r[0])}, ${fmt(d.r[1])}, ${fmt(d.r[2])}) ${lu}, con |r| = ${fmt(d.rmag)} ${lu}.<br>
+    Vector de fuerza <strong>F</strong> = (${fmt(d.F[0])}, ${fmt(d.F[1])}, ${fmt(d.F[2])}) ${fu}, con |F| = ${fmt(d.Fmag)} ${fu}.<br>
+    Ángulo entre ambos: <div class="math-block">cos θ = (r·F)/(|r||F|)\nθ = ${fmt(d.theta)}°</div>`);
+
+  if (d.operation === 'cross' || d.operation === 'mixed') {
+    html += stepHtml(step++, 'Producto Cruz — Determinante 3×3',
+      `El producto cruz se obtiene expandiendo el determinante con î, ĵ, k̂ en la primera fila, r en la segunda y F en la tercera:<br>
+      <div class="math-block">M = r × F =\n  | i        j        k      |\n  | ${fmt(d.r[0]).padStart(7)}  ${fmt(d.r[1]).padStart(7)}  ${fmt(d.r[2]).padStart(7)} |   (r, ${lu})\n  | ${fmt(d.F[0]).padStart(7)}  ${fmt(d.F[1]).padStart(7)}  ${fmt(d.F[2]).padStart(7)} |   (F, ${fu})\n\nMx = ry·Fz − rz·Fy = (${fmt(d.r[1])})(${fmt(d.F[2])}) − (${fmt(d.r[2])})(${fmt(d.F[1])}) = ${fmt(d.M[0])}\nMy = rz·Fx − rx·Fz = (${fmt(d.r[2])})(${fmt(d.F[0])}) − (${fmt(d.r[0])})(${fmt(d.F[2])}) = ${fmt(d.M[1])}\nMz = rx·Fy − ry·Fx = (${fmt(d.r[0])})(${fmt(d.F[1])}) − (${fmt(d.r[1])})(${fmt(d.F[0])}) = ${fmt(d.M[2])}\n\nM = (${fmt(d.M[0])}, ${fmt(d.M[1])}, ${fmt(d.M[2])}) ${mu}\n|M| = √(Mx²+My²+Mz²) = ${fmt(d.Mmag)} ${mu}</div>
+      Verificación: M·r = ${d.perpR.toExponential(3)} ≈ 0 y M·F = ${d.perpF.toExponential(3)} ≈ 0, confirmando que M es perpendicular al plano formado por r y F.`);
+  }
+
+  if (d.operation === 'dot') {
+    html += stepHtml(step++, 'Producto Punto — Suma de Componentes',
+      `El producto punto es la suma de los productos de las componentes correspondientes:<div class="math-block">r · F = rx·Fx + ry·Fy + rz·Fz\n     = (${fmt(d.r[0])})(${fmt(d.F[0])}) + (${fmt(d.r[1])})(${fmt(d.F[1])}) + (${fmt(d.r[2])})(${fmt(d.F[2])})\n     = ${fmt(d.dotVal)} ${mu}</div>
+      Este escalar también permite obtener el ángulo entre los vectores: cos θ = (r·F)/(|r||F|) = ${fmt(Math.cos(d.theta*Math.PI/180))} → θ = ${fmt(d.theta)}°.`);
+  }
+
+  if (d.operation === 'mixed') {
+    html += stepHtml(step++, 'Producto Mixto — Proyección sobre el Eje ûL',
+      `Con M = r × F ya calculado, se proyecta sobre la dirección del eje mediante el producto punto (producto mixto ûL·(r×F)):<div class="math-block">M_L = ûL · M\n    = (${fmt(d.uL[0])})(${fmt(d.M[0])}) + (${fmt(d.uL[1])})(${fmt(d.M[1])}) + (${fmt(d.uL[2])})(${fmt(d.M[2])})\n    = ${fmt(d.ML)} ${mu}</div>
+      M_L representa la componente del momento que tiende a girar el cuerpo alrededor del eje definido por ûL.`);
+  }
+
+  let conclusion = '';
+  if (d.operation === 'cross') conclusion = `El producto cruz es <strong>M = (${fmt(d.M[0])}, ${fmt(d.M[1])}, ${fmt(d.M[2])}) ${mu}</strong>, con magnitud <strong>${fmt(d.Mmag)} ${mu}</strong>.`;
+  else if (d.operation === 'dot') conclusion = `El producto punto es <strong>r · F = ${fmt(d.dotVal)} ${mu}</strong>.`;
+  else conclusion = `El momento respecto al eje ûL es <strong>M_L = ${fmt(d.ML)} ${mu}</strong>, obtenido a partir de M = (${fmt(d.M[0])}, ${fmt(d.M[1])}, ${fmt(d.M[2])}) ${mu}.`;
+  html += stepHtml(step++, 'Conclusión', conclusion);
+
+  const sc = document.getElementById('stepsContent');
+  sc.innerHTML = html; sc.style.display = 'block';
+  document.getElementById('stepsPH').style.display = 'none';
+  switchTab('steps');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 3D GRAPH (Three.js r128)
+// ═══════════════════════════════════════════════════════════════
+function graficar() {
+  let d;
+  try { lastResult = solveSystem(); d = toDisplay(lastResult); } catch(e) { alert('Error: '+e.message); return; }
+
+  switchTab('graph');
+  document.getElementById('graphPH').style.display = 'none';
+  document.getElementById('graphTip').style.display = 'block';
+  const canvas = document.getElementById('graphCanvas');
+  canvas.style.display = 'block';
+  if (threeRenderer) { threeRenderer.dispose(); threeScene = threeCamera = null; }
+
+  const cw = canvas.parentElement, w = cw.clientWidth, h = cw.clientHeight;
+  threeRenderer = new THREE.WebGLRenderer({canvas, antialias:true, alpha:true});
+  threeRenderer.setSize(w,h); threeRenderer.setPixelRatio(window.devicePixelRatio);
+  threeRenderer.setClearColor(0xf1f5f4, 1);
+  threeScene = new THREE.Scene();
+  threeCamera = new THREE.PerspectiveCamera(50, w/h, .01, 1000);
+
+  const maxR = Math.max(0.01, vnorm(d.r));
+  const sc = 1 / maxR;
+  const O = new THREE.Vector3(0,0,0);
+  const Rv = new THREE.Vector3(d.r[0]*sc, d.r[1]*sc, d.r[2]*sc);
+
+  function addArrow(from, to, color, thin) {
+    const mat = new THREE.LineBasicMaterial({color, linewidth: thin?1:2});
+    threeScene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([from,to]), mat));
+    const dir = to.clone().sub(from);
+    const len = dir.length();
+    if (len > 0.005) { dir.normalize(); threeScene.add(new THREE.ArrowHelper(dir, from, len, color, .07, .045)); }
+  }
+  function sph(pos, color, r) {
+    const m = new THREE.Mesh(new THREE.SphereGeometry(r,16,16), new THREE.MeshStandardMaterial({color, roughness:.4, metalness:.3}));
+    m.position.copy(pos); threeScene.add(m);
+  }
+
+  const axL = 1.3;
+  addArrow(O, new THREE.Vector3(axL,0,0), 0x9ca3af, true);
+  addArrow(O, new THREE.Vector3(0,axL,0), 0x9ca3af, true);
+  addArrow(O, new THREE.Vector3(0,0,axL), 0x9ca3af, true);
+  sph(O, 0x059669, .045);
+
+  cw.querySelectorAll('.lbl3d').forEach(el=>el.remove());
+  const labels = [];
+  function lbl(text, pos, color) {
+    const el = document.createElement('div');
+    el.className = 'lbl3d';
+    if (color) el.style.color = color;
+    el.textContent = text; cw.appendChild(el); labels.push({div:el,pos});
+  }
+  lbl('O', O, '#059669');
+  lbl('x', new THREE.Vector3(axL+.06,0,0));
+  lbl('y', new THREE.Vector3(0,axL+.06,0));
+  lbl('z', new THREE.Vector3(0,0,axL+.06));
+
+  // r vector (gray)
+  addArrow(O, Rv, 0x6b7280);
+  sph(Rv, 0x6b7280, .03);
+  lbl('r', Rv, '#555');
+
+  // F vector (teal)
+  const Fmag = vnorm(d.F);
+  const Fscale = .55;
+  const Fdir = Fmag>1e-9 ? unitVec(d.F) : [0,0,0];
+  const Fend = Rv.clone().add(new THREE.Vector3(Fdir[0]*Fscale, Fdir[1]*Fscale, Fdir[2]*Fscale));
+  addArrow(Rv, Fend, 0x0891b2);
+  lbl('F', Fend, '#0891b2');
+
+  // M vector (green)
+  if (d.M) {
+    const Mmag = vnorm(d.M);
+    if (Mmag > 1e-9) {
+      const Mdir = unitVec(d.M);
+      const Mlen = .7;
+      const Mend = O.clone().add(new THREE.Vector3(Mdir[0]*Mlen, Mdir[1]*Mlen, Mdir[2]*Mlen));
+      addArrow(O, Mend, 0x059669);
+      lbl('M', Mend, '#059669');
+    }
+  }
+
+  // uL axis (purple)
+  if (d.uL) {
+    const Lend = O.clone().add(new THREE.Vector3(d.uL[0]*.9, d.uL[1]*.9, d.uL[2]*.9));
+    const Lstart = O.clone().add(new THREE.Vector3(-d.uL[0]*.9, -d.uL[1]*.9, -d.uL[2]*.9));
+    addArrow(Lstart, Lend, 0x7c3aed, true);
+    lbl('ûL', Lend, '#7c3aed');
+  }
+
+  threeScene.add(new THREE.AmbientLight(0xffffff,.8));
+  const dl2 = new THREE.DirectionalLight(0xffffff,.6); dl2.position.set(5,10,5); threeScene.add(dl2);
+  threeCamera.position.set(2,2,2); threeCamera.lookAt(0,0,0);
+
+  // legend
+  const leg = document.getElementById('graphLeg');
+  let legHtml = `<div class="leg-title">Leyenda</div>`;
+  legHtml += `<div class="leg-item"><span class="leg-dot" style="background:#6b7280"></span>r — |r|=${fmt(d.rmag)} ${lu}</div>`;
+  legHtml += `<div class="leg-item"><span class="leg-dot" style="background:#0891b2"></span>F — |F|=${fmt(d.Fmag)} ${fu}</div>`;
+  if (d.M) legHtml += `<div class="leg-item"><span class="leg-dot" style="background:#059669"></span>M = r×F</div>`;
+  if (d.uL) legHtml += `<div class="leg-item"><span class="leg-dot" style="background:#7c3aed"></span>Eje ûL</div>`;
+  leg.innerHTML = legHtml;
+  leg.style.display = 'flex';
+
+  cw.onmousedown = e => { mouse.down=true; mouse.x=e.clientX; mouse.y=e.clientY; };
+  cw.onmousemove = e => {
+    if (!mouse.down) return;
+    spherical.theta -= (e.clientX-mouse.x)*.01;
+    spherical.phi -= (e.clientY-mouse.y)*.01;
+    spherical.phi = Math.max(.1, Math.min(Math.PI-.1, spherical.phi));
+    mouse.x = e.clientX; mouse.y = e.clientY;
+  };
+  cw.onmouseup = () => mouse.down=false;
+  cw.onmouseleave = () => mouse.down=false;
+  cw.onwheel = e => { spherical.radius = Math.max(.6, Math.min(10, spherical.radius + e.deltaY*.005)); e.preventDefault(); };
+
+  let go = true;
+  (function animate(){
+    if (!go) return; requestAnimationFrame(animate);
+    threeCamera.position.set(
+      spherical.radius*Math.sin(spherical.phi)*Math.sin(spherical.theta),
+      spherical.radius*Math.cos(spherical.phi),
+      spherical.radius*Math.sin(spherical.phi)*Math.cos(spherical.theta));
+    threeCamera.lookAt(0,0,0);
+    threeRenderer.render(threeScene, threeCamera);
+    labels.forEach(({div,pos})=>{
+      const v = pos.clone().project(threeCamera);
+      div.style.left = ((v.x*.5+.5)*w+5)+'px';
+      div.style.top  = ((-.5*v.y+.5)*h-10)+'px';
+    });
+  })();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// DOWNLOAD
+// ═══════════════════════════════════════════════════════════════
+function downloadSolution() {
+  let d;
+  try {
+    if (!lastResult) lastResult = solveSystem();
+    d = toDisplay(lastResult);
+  } catch(e) { alert('Calcula primero. ' + e.message); return; }
+
+  const mu = d.mu;
+  const now = new Date().toLocaleString('es-MX');
+  const opName = d.operation==='cross' ? 'Producto Cruz (r × F)' : d.operation==='dot' ? 'Producto Punto (r · F)' : 'Producto Mixto (ûL · (r × F))';
+
+  let txt = `PRODUCTO CRUZ Y PUNTO — ESTÁTICA 3D
+Calculadora Vectorial de Momentos
+Generado: ${now}
+${'='.repeat(64)}
+
+OPERACIÓN: ${opName}
+Unidad de resultado: ${mu}
+
+${'='.repeat(64)}
+VECTORES DE ENTRADA
+--------------------
+  r (posición) : (${fmt(d.r[0])}, ${fmt(d.r[1])}, ${fmt(d.r[2])}) ${lu}
+  |r|          : ${fmt(d.rmag)} ${lu}
+  F (fuerza)   : (${fmt(d.F[0])}, ${fmt(d.F[1])}, ${fmt(d.F[2])}) ${fu}
+  |F|          : ${fmt(d.Fmag)} ${fu}
+  Ángulo θ     : ${fmt(d.theta)}°
+`;
+
+  if (d.M) {
+    txt += `
+${'='.repeat(64)}
+PRODUCTO CRUZ  M = r × F
+-------------------------
+  M   = (${fmt(d.M[0])}, ${fmt(d.M[1])}, ${fmt(d.M[2])}) ${mu}
+  |M| = ${fmt(d.Mmag)} ${mu}
+  Verificación perpendicularidad: M·r = ${d.perpR.toExponential(4)} ,  M·F = ${d.perpF.toExponential(4)}
+`;
+  }
+
+  if (d.dotVal !== undefined) {
+    txt += `
+${'='.repeat(64)}
+PRODUCTO PUNTO  r · F
+----------------------
+  r · F = ${fmt(d.dotVal)} ${mu}
+  cos θ = ${fmt(Math.cos(d.theta*Math.PI/180))}
+`;
+  }
+
+  if (d.ML !== undefined) {
+    txt += `
+${'='.repeat(64)}
+PRODUCTO MIXTO  ML = ûL · (r × F)
+-----------------------------------
+  ûL = (${fmt(d.uL[0])}, ${fmt(d.uL[1])}, ${fmt(d.uL[2])})
+  ML = ${fmt(d.ML)} ${mu}
+`;
+  }
+
+  txt += `\n${'='.repeat(64)}\nEstática 3D — Calculadora Vectorial\n`;
+
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([txt], {type:'text/plain;charset=utf-8'}));
+  a.download = 'producto_cruz_punto.txt';
+  a.click();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CLEAR
+// ═══════════════════════════════════════════════════════════════
+function clearAll() {
+  if (!confirm('¿Limpiar todo el formulario?')) return;
+  lastResult = null;
+  document.getElementById('rx').value = '0';
+  document.getElementById('ry').value = '0';
+  document.getElementById('rz').value = '0';
+  document.getElementById('Fx').value = '0';
+  document.getElementById('Fy').value = '0';
+  document.getElementById('Fz').value = '0';
+  document.getElementById('ULx').value = '0';
+  document.getElementById('ULy').value = '1';
+  document.getElementById('ULz').value = '0';
+  document.getElementById('resultsContent').style.display = 'none';
+  document.getElementById('resultsPH').style.display = 'flex';
+  document.getElementById('stepsContent').style.display = 'none';
+  document.getElementById('stepsPH').style.display = 'flex';
+  const canvas = document.getElementById('graphCanvas');
+  canvas.style.display = 'none';
+  document.getElementById('graphPH').style.display = 'flex';
+  document.getElementById('graphLeg').style.display = 'none';
+  document.getElementById('graphTip').style.display = 'none';
+  updateInfoBar();
+  switchTab('graph');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TABS
+// ═══════════════════════════════════════════════════════════════
+function switchTab(t) {
+  ['graph','results','steps'].forEach(id => {
+    document.getElementById('tab'+id[0].toUpperCase()+id.slice(1)).classList.toggle('active', id===t);
+    const el = document.getElementById('panel'+id[0].toUpperCase()+id.slice(1));
+    el.style.display = id===t ? (id==='graph'?'flex':'block') : 'none';
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════
+(function init() {
+  setSystem('SI');
+  document.getElementById('selLen').value   = 'm';
+  document.getElementById('selForce').value = 'N';
+  document.getElementById('selMomUnit').value = 'N·m';
+  updateUnits();
+  setOperation('cross');
+  updateInfoBar();
+})();
+</script>
+</body>
+</html>

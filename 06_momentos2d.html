@@ -1,0 +1,1610 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Momentos 2D — TecNM</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700&family=Roboto:wght@300;400;500&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --green:#059669;--green-light:#10b981;--green-dark:#047857;
+  --teal:#0891b2;--teal-light:#22d3ee;--teal-dark:#0e7490;
+  --gray:#555;--gray-light:#94a3b8;--gray-lighter:#e2e8f0;--gray-bg:#f1f5f9;
+  --white:#ffffff;--surface:#f8fafb;--surface2:#f0fdf4;
+  --text:#1e293b;--text2:#64748b;--text3:#94a3b8;
+  --red:#dc2626;--red-light:#fef2f2;--gold:#d97706;--gold-light:#fffbeb;
+  --border:#e2e8f0;--border-green:rgba(5,150,105,.18);
+  --radius:10px;--radius2:14px;
+  --shadow-sm:0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+  --shadow-md:0 4px 12px rgba(0,0,0,.07), 0 2px 4px rgba(0,0,0,.04);
+  --shadow-lg:0 10px 30px rgba(0,0,0,.08);
+  --gradient:linear-gradient(135deg, var(--green) 0%, var(--teal) 100%);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--gray-bg);color:var(--text);font-family:'Roboto',sans-serif;font-size:15px;min-height:100vh;-webkit-font-smoothing:antialiased;}
+
+/* ══════════ HEADER ══════════ */
+header{
+  background:var(--white);
+  border-bottom:1px solid var(--border);
+  padding:0 28px;
+  display:flex;align-items:center;justify-content:space-between;height:64px;
+  box-shadow:var(--shadow-sm);position:relative;z-index:20;
+}
+header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;
+  background:var(--gradient);opacity:.7;}
+.hd-left{display:flex;align-items:center;gap:10px;}
+.hd-logo{width:36px;height:36px;border-radius:10px;background:var(--gradient);
+  display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Poppins',sans-serif;
+  font-weight:700;font-size:14px;letter-spacing:1px;}
+.hd-brand{font-family:'Poppins',sans-serif;font-size:20px;font-weight:700;letter-spacing:2px;
+  background:var(--gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.hd-center{font-family:'Inter',sans-serif;font-size:13px;font-weight:600;letter-spacing:.5px;
+  color:var(--gray);text-align:center;line-height:1.4;}
+.hd-center span{display:block;font-size:11px;font-weight:400;color:var(--text3);letter-spacing:0;}
+.hd-right{font-family:'Poppins',sans-serif;font-size:18px;font-weight:700;letter-spacing:2px;
+  color:var(--teal);}
+
+/* ══════════ MAIN LAYOUT ══════════ */
+.main{display:grid;grid-template-columns:320px 1fr 340px;gap:0;height:calc(100vh - 64px);}
+.panel-left{background:var(--white);border-right:1px solid var(--border);overflow-y:auto;padding:20px 18px;
+  box-shadow:2px 0 8px rgba(0,0,0,.03);}
+.panel-center{background:var(--surface);display:flex;flex-direction:column;position:relative;}
+.panel-right{background:var(--white);border-left:1px solid var(--border);overflow-y:auto;padding:20px 18px;
+  box-shadow:-2px 0 8px rgba(0,0,0,.03);}
+
+/* ══════════ SECTIONS ══════════ */
+.sec{margin-bottom:18px;}
+.sec-title{font-family:'Poppins',sans-serif;font-size:11.5px;font-weight:700;letter-spacing:1.8px;color:var(--green);
+  text-transform:uppercase;padding-bottom:8px;margin-bottom:12px;
+  display:flex;align-items:center;gap:8px;
+  border-bottom:2px solid var(--border-green);}
+.sec-title svg{width:16px;height:16px;stroke:var(--green);stroke-width:2;fill:none;flex-shrink:0;}
+
+/* ══════════ UNIT TABS ══════════ */
+.unit-tabs{display:flex;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:12px;
+  background:var(--gray-bg);}
+.unit-tab{flex:1;padding:8px;text-align:center;font-family:'Inter',sans-serif;font-weight:600;font-size:12.5px;
+  letter-spacing:.5px;cursor:pointer;background:transparent;color:var(--text2);transition:all .25s;border:none;outline:none;}
+.unit-tab.active{background:var(--gradient);color:#fff;border-radius:var(--radius);}
+.unit-tab:hover:not(.active){background:rgba(5,150,105,.06);}
+
+/* ══════════ INPUTS ══════════ */
+label{font-size:12px;color:var(--text2);display:block;margin-bottom:4px;letter-spacing:.2px;font-weight:500;}
+select,input[type=number]{
+  width:100%;background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius);
+  color:var(--text);font-family:'Roboto',sans-serif;font-size:14px;padding:8px 11px;
+  outline:none;transition:all .2s;
+}
+select:focus,input[type=number]:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(5,150,105,.1);}
+select option{background:var(--white);}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;}
+
+/* ══════════ FORCE BLOCK ══════════ */
+.force-block{background:var(--white);border:1.5px solid var(--border-green);border-radius:var(--radius2);
+  padding:14px 15px;margin-bottom:10px;transition:all .25s;position:relative;
+  box-shadow:var(--shadow-sm);}
+.force-block:hover{border-color:var(--green);box-shadow:var(--shadow-md);}
+.force-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:6px;}
+.force-name{font-family:'Poppins',sans-serif;font-size:15px;font-weight:700;letter-spacing:.5px;
+  display:flex;align-items:center;gap:8px;color:var(--text);}
+.fdot{width:10px;height:10px;border-radius:50%;flex-shrink:0;box-shadow:0 0 0 2px rgba(255,255,255,.8);}
+
+.mag-row{display:flex;align-items:center;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid var(--gray-lighter);}
+.mag-label{font-family:'Roboto Mono',monospace;font-size:13px;font-weight:500;color:var(--text2);white-space:nowrap;min-width:36px;}
+.mag-input-wrap{flex:1;max-width:100px;position:relative;}
+.mag-input-wrap input{width:100%;}
+.mag-input-wrap input.is-unknown{opacity:.5;cursor:not-allowed;border-style:dashed;border-color:var(--gold);}
+.mag-unit{font-size:12px;color:var(--text2);white-space:nowrap;font-family:'Roboto Mono',monospace;}
+
+/* ══════════ TOGGLE ══════════ */
+.switch{position:relative;width:38px;height:20px;flex-shrink:0;}
+.switch input{opacity:0;width:0;height:0;}
+.slider{position:absolute;cursor:pointer;inset:0;background:var(--gray-lighter);border-radius:20px;transition:.25s;}
+.slider:before{content:'';position:absolute;height:14px;width:14px;left:3px;bottom:3px;
+  background:#fff;border-radius:50%;transition:.25s;box-shadow:0 1px 3px rgba(0,0,0,.15);}
+.switch input:checked+.slider{background:var(--green);}
+.switch input:checked+.slider:before{transform:translateX(18px);}
+.sw-label{font-size:11px;color:var(--text2);white-space:nowrap;font-weight:500;}
+
+/* ══════════ PILLS ══════════ */
+.pill{font-size:10px;padding:3px 9px;border-radius:12px;font-family:'Inter',sans-serif;
+  font-weight:700;letter-spacing:.4px;white-space:nowrap;}
+.pill-dato{background:rgba(5,150,105,.1);color:var(--green);border:1px solid rgba(5,150,105,.25);}
+.pill-unk{background:rgba(217,119,6,.1);color:var(--gold);border:1px solid rgba(217,119,6,.25);}
+
+/* ══════════ DELETE BTN ══════════ */
+.btn-del-force{background:var(--red-light);
+  border:1px solid rgba(220,38,38,.2);color:var(--red);border-radius:6px;
+  font-size:11px;font-family:'Inter',sans-serif;font-weight:600;letter-spacing:.3px;
+  padding:3px 9px;cursor:pointer;transition:all .2s;white-space:nowrap;flex-shrink:0;}
+.btn-del-force:hover{background:rgba(220,38,38,.15);border-color:rgba(220,38,38,.35);}
+
+/* ══════════ INFO BAR ══════════ */
+.info-bar{background:rgba(5,150,105,.05);border:1px solid rgba(5,150,105,.15);border-radius:var(--radius);
+  padding:8px 13px;font-size:12px;color:var(--green);margin-bottom:12px;
+  font-family:'Inter',sans-serif;font-weight:500;letter-spacing:.2px;
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.info-bar svg{flex-shrink:0;}
+.info-bar.warn{background:rgba(220,38,38,.04);border-color:rgba(220,38,38,.2);color:var(--red);}
+
+/* ══════════ ACTION BUTTONS ══════════ */
+.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px;}
+.btn{flex:1;min-width:68px;padding:10px 6px;border-radius:var(--radius);border:none;
+  font-family:'Inter',sans-serif;font-weight:700;font-size:12px;letter-spacing:.5px;
+  cursor:pointer;transition:all .25s;text-transform:uppercase;
+  display:flex;align-items:center;justify-content:center;gap:5px;}
+.btn:active{transform:scale(.97);}
+.btn-calc{background:var(--gradient);color:#fff;box-shadow:0 2px 8px rgba(5,150,105,.3);}
+.btn-calc:hover{filter:brightness(1.08);box-shadow:0 4px 14px rgba(5,150,105,.35);}
+.btn-graph{background:var(--teal);color:#fff;box-shadow:0 2px 6px rgba(8,145,178,.25);}
+.btn-graph:hover{filter:brightness(1.1);}
+.btn-steps{background:var(--gold-light);color:var(--gold);border:1px solid rgba(217,119,6,.25);}
+.btn-steps:hover{background:rgba(217,119,6,.12);}
+.btn-add{width:100%;margin-top:4px;padding:11px;border-radius:var(--radius);border:2px dashed var(--border-green);
+  background:rgba(5,150,105,.03);color:var(--green);font-family:'Inter',sans-serif;font-weight:700;
+  font-size:12.5px;letter-spacing:.6px;cursor:pointer;transition:all .25s;text-transform:uppercase;
+  display:flex;align-items:center;justify-content:center;gap:7px;}
+.btn-add:hover{background:rgba(5,150,105,.08);border-color:var(--green);box-shadow:var(--shadow-sm);}
+.btn-add:active{transform:scale(.98);}
+.btn-dl{background:rgba(8,145,178,.06);color:var(--teal);border:1px solid rgba(8,145,178,.2);}
+.btn-dl:hover{background:rgba(8,145,178,.13);}
+.btn-clear{background:var(--red-light);color:var(--red);border:1px solid rgba(220,38,38,.18);}
+.btn-clear:hover{background:rgba(220,38,38,.12);}
+
+/* ══════════ RIGHT-PANEL TABS ══════════ */
+.rtabs{display:flex;border-bottom:1px solid var(--border);background:var(--white);z-index:2;position:relative;}
+.rtab{padding:13px 20px;font-family:'Inter',sans-serif;font-weight:600;font-size:12px;
+  letter-spacing:.6px;color:var(--text3);cursor:pointer;border-bottom:3px solid transparent;
+  transition:all .25s;text-transform:uppercase;}
+.rtab:hover{color:var(--text2);}
+.rtab.active{color:var(--green);border-bottom-color:var(--green);}
+
+/* ══════════ CANVAS ══════════ */
+.canvas-wrap{flex:1;position:relative;overflow:hidden;background:var(--surface);}
+#panelResults{padding:20px;overflow-y:auto;flex:1;}
+#panelSteps{padding:20px;overflow-y:auto;flex:1;}
+
+/* ══════════ RESULT CARDS ══════════ */
+.result-card{background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius2);
+  padding:16px 18px;margin-bottom:14px;box-shadow:var(--shadow-sm);}
+.result-title{font-family:'Poppins',sans-serif;font-size:12px;font-weight:700;letter-spacing:1.2px;
+  color:var(--text2);text-transform:uppercase;margin-bottom:10px;
+  display:flex;align-items:center;gap:6px;}
+.rrow{display:flex;justify-content:space-between;align-items:center;padding:6px 0;
+  border-bottom:1px solid var(--gray-lighter);font-size:13px;color:var(--text);}
+.rrow:last-child{border:none;}
+.rval{font-family:'Roboto Mono',monospace;font-size:16px;font-weight:500;color:var(--teal);}
+.rval.ans{color:var(--green);font-size:19px;font-weight:700;}
+.rval.neg{color:var(--red);}
+.rval.pos{color:var(--green);}
+
+/* ══════════ STEPS ══════════ */
+.step-item{display:flex;gap:16px;margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid var(--gray-lighter);}
+.step-num{width:32px;height:32px;border-radius:50%;background:var(--gradient);color:#fff;
+  display:flex;align-items:center;justify-content:center;font-family:'Poppins',sans-serif;
+  font-weight:700;font-size:14px;flex-shrink:0;box-shadow:0 2px 6px rgba(5,150,105,.25);}
+.step-body h4{font-family:'Poppins',sans-serif;font-size:14px;font-weight:600;color:var(--green-dark);
+  margin-bottom:6px;letter-spacing:.3px;}
+.step-body p{font-size:13px;color:var(--text2);line-height:1.7;font-family:'Roboto',sans-serif;}
+.math-block{background:var(--surface2);border-left:3px solid var(--green);padding:10px 14px;
+  margin:8px 0;border-radius:0 var(--radius) var(--radius) 0;
+  font-family:'Roboto Mono',monospace;font-size:12.5px;color:var(--green-dark);white-space:pre-wrap;
+  box-shadow:var(--shadow-sm);}
+
+.moment-badge{display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:20px;
+  font-family:'Inter',sans-serif;font-weight:700;font-size:13px;margin-top:8px;}
+.badge-acw{background:rgba(5,150,105,.1);color:var(--green);border:1px solid rgba(5,150,105,.25);}
+.badge-cw{background:rgba(220,38,38,.08);color:var(--red);border:1px solid rgba(220,38,38,.2);}
+
+/* ══════════ PLACEHOLDER ══════════ */
+.placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  height:100%;color:var(--text3);gap:14px;}
+.placeholder svg{opacity:.2;stroke:var(--green);}
+.placeholder p{font-size:13px;text-align:center;max-width:280px;line-height:1.6;color:var(--text2);}
+.tip{font-size:11px;color:var(--text3);margin-top:4px;font-style:italic;}
+
+/* ══════════ CONV INFO ══════════ */
+.conv-info{margin-top:4px;padding:5px 10px;background:rgba(5,150,105,.04);border-radius:8px;
+  font-size:10.5px;color:var(--green);line-height:1.5;font-family:'Roboto',sans-serif;}
+.conv-badge{margin-top:6px;padding:6px 10px;background:rgba(8,145,178,.05);border-radius:8px;
+  font-size:11.5px;color:var(--teal);font-family:'Roboto Mono',monospace;font-weight:500;}
+
+/* ══════════ SCROLLBAR ══════════ */
+::-webkit-scrollbar{width:5px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--gray-lighter);border-radius:4px;}
+::-webkit-scrollbar-thumb:hover{background:var(--green-light);}
+
+/* ══════════ ZOOM CONTROLS ══════════ */
+.zoom-bar{position:absolute;bottom:16px;right:16px;display:flex;flex-direction:column;gap:5px;z-index:10;}
+.zoom-btn{width:34px;height:34px;border-radius:8px;border:1px solid var(--border);
+  background:var(--white);color:var(--green);font-size:18px;font-weight:700;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:all .2s;line-height:1;font-family:'Inter',sans-serif;box-shadow:var(--shadow-sm);}
+.zoom-btn:hover{background:var(--gradient);border-color:var(--green);color:#fff;}
+.zoom-level{font-family:'Roboto Mono',monospace;font-size:10px;font-weight:500;
+  color:var(--text3);text-align:center;padding:2px 0;}
+.zoom-tip{position:absolute;bottom:16px;left:16px;font-size:10px;color:var(--text3);
+  font-family:'Inter',sans-serif;letter-spacing:.2px;pointer-events:none;
+  background:var(--white);padding:4px 10px;border-radius:6px;box-shadow:var(--shadow-sm);}
+
+/* ══════════ PANEL-RIGHT HEADER ══════════ */
+.panel-right-header{display:flex;align-items:center;gap:10px;margin-bottom:16px;
+  padding-bottom:14px;border-bottom:2px solid var(--border-green);}
+.panel-right-header svg{width:22px;height:22px;stroke:var(--green);stroke-width:2;fill:none;}
+.panel-right-header h2{font-family:'Poppins',sans-serif;font-size:16px;font-weight:700;
+  letter-spacing:.5px;color:var(--text);margin:0;}
+.force-count{font-size:11px;background:var(--gradient);color:#fff;padding:2px 9px;
+  border-radius:12px;font-family:'Inter',sans-serif;font-weight:700;margin-left:auto;}
+
+/* ══════════ RESPONSIVE ══════════ */
+@media(max-width:1100px){
+  .main{grid-template-columns:280px 1fr 300px;}
+}
+@media(max-width:900px){
+  .main{grid-template-columns:1fr;grid-template-rows:auto 1fr auto;}
+  .panel-left{border-right:none;border-bottom:1px solid var(--border);max-height:45vh;overflow-y:auto;}
+  .panel-right{border-left:none;border-top:1px solid var(--border);max-height:45vh;overflow-y:auto;}
+  .panel-center{min-height:400px;}
+}
+@media(max-width:600px){
+  header{padding:0 14px;height:56px;}
+  .hd-center{font-size:11px;}
+  .hd-brand{font-size:16px;}
+  .panel-left,.panel-right{padding:14px 12px;}
+  .actions{gap:5px;}
+  .btn{font-size:11px;padding:8px 4px;}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hd-left">
+    <div class="hd-logo">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round">
+        <circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/>
+      </svg>
+    </div>
+    <span class="hd-brand">TecNM</span>
+  </div>
+  <div class="hd-center">
+    Programa Para Calcular Momentos en Dos Dimensiones
+    <span>MOOC — Estática 2D</span>
+  </div>
+  <div class="hd-right">MOOC</div>
+</header>
+
+<div class="main">
+<!-- ═══════════════════════════ LEFT PANEL — CONFIGURACIÓN ═══════════════════════════ -->
+<div class="panel-left">
+
+  <!-- Sistema de Unidades -->
+  <div class="sec">
+    <div class="sec-title">
+      <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+      Sistema de Unidades
+    </div>
+    <div class="unit-tabs">
+      <button class="unit-tab active" id="btnSI"  onclick="setSystem('SI')">Internacional (SI)</button>
+      <button class="unit-tab"        id="btnENG" onclick="setSystem('ENG')">Inglés</button>
+    </div>
+    <div class="g2">
+      <div>
+        <label>Longitud (entrada)</label>
+        <select id="selLen" onchange="updateUnits()">
+          <option value="m">m (metros)</option>
+          <option value="cm">cm (centímetros)</option>
+          <option value="mm">mm (milímetros)</option>
+        </select>
+      </div>
+      <div>
+        <label>Fuerza (entrada)</label>
+        <select id="selForce" onchange="updateUnits()">
+          <option value="N">N (Newtons)</option>
+          <option value="kN">kN (Kilonewtons)</option>
+        </select>
+      </div>
+    </div>
+    <div style="margin-top:10px;">
+      <label>Unidad del resultado (momento)</label>
+      <select id="selMomUnit" onchange="updateResultUnit()">
+        <option value="auto">Automático (fu · lu)</option>
+        <option value="N·m">N·m</option>
+        <option value="N·cm">N·cm</option>
+        <option value="N·mm">N·mm</option>
+        <option value="kN·m">kN·m</option>
+        <option value="lb·ft">lb·ft</option>
+        <option value="lb·in">lb·in</option>
+        <option value="kip·ft">kip·ft</option>
+        <option value="kip·in">kip·in</option>
+      </select>
+    </div>
+    <div class="conv-badge">
+      Unidad de momento: <strong id="momentUnit">N·m</strong>
+    </div>
+    <div class="conv-info" id="convInfo">
+      ✓ Unidad base — 1 N·m = 1 N·m
+    </div>
+  </div>
+
+  <!-- Punto de referencia O -->
+  <div class="sec">
+    <div class="sec-title">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v4"/><path d="M12 18v4"/><path d="M2 12h4"/><path d="M18 12h4"/></svg>
+      Punto de Referencia O
+    </div>
+    <div class="g2">
+      <div><label>Ox (<span class="ulen">m</span>)</label><input type="number" id="ox" value="0" step="any"></div>
+      <div><label>Oy (<span class="ulen">m</span>)</label><input type="number" id="oy" value="0" step="any"></div>
+    </div>
+    <div class="tip">Punto respecto al cual se calculan todos los momentos</div>
+  </div>
+
+  <!-- Convención de signos -->
+  <div class="sec">
+    <div class="sec-title">
+      <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 110 20 10 10 0 010-20z"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
+      Convención de Signos
+    </div>
+    <div class="unit-tabs" style="margin-bottom:6px;">
+      <button class="unit-tab active" id="signACW" onclick="setSignConv('acw')">⟳ Antihorario (+)</button>
+      <button class="unit-tab" id="signCW"  onclick="setSignConv('cw')">⟲ Horario (+)</button>
+    </div>
+    <div class="tip" id="signTip">Sentido antihorario = positivo (convención estándar)</div>
+  </div>
+
+  <!-- Info -->
+  <div class="info-bar" id="infoBar">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+    </svg>
+    <span id="infoTxt">Agrega al menos una fuerza para calcular</span>
+  </div>
+
+  <!-- Botones -->
+  <div class="actions">
+    <button class="btn btn-calc" onclick="calculate()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <rect x="4" y="2" width="16" height="20" rx="2"/>
+        <line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="12" y2="14"/>
+      </svg>Calcular
+    </button>
+    <button class="btn btn-graph" onclick="graficar()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="9"/><line x1="12" y1="3" x2="12" y2="12"/><line x1="12" y1="12" x2="19" y2="12"/>
+      </svg>Graficar
+    </button>
+    <button class="btn btn-steps" onclick="showSteps()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
+      </svg>Procedimiento
+    </button>
+    <button class="btn btn-dl" onclick="downloadSolution()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+        <polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/>
+      </svg>Descargar
+    </button>
+    <button class="btn btn-clear" onclick="clearAll()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="3,6 5,6 21,6"/>
+        <path d="M19,6l-1,14a2,2,0,0,1-2,2H8a2,2,0,0,1-2-2L5,6"/>
+        <path d="M10,11v6"/><path d="M14,11v6"/>
+        <path d="M9,6V4a1,1,0,0,1,1-1h4a1,1,0,0,1,1,1V6"/>
+      </svg>Limpiar
+    </button>
+  </div>
+
+</div><!-- end panel-left -->
+
+<!-- ═══════════════════════════ CENTER PANEL — GRÁFICA / RESULTADOS ═══════════════════════════ -->
+<div class="panel-center">
+  <div class="rtabs">
+    <div class="rtab active" id="tabGraph"   onclick="switchTab('graph')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;margin-right:4px;">
+        <circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/>
+      </svg>Gráfica 2D
+    </div>
+    <div class="rtab"        id="tabResults" onclick="switchTab('results')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;margin-right:4px;">
+        <rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="16" y2="10"/>
+      </svg>Resultados
+    </div>
+    <div class="rtab"        id="tabSteps"   onclick="switchTab('steps')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;margin-right:4px;">
+        <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
+      </svg>Procedimiento
+    </div>
+  </div>
+
+  <!-- Gráfica -->
+  <div id="panelGraph" class="canvas-wrap">
+    <div class="placeholder" id="graphPH">
+      <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke-width="1">
+        <circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/>
+      </svg>
+      <p>Ingresa las fuerzas y presiona <strong>Graficar</strong> para visualizar el diagrama de cuerpo libre.</p>
+    </div>
+    <canvas id="graphCanvas" style="display:none;width:100%;height:100%;cursor:grab;"></canvas>
+    <div class="zoom-bar" id="zoomBar" style="display:none;">
+      <button class="zoom-btn" onclick="zoomIn()"  title="Acercar">+</button>
+      <div class="zoom-level" id="zoomLabel">100%</div>
+      <button class="zoom-btn" onclick="zoomOut()" title="Alejar">−</button>
+      <button class="zoom-btn" onclick="zoomReset()" title="Restablecer vista" style="font-size:12px;">⊙</button>
+    </div>
+    <div class="zoom-tip" id="zoomTip" style="display:none;">🖱 Rueda = zoom · Arrastrar = mover</div>
+  </div>
+
+  <!-- Resultados -->
+  <div id="panelResults" style="display:none;">
+    <div class="placeholder" id="resultsPH">
+      <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke-width="1">
+        <rect x="4" y="2" width="16" height="20" rx="2"/>
+        <line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="12" y2="14"/>
+      </svg>
+      <p>Presiona <strong>Calcular</strong> para obtener los resultados.</p>
+    </div>
+    <div id="resultsContent" style="display:none;"></div>
+  </div>
+
+  <!-- Procedimiento -->
+  <div id="panelSteps" style="display:none;overflow-y:auto;flex:1;padding:20px;">
+    <div class="placeholder" id="stepsPH">
+      <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke-width="1">
+        <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
+      </svg>
+      <p>Presiona <strong>Calcular</strong> y luego <strong>Procedimiento</strong>.</p>
+    </div>
+    <div id="stepsContent" style="display:none;"></div>
+  </div>
+</div><!-- end panel-center -->
+
+<!-- ═══════════════════════════ RIGHT PANEL — FUERZAS ═══════════════════════════ -->
+<div class="panel-right">
+  <div class="panel-right-header">
+    <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+    </svg>
+    <h2>Fuerzas</h2>
+    <span class="force-count" id="forceCount">0</span>
+  </div>
+
+  <div id="forceList"></div>
+
+  <button class="btn-add" onclick="addForce()">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+      <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+    </svg>
+    Agregar Fuerza
+  </button>
+</div><!-- end panel-right -->
+
+</div><!-- end main -->
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════════
+let forceCounter = 0;
+let forceIds = [];
+let lastResult = null;
+let signConv = 'acw';
+let fu = 'N', lu = 'm';
+let currentSystem = 'SI';
+
+const LEN_TO_M = { m:1, cm:0.01, mm:0.001, ft:0.3048, in:0.0254 };
+const FORCE_TO_N = { N:1, kN:1000, lb:4.44822, kip:4448.22 };
+
+const FORCE_COLORS = [
+  '#059669','#0891b2','#d97706','#dc2626','#7c3aed',
+  '#db2777','#0284c7','#65a30d','#ea580c','#6366f1'
+];
+
+let viewZoom   = 1;
+let viewPanX   = 0;
+let viewPanY   = 0;
+let isPanning  = false;
+let panStartX  = 0;
+let panStartY  = 0;
+let panOriginX = 0;
+let panOriginY = 0;
+let lastDrawForces = null;
+let lastDrawOx = 0, lastDrawOy = 0;
+
+// ═══════════════════════════════════════════════════════════════
+// UNITS
+// ═══════════════════════════════════════════════════════════════
+const UNIT_OPTIONS = {
+  SI: {
+    len:   [['m','m (metros)'],['cm','cm (centímetros)'],['mm','mm (milímetros)']],
+    force: [['N','N (Newtons)'],['kN','kN (Kilonewtons)']]
+  },
+  ENG: {
+    len:   [['ft','ft (pies)'],['in','in (pulgadas)']],
+    force: [['lb','lb (libras)'],['kip','kip (kilopound)']]
+  }
+};
+
+const ALL_MOMENT_UNITS = ['N·m','N·cm','N·mm','kN·m','lb·ft','lb·in','kip·ft','kip·in'];
+
+const MU_TO_NM = {
+  'N·m':1, 'N·cm':0.01, 'N·mm':0.001, 'kN·m':1000,
+  'lb·ft':1.35582, 'lb·in':0.112985, 'kip·ft':1355.82, 'kip·in':112.985
+};
+
+let muOverride = 'auto';
+
+function setSystem(sys) {
+  currentSystem = sys;
+  document.getElementById('btnSI').classList.toggle('active',  sys === 'SI');
+  document.getElementById('btnENG').classList.toggle('active', sys === 'ENG');
+  const prevLen   = document.getElementById('selLen').value;
+  const prevForce = document.getElementById('selForce').value;
+  const selLen = document.getElementById('selLen');
+  selLen.innerHTML = UNIT_OPTIONS[sys].len
+    .map(([v,t]) => `<option value="${v}"${v===prevLen?' selected':''}>${t}</option>`).join('');
+  const selForce = document.getElementById('selForce');
+  selForce.innerHTML = UNIT_OPTIONS[sys].force
+    .map(([v,t]) => `<option value="${v}"${v===prevForce?' selected':''}>${t}</option>`).join('');
+  updateUnits();
+}
+
+function updateUnits() {
+  lu = document.getElementById('selLen').value;
+  fu = document.getElementById('selForce').value;
+  document.querySelectorAll('.ulen').forEach(el => el.textContent = lu);
+  document.querySelectorAll('.uforce').forEach(el => el.textContent = fu);
+  updateResultUnit();
+}
+
+function updateResultUnit() {
+  muOverride = document.getElementById('selMomUnit').value;
+  const autoMu = fu + '·' + lu;
+  const mu = (muOverride === 'auto') ? autoMu : muOverride;
+  document.getElementById('momentUnit').textContent = mu;
+  document.querySelectorAll('.umom').forEach(el => el.textContent = mu);
+  const kM_auto = (LEN_TO_M[lu] || 1) * (FORCE_TO_N[fu] || 1);
+  const kM_res  = MU_TO_NM[mu] || kM_auto;
+  const info = document.getElementById('convInfo');
+  if (info) {
+    if (kM_res === 1 && kM_auto === 1) {
+      info.innerHTML = `✓ Entrada y resultado en unidades base (1 N·m = 1 N·m)`;
+      info.style.color = 'var(--green)';
+    } else {
+      const kM_autoStr = kM_auto < 0.001 ? kM_auto.toExponential(3)
+                       : Number.isInteger(kM_auto) ? kM_auto
+                       : kM_auto.toPrecision(4);
+      const kM_resStr  = kM_res  < 0.001 ? kM_res.toExponential(3)
+                       : Number.isInteger(kM_res)  ? kM_res
+                       : kM_res.toPrecision(4);
+      let lines = [];
+      if (kM_auto !== 1) lines.push(`1 ${autoMu} = ${kM_autoStr} N·m (entrada)`);
+      if (mu !== autoMu) lines.push(`1 ${mu} = ${kM_resStr} N·m (resultado)`);
+      info.innerHTML = `⚙ ${lines.join(' &nbsp;|&nbsp; ')} &nbsp;·&nbsp; Cálculo interno en SI`;
+      info.style.color = 'var(--gold)';
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SIGN CONVENTION
+// ═══════════════════════════════════════════════════════════════
+function setSignConv(c) {
+  signConv = c;
+  document.getElementById('signACW').classList.toggle('active', c === 'acw');
+  document.getElementById('signCW').classList.toggle('active', c === 'cw');
+  document.getElementById('signTip').textContent = c === 'acw'
+    ? 'Sentido antihorario = positivo (convención estándar)'
+    : 'Sentido horario = positivo (convención alternativa)';
+}
+
+// ═══════════════════════════════════════════════════════════════
+// FORCE MANAGEMENT
+// ═══════════════════════════════════════════════════════════════
+function updateForceCount() {
+  const el = document.getElementById('forceCount');
+  if (el) el.textContent = forceIds.length;
+}
+
+function addForce(preset) {
+  const id = ++forceCounter;
+  forceIds.push(id);
+  const color = FORCE_COLORS[(id-1) % FORCE_COLORS.length];
+  const label = 'F' + id;
+
+  const p = preset || {};
+  const px = p.px !== undefined ? p.px : 0;
+  const py = p.py !== undefined ? p.py : 0;
+  const mag = p.mag || '';
+  const ang = p.ang !== undefined ? p.ang : 90;
+  const isUnk = p.unk !== undefined ? p.unk : false;
+
+  const div = document.createElement('div');
+  div.className = 'force-block';
+  div.id = 'fb_'+id;
+  div.innerHTML = `
+    <div class="force-head">
+      <span class="force-name">
+        <span class="fdot" style="background:${color}"></span>${label}
+      </span>
+      <span class="pill ${isUnk?'pill-unk':'pill-dato'}" id="pill_${id}">${label} = ${isUnk?'INCÓGNITA':'DATO'}</span>
+      <button class="btn-del-force" onclick="removeForce(${id})" title="Eliminar fuerza">✕</button>
+    </div>
+    <div style="font-size:11px;color:var(--text3);margin-bottom:7px;letter-spacing:.2px;font-weight:500;">Punto de aplicación A</div>
+    <div class="g2">
+      <div><label>Ax (<span class="ulen">${lu}</span>)</label>
+        <input type="number" id="px_${id}" value="${px}" step="any"></div>
+      <div><label>Ay (<span class="ulen">${lu}</span>)</label>
+        <input type="number" id="py_${id}" value="${py}" step="any"></div>
+    </div>
+    <div class="mag-row">
+      <span class="mag-label">|${label}|</span>
+      <div class="mag-input-wrap">
+        <input type="number" id="mag_${id}" value="${mag}" step="any"
+          placeholder="${isUnk?'incógnita':'valor'}"
+          class="${isUnk?'is-unknown':''}"
+          ${isUnk?'disabled':''}>
+      </div>
+      <span class="mag-unit uforce">${fu}</span>
+      <label class="switch" title="ON = dato  OFF = incógnita">
+        <input type="checkbox" id="chk_${id}" ${isUnk?'':'checked'}
+          onchange="onToggleMag(${id})">
+        <span class="slider"></span>
+      </label>
+      <span class="sw-label" id="swl_${id}">${isUnk?'Incógnita':'Dato'}</span>
+    </div>
+    <div style="margin-top:10px;">
+      <label>Ángulo θ respecto al eje x positivo (° antihorario)</label>
+      <div class="g2">
+        <input type="number" id="ang_${id}" value="${ang}" step="any" placeholder="grados">
+        <div style="display:flex;align-items:center;gap:5px;padding:6px 0;">
+          <span style="font-size:11px;color:var(--text3);font-family:'Roboto Mono',monospace;">Fx=|F|cosθ  Fy=|F|sinθ</span>
+        </div>
+      </div>
+    </div>
+  `;
+  document.getElementById('forceList').appendChild(div);
+  updateInfoBar();
+  updateForceCount();
+}
+
+function removeForce(id) {
+  const idx = forceIds.indexOf(id);
+  if (idx > -1) forceIds.splice(idx, 1);
+  const el = document.getElementById('fb_'+id);
+  if (el) el.remove();
+  updateInfoBar();
+  updateForceCount();
+}
+
+function onToggleMag(id) {
+  const chk = document.getElementById('chk_'+id);
+  const inp = document.getElementById('mag_'+id);
+  const pill = document.getElementById('pill_'+id);
+  const swl = document.getElementById('swl_'+id);
+  const label = 'F' + id;
+  const known = chk.checked;
+  inp.disabled = !known;
+  inp.classList.toggle('is-unknown', !known);
+  inp.placeholder = known ? 'valor' : 'incógnita';
+  if (!known) inp.value = '';
+  pill.className = 'pill ' + (known ? 'pill-dato' : 'pill-unk');
+  pill.textContent = label + ' = ' + (known ? 'DATO' : 'INCÓGNITA');
+  swl.textContent = known ? 'Dato' : 'Incógnita';
+  updateInfoBar();
+}
+
+function updateInfoBar() {
+  const bar = document.getElementById('infoBar');
+  const txt = document.getElementById('infoTxt');
+  const unks = forceIds.filter(id => {
+    const chk = document.getElementById('chk_'+id);
+    return chk && !chk.checked;
+  });
+  const n = forceIds.length;
+  if (n === 0) {
+    bar.className = 'info-bar';
+    txt.textContent = 'Agrega al menos una fuerza para calcular';
+    return;
+  }
+  if (unks.length > 1) {
+    bar.className = 'info-bar warn';
+    txt.textContent = `⚠ Solo se puede resolver 1 incógnita de fuerza (hay ${unks.length}). Activa el toggle de las demás.`;
+    return;
+  }
+  bar.className = 'info-bar';
+  if (unks.length === 1) {
+    txt.textContent = `${n} fuerza(s) · F${unks[0]} = INCÓGNITA — se resolverá por equilibrio de momento`;
+  } else {
+    txt.textContent = `${n} fuerza(s) definidas · cálculo de momento resultante`;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// UNIT CONVERSION
+// ═══════════════════════════════════════════════════════════════
+function getMomentFactor(f, l) {
+  return FORCE_TO_N[f] * LEN_TO_M[l];
+}
+
+// ═══════════════════════════════════════════════════════════════
+// READ INPUTS
+// ═══════════════════════════════════════════════════════════════
+function readForces() {
+  const forces = [];
+  for (const id of forceIds) {
+    const px  = parseFloat(document.getElementById('px_'+id).value) || 0;
+    const py  = parseFloat(document.getElementById('py_'+id).value) || 0;
+    const ang = parseFloat(document.getElementById('ang_'+id).value) || 0;
+    const chk = document.getElementById('chk_'+id).checked;
+    const magRaw = parseFloat(document.getElementById('mag_'+id).value);
+    const mag = chk ? (isNaN(magRaw) ? null : magRaw) : null;
+    const rad = ang * Math.PI / 180;
+    forces.push({ id, px, py, ang, rad, mag, known: chk, label:'F'+id });
+  }
+  return forces;
+}
+
+function toSI(f, ox_disp, oy_disp) {
+  const kL = LEN_TO_M[lu];
+  const kF = FORCE_TO_N[fu];
+  return {
+    ...f,
+    px_si : f.px * kL,
+    py_si : f.py * kL,
+    ox_si : ox_disp * kL,
+    oy_si : oy_disp * kL,
+    mag_si: f.mag !== null ? f.mag * kF : null,
+  };
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CALCULATE
+// ═══════════════════════════════════════════════════════════════
+function calculate() {
+  const ox_d = parseFloat(document.getElementById('ox').value) || 0;
+  const oy_d = parseFloat(document.getElementById('oy').value) || 0;
+  const forces = readForces();
+
+  if (forces.length === 0) { alert('Agrega al menos una fuerza.'); return; }
+
+  const unknowns = forces.filter(f => !f.known);
+  if (unknowns.length > 1) { alert('Solo puede haber una incógnita de fuerza a la vez.'); return; }
+
+  for (const f of forces) {
+    if (f.known && (f.mag === null || f.mag < 0)) {
+      alert(`La fuerza F${f.id} necesita una magnitud válida (≥ 0).`); return;
+    }
+  }
+
+  const kL = LEN_TO_M[lu];
+  const kF = FORCE_TO_N[fu];
+  const ox_si = ox_d * kL;
+  const oy_si = oy_d * kL;
+
+  const forces_si = forces.map(f => ({
+    ...f,
+    px: f.px * kL,
+    py: f.py * kL,
+    mag: f.mag !== null ? f.mag * kF : null,
+  }));
+
+  const sign = signConv === 'acw' ? 1 : -1;
+
+  let results_si;
+  if (unknowns.length === 0) {
+    results_si = computeMoments(forces_si, ox_si, oy_si, sign);
+  } else {
+    const unk_si = forces_si.find(f => !f.known);
+    results_si = solveForUnknown(forces_si, unk_si, ox_si, oy_si, sign);
+  }
+
+  if (!results_si) return;
+
+  const mu_display = document.getElementById('momentUnit').textContent;
+  const kM_input = kL * kF;
+  const kM = MU_TO_NM[mu_display] || kM_input;
+  const results = convertResultsToDisplay(results_si, kL, kF, kM, unknowns);
+
+  if (unknowns.length === 1) {
+    const unkId = unknowns[0].id;
+    const solvedItem = results.items.find(i => i.id === unkId);
+    if (solvedItem) {
+      const inp = document.getElementById('mag_'+unkId);
+      if (inp) inp.value = Math.abs(solvedItem.mag).toFixed(4);
+    }
+  }
+
+  lastResult = { ox: ox_d, oy: oy_d, forces, results, sign, kL, kF, kM };
+  displayResults(lastResult);
+  switchTab('results');
+}
+
+function convertResultsToDisplay(res_si, kL, kF, kM, unknowns) {
+  const items = res_si.items.map(it => ({
+    ...it,
+    px   : it.px  / kL,
+    py   : it.py  / kL,
+    mag  : it.mag !== null ? it.mag / kF : null,
+    Fx   : it.Fx  / kF,
+    Fy   : it.Fy  / kF,
+    dx   : it.dx  / kL,
+    dy   : it.dy  / kL,
+    M_raw: it.M_raw / kM,
+  }));
+  return {
+    ...res_si,
+    items,
+    MR_raw    : res_si.MR_raw     / kM,
+    MR        : res_si.MR         / kM,
+    solvedMag : res_si.solvedMag  !== undefined ? res_si.solvedMag / kF : undefined,
+  };
+}
+
+function computeMoments(forces, ox, oy, sign) {
+  let MR = 0;
+  const items = [];
+  for (const f of forces) {
+    const Fx = f.mag * Math.cos(f.rad);
+    const Fy = f.mag * Math.sin(f.rad);
+    const dx = f.px - ox;
+    const dy = f.py - oy;
+    const M_raw = dx * Fy - dy * Fx;
+    const M = sign >= 0 ? M_raw : -M_raw;
+    MR += M_raw;
+    items.push({ ...f, Fx, Fy, dx, dy, M_raw, M_contrib: M_raw });
+  }
+  return { type:'calc', items, MR_raw: MR, MR: sign>=0 ? MR : -MR };
+}
+
+function solveForUnknown(forces, unk, ox, oy, sign) {
+  let knownMoment = 0;
+  const items = [];
+  for (const f of forces) {
+    if (!f.known) continue;
+    const Fx = f.mag * Math.cos(f.rad);
+    const Fy = f.mag * Math.sin(f.rad);
+    const dx = f.px - ox;
+    const dy = f.py - oy;
+    const M_raw = dx * Fy - dy * Fx;
+    knownMoment += M_raw;
+    items.push({ ...f, Fx, Fy, dx, dy, M_raw });
+  }
+
+  const dx_u = unk.px - ox;
+  const dy_u = unk.py - oy;
+  const cosA = Math.cos(unk.rad);
+  const sinA = Math.sin(unk.rad);
+  const coeff = dx_u * sinA - dy_u * cosA;
+
+  if (Math.abs(coeff) < 1e-12) {
+    alert(`La fuerza F${unk.id} tiene brazo de momento nulo respecto a O con el ángulo dado. No se puede resolver.`);
+    return null;
+  }
+
+  const F_unk = -knownMoment / coeff;
+  const Fx_u = F_unk * cosA;
+  const Fy_u = F_unk * sinA;
+  const M_u = dx_u * Fy_u - dy_u * Fx_u;
+
+  const unkItem = { ...unk, mag: F_unk, Fx: Fx_u, Fy: Fy_u, dx: dx_u, dy: dy_u, M_raw: M_u };
+  items.push(unkItem);
+
+  const MR_raw = knownMoment + M_u;
+  return { type:'solve', items, MR_raw, MR: sign>=0 ? MR_raw : -MR_raw, solvedId: unk.id, solvedMag: F_unk };
+}
+
+// ═══════════════════════════════════════════════════════════════
+// DISPLAY RESULTS
+// ═══════════════════════════════════════════════════════════════
+function displayResults(state) {
+  const { results, sign, kM } = state;
+  if (!results) return;
+
+  const mu = document.getElementById('momentUnit').textContent;
+  const showEqLocal = (kM !== 1);
+
+  let html = '';
+
+  html += `<div class="result-card">
+    <div class="result-title">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+      Descomposición por Fuerza — Brazo de Momento
+    </div>`;
+
+  for (const it of results.items) {
+    const cw_acw  = it.M_raw >= 0 ? '⟳ Antihorario' : '⟲ Horario';
+    const col     = it.M_raw >= 0 ? 'var(--green)' : 'var(--red)';
+    const signedM = signConv === 'acw' ? it.M_raw : -it.M_raw;
+    const M_Nm    = signedM * kM;
+    html += `
+    <div style="border-bottom:1px solid var(--gray-lighter);padding:10px 0;">
+      <div style="font-family:'Poppins',sans-serif;font-weight:700;font-size:14px;color:${FORCE_COLORS[(it.id-1)%FORCE_COLORS.length]};margin-bottom:6px;">
+        ${it.label}  ${it.known?'':'(CALCULADA)'}
+      </div>
+      <div class="rrow"><span>Magnitud |${it.label}|</span>
+        <span class="rval">${Math.abs(it.mag||0).toFixed(4)} <small>${fu}</small></span></div>
+      <div class="rrow"><span>Ángulo θ</span>
+        <span class="rval">${it.ang.toFixed(2)}°</span></div>
+      <div class="rrow"><span style="font-family:'Roboto Mono',monospace;font-size:12px;">Fx = |F|·cos θ</span>
+        <span class="rval ${it.Fx<0?'neg':''}">${it.Fx.toFixed(4)} <small>${fu}</small></span></div>
+      <div class="rrow"><span style="font-family:'Roboto Mono',monospace;font-size:12px;">Fy = |F|·sin θ</span>
+        <span class="rval ${it.Fy<0?'neg':''}">${it.Fy.toFixed(4)} <small>${fu}</small></span></div>
+      <div class="rrow"><span style="font-family:'Roboto Mono',monospace;font-size:12px;">dx = Ax − Ox</span>
+        <span class="rval ${it.dx<0?'neg':''}">${it.dx.toFixed(4)} <small>${lu}</small></span></div>
+      <div class="rrow"><span style="font-family:'Roboto Mono',monospace;font-size:12px;">dy = Ay − Oy</span>
+        <span class="rval ${it.dy<0?'neg':''}">${it.dy.toFixed(4)} <small>${lu}</small></span></div>
+      <div class="rrow"><span style="font-family:'Roboto Mono',monospace;font-size:12px;">M = dx·Fy − dy·Fx</span>
+        <span class="rval" style="color:${col}">${signedM.toFixed(4)} <small>${mu}</small></span></div>
+      ${showEqLocal ? `<div class="rrow" style="opacity:.7;"><span style="font-size:11px;">≡ en N·m</span>
+        <span style="font-family:'Roboto Mono',monospace;font-size:13px;font-weight:500;color:${col};">${M_Nm.toFixed(4)} <small>N·m</small></span></div>` : ''}
+      <div><span style="font-size:11px;color:${col};font-family:'Inter',sans-serif;font-weight:600;">${cw_acw}</span></div>
+    </div>`;
+  }
+  html += `</div>`;
+
+  const MR_signed = signConv === 'acw' ? results.MR_raw : -results.MR_raw;
+  const MR_phys = results.MR_raw;
+  const dirText  = Math.abs(MR_phys) < 1e-9 ? '— Momento nulo' : (MR_phys >= 0 ? '⟳ Antihorario' : '⟲ Horario');
+  const dirColor = Math.abs(MR_phys) < 1e-9 ? 'var(--gray-light)'    : (MR_phys >= 0 ? 'var(--green)'  : 'var(--red)');
+  const MR_Nm   = MR_signed * kM;
+  const showEq  = (kM !== 1);
+
+  html += `<div class="result-card">
+    <div class="result-title">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+      Momento Resultante ΣM<sub>O</sub>
+    </div>
+    <div class="rrow"><span style="font-family:'Roboto Mono',monospace;font-size:12px;">ΣM<sub>O</sub> = Σ(dx·Fy − dy·Fx)</span>
+      <span class="rval ans">${MR_signed.toFixed(4)} <small>${mu}</small></span></div>`;
+
+  if (showEq) {
+    html += `<div class="rrow" style="opacity:.75;">
+      <span style="font-size:12px;">Equivalencia en N·m</span>
+      <span class="rval" style="font-size:14px;color:var(--gold);">${MR_Nm.toFixed(4)} <small>N·m</small></span></div>`;
+  }
+
+  html += `<div class="rrow"><span>Sentido de rotación</span>
+      <span style="font-family:'Poppins',sans-serif;font-size:15px;font-weight:700;color:${dirColor}">${dirText}</span></div>`;
+
+  if (results.type === 'solve') {
+    const fId  = results.solvedId;
+    const fMag = results.solvedMag;
+    html += `<div class="rrow" style="margin-top:6px;background:rgba(217,119,6,.06);padding:6px 10px;border-radius:8px;">
+      <span>F${fId} (incógnita resuelta)</span>
+      <span class="rval ans">${Math.abs(fMag).toFixed(4)} <small>${fu}</small></span></div>
+      <div style="font-size:11px;color:var(--text2);margin-top:5px;">
+        ${fMag < 0 ? '⚠ Signo negativo indica que la fuerza actúa en sentido contrario al ángulo definido.' : '✓ La fuerza actúa en la dirección del ángulo definido.'}
+      </div>`;
+    const res = Math.abs(results.MR_raw);
+    const ok  = res < 1e-4;
+    html += `<div style="margin-top:10px;border-radius:8px;padding:8px 12px;font-family:'Inter',sans-serif;font-weight:600;font-size:12px;${ok?'background:rgba(5,150,105,.08);color:var(--green);border:1px solid rgba(5,150,105,.2)':'background:rgba(220,38,38,.06);color:var(--red);border:1px solid rgba(220,38,38,.2)'}">
+      ${ok ? '✓ EQUILIBRIO VERIFICADO — ΣM_O ≈ 0' : '⚠ Revisar datos — residuo: '+res.toFixed(6)+' '+mu}
+    </div>`;
+  }
+  html += `</div>`;
+
+  const rc = document.getElementById('resultsContent');
+  rc.innerHTML = html;
+  rc.style.display = 'block';
+  document.getElementById('resultsPH').style.display = 'none';
+}
+
+// ═══════════════════════════════════════════════════════════════
+// STEP-BY-STEP PROCEDURE
+// ═══════════════════════════════════════════════════════════════
+function showSteps() {
+  if (!lastResult) { try { calculate(); } catch(e) { return; } }
+  if (!lastResult || !lastResult.results) return;
+
+  const { ox, oy, results, kL, kF, kM } = lastResult;
+  const mu = document.getElementById('momentUnit').textContent;
+  const conv = signConv === 'acw' ? 'antihorario (+)' : 'horario (+)';
+  const autoMu = fu + '·' + lu;
+  const kM_input = kL * kF;
+
+  let html = '';
+  let step = 1;
+
+  const needsConv = (kM_input !== 1 || kM !== 1 || mu !== 'N·m');
+  if (needsConv) {
+    let convLines = [];
+    convLines.push(`Factor longitud  : 1 ${lu} = ${LEN_TO_M[lu]} m`);
+    convLines.push(`Factor fuerza    : 1 ${fu} = ${FORCE_TO_N[fu]} N`);
+    convLines.push(`Entrada momento  : 1 ${autoMu} = ${kM_input.toPrecision(4)} N·m`);
+    if (mu !== autoMu) {
+      convLines.push(`Resultado momento: 1 ${mu} = ${kM.toPrecision(4)} N·m`);
+    }
+    html += stepHtml(step++, 'Conversión de Unidades',
+      `Todos los valores se convierten a SI antes de calcular. El resultado se expresa en <strong>${mu}</strong>.<br>
+      <div class="math-block">${convLines.join('\n')}</div>`);
+  }
+
+  html += stepHtml(step++, 'Identificación del Sistema',
+    `Se define el punto de referencia <strong>O(${ox}, ${oy}) ${lu}</strong> y la convención de signos: <strong>${conv}</strong>.<br>
+    El momento de una fuerza respecto a O se calcula mediante el producto cruzado 2D:<br>
+    <div class="math-block">M_O = r × F = dx·Fy − dy·Fx</div>
+    donde <strong>dx = Ax − Ox</strong> y <strong>dy = Ay − Oy</strong> son las distancias desde O al punto de aplicación.`);
+
+  let decompText = `Para cada fuerza se determinan las componentes rectangulares usando θ medido desde el eje x positivo en sentido antihorario:<br>`;
+  for (const it of results.items) {
+    decompText += `<div class="math-block">` +
+      `${it.label}  |  θ = ${it.ang.toFixed(2)}°  |  |F| = ${Math.abs(it.mag||0).toFixed(4)} ${fu}\n` +
+      `  Fx = ${Math.abs(it.mag||0).toFixed(4)} · cos(${it.ang.toFixed(2)}°) = ${it.Fx.toFixed(4)} ${fu}\n` +
+      `  Fy = ${Math.abs(it.mag||0).toFixed(4)} · sin(${it.ang.toFixed(2)}°) = ${it.Fy.toFixed(4)} ${fu}` +
+      `</div>`;
+  }
+  html += stepHtml(step++, 'Descomposición en Componentes Rectangulares', decompText);
+
+  let momText = 'Se calculan los brazos de momento y el momento de cada componente (Teorema de Varignon):';
+  for (const it of results.items) {
+    const signedM = signConv === 'acw' ? it.M_raw : -it.M_raw;
+    const dir = it.M_raw >= 0 ? '⟳ Antihorario' : '⟲ Horario';
+    momText += `<div class="math-block">` +
+      `${it.label}  |  Punto A(${it.px.toFixed(4)}, ${it.py.toFixed(4)}) ${lu}\n` +
+      `  dx = ${it.px.toFixed(4)} − (${ox}) = ${it.dx.toFixed(4)} ${lu}\n` +
+      `  dy = ${it.py.toFixed(4)} − (${oy}) = ${it.dy.toFixed(4)} ${lu}\n` +
+      `  M_${it.label} = dx·Fy − dy·Fx\n` +
+      `       = (${it.dx.toFixed(4)} ${lu})(${it.Fy.toFixed(4)} ${fu})\n` +
+      `         − (${it.dy.toFixed(4)} ${lu})(${it.Fx.toFixed(4)} ${fu})\n` +
+      `       = ${signedM.toFixed(4)} ${mu}   ${dir}` +
+      `</div>`;
+  }
+  html += stepHtml(step++, 'Brazos de Momento y Contribución Individual (Varignon)', momText);
+
+  if (results.type === 'solve') {
+    const unkId  = results.solvedId;
+    const unkIt  = results.items.find(i => i.id === unkId);
+    const knownItems = results.items.filter(i => i.id !== unkId);
+    const knownSum = knownItems.reduce((s, i) => s + i.M_raw, 0);
+    const signedKnown = signConv === 'acw' ? knownSum : -knownSum;
+    const coeff = unkIt.dx * Math.sin(unkIt.rad) - unkIt.dy * Math.cos(unkIt.rad);
+
+    html += stepHtml(step++, 'Resolución de la Incógnita (ΣM_O = 0)',
+      `El sistema está en equilibrio de momentos (ΣM_O = 0):<br>
+      <div class="math-block">ΣM_O = 0\n` +
+      `  Σ M_conocidas = ${signedKnown.toFixed(4)} ${mu}\n\n` +
+      `  M_F${unkId} = F${unkId} · (dx·sin θ − dy·cos θ)\n` +
+      `           = F${unkId} · (${unkIt.dx.toFixed(4)} · sin(${unkIt.ang.toFixed(2)}°)\n` +
+      `                        − ${unkIt.dy.toFixed(4)} · cos(${unkIt.ang.toFixed(2)}°))\n` +
+      `           = F${unkId} · (${coeff.toFixed(6)} ${lu})\n\n` +
+      `  F${unkId} · (${coeff.toFixed(6)} ${lu}) + (${signedKnown.toFixed(4)} ${mu}) = 0\n` +
+      `  F${unkId} = ${Math.abs(results.solvedMag).toFixed(4)} ${fu}` +
+      `</div>`);
+  } else {
+    const MR_signed = signConv === 'acw' ? results.MR_raw : -results.MR_raw;
+    const dir = results.MR_raw >= 0 ? '⟳ Antihorario' : '⟲ Horario';
+    const sumLine = results.items.map(i => {
+      const s = signConv === 'acw' ? i.M_raw : -i.M_raw;
+      return `(${s.toFixed(4)})`;
+    }).join(' + ');
+    html += stepHtml(step++, 'Momento Resultante ΣM_O',
+      `Se suman algebraicamente todos los momentos individuales:<div class="math-block">` +
+      `ΣM_O = ${sumLine}\nΣM_O = ${MR_signed.toFixed(4)} ${mu}   ${dir}</div>`);
+  }
+
+  const MR_signed = signConv === 'acw' ? results.MR_raw : -results.MR_raw;
+  const dirFinal  = Math.abs(results.MR_raw) < 1e-9
+    ? 'nulo'
+    : (results.MR_raw >= 0 ? 'antihorario' : 'horario');
+  html += stepHtml(step++, 'Conclusión',
+    `El momento resultante respecto al punto O(${ox}, ${oy}) ${lu} es:<br>
+    <div class="math-block">ΣM_O = ${MR_signed.toFixed(4)} ${mu}   (${dirFinal})</div>
+    ${results.type === 'solve'
+      ? `La magnitud de la fuerza incógnita F${results.solvedId} requerida para el equilibrio de momentos es <strong>${Math.abs(results.solvedMag).toFixed(4)} ${fu}</strong>.`
+      : `Este momento tiende a girar el sistema en sentido <strong>${dirFinal}</strong> alrededor del punto O.`}`);
+
+  const sc = document.getElementById('stepsContent');
+  sc.innerHTML = html;
+  sc.style.display = 'block';
+  document.getElementById('stepsPH').style.display = 'none';
+  switchTab('steps');
+}
+
+function stepHtml(n, title, body) {
+  return `<div class="step-item">
+    <div class="step-num">${n}</div>
+    <div class="step-body"><h4>${title}</h4><p>${body}</p></div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 2D CANVAS DRAWING + ZOOM / PAN
+// ═══════════════════════════════════════════════════════════════
+function graficar() {
+  if (forceIds.length === 0) { alert('Agrega al menos una fuerza antes de graficar.'); return; }
+  const forces = readForces();
+  const ox = parseFloat(document.getElementById('ox').value) || 0;
+  const oy = parseFloat(document.getElementById('oy').value) || 0;
+
+  for (const f of forces) {
+    if (f.known && f.mag === null) { alert(`Ingresa la magnitud de F${f.id} o calcula primero.`); return; }
+  }
+  if (lastResult) {
+    for (const f of forces) {
+      if (!f.known) {
+        const solved = lastResult.results && lastResult.results.items.find(i => i.id === f.id);
+        if (solved) f.mag = solved.mag;
+      }
+    }
+  }
+
+  forces.forEach(f => {
+    if (f.mag !== null) {
+      f.Fx = f.mag * Math.cos(f.rad);
+      f.Fy = f.mag * Math.sin(f.rad);
+    }
+  });
+
+  lastDrawForces = forces;
+  lastDrawOx = ox; lastDrawOy = oy;
+  viewZoom = 1; viewPanX = 0; viewPanY = 0;
+
+  const canvas = document.getElementById('graphCanvas');
+  const wrap   = canvas.parentElement;
+  canvas.width  = wrap.clientWidth  || 700;
+  canvas.height = wrap.clientHeight || 500;
+  canvas.style.display = 'block';
+  document.getElementById('graphPH').style.display = 'none';
+  document.getElementById('zoomBar').style.display  = 'flex';
+  document.getElementById('zoomTip').style.display  = 'block';
+
+  setupCanvasEvents(canvas);
+  redraw();
+  switchTab('graph');
+}
+
+function redraw() {
+  if (!lastDrawForces) return;
+  const canvas = document.getElementById('graphCanvas');
+  const ctx = canvas.getContext('2d');
+  drawScene(ctx, canvas.width, canvas.height,
+            lastDrawForces, lastDrawOx, lastDrawOy,
+            viewZoom, viewPanX, viewPanY);
+  document.getElementById('zoomLabel').textContent = Math.round(viewZoom * 100) + '%';
+}
+
+function zoomIn()    { viewZoom = Math.min(viewZoom * 1.25, 12); redraw(); }
+function zoomOut()   { viewZoom = Math.max(viewZoom / 1.25, 0.15); redraw(); }
+function zoomReset() { viewZoom = 1; viewPanX = 0; viewPanY = 0; redraw(); }
+
+function setupCanvasEvents(canvas) {
+  const fresh = canvas.cloneNode(true);
+  canvas.parentNode.replaceChild(fresh, canvas);
+  const c = document.getElementById('graphCanvas');
+
+  c.addEventListener('wheel', e => {
+    e.preventDefault();
+    const rect = c.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const my = e.clientY - rect.top;
+    const factor = e.deltaY < 0 ? 1.15 : 1/1.15;
+    const newZoom = Math.max(0.15, Math.min(12, viewZoom * factor));
+    viewPanX = mx - (mx - viewPanX) * (newZoom / viewZoom);
+    viewPanY = my - (my - viewPanY) * (newZoom / viewZoom);
+    viewZoom = newZoom;
+    redraw();
+  }, { passive: false });
+
+  c.addEventListener('mousedown', e => {
+    isPanning = true;
+    panStartX = e.clientX; panStartY = e.clientY;
+    panOriginX = viewPanX; panOriginY = viewPanY;
+    c.style.cursor = 'grabbing';
+  });
+  c.addEventListener('mousemove', e => {
+    if (!isPanning) return;
+    viewPanX = panOriginX + (e.clientX - panStartX);
+    viewPanY = panOriginY + (e.clientY - panStartY);
+    redraw();
+  });
+  const endPan = () => { isPanning = false; c.style.cursor = 'grab'; };
+  c.addEventListener('mouseup',    endPan);
+  c.addEventListener('mouseleave', endPan);
+
+  let lastTouchDist = null;
+  c.addEventListener('touchstart', e => {
+    if (e.touches.length === 1) {
+      isPanning = true;
+      panStartX = e.touches[0].clientX; panStartY = e.touches[0].clientY;
+      panOriginX = viewPanX; panOriginY = viewPanY;
+    }
+    if (e.touches.length === 2) {
+      isPanning = false;
+      lastTouchDist = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY);
+    }
+    e.preventDefault();
+  }, { passive: false });
+  c.addEventListener('touchmove', e => {
+    if (e.touches.length === 1 && isPanning) {
+      viewPanX = panOriginX + (e.touches[0].clientX - panStartX);
+      viewPanY = panOriginY + (e.touches[0].clientY - panStartY);
+      redraw();
+    }
+    if (e.touches.length === 2 && lastTouchDist) {
+      const d = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY);
+      viewZoom = Math.max(0.15, Math.min(12, viewZoom * d / lastTouchDist));
+      lastTouchDist = d;
+      redraw();
+    }
+    e.preventDefault();
+  }, { passive: false });
+  c.addEventListener('touchend', () => { isPanning = false; lastTouchDist = null; });
+}
+
+function drawScene(ctx, W, H, forces, ox, oy, zoom=1, panX=0, panY=0) {
+  ctx.clearRect(0, 0, W, H);
+
+  // Background — light theme
+  ctx.fillStyle = '#f8fafb';
+  ctx.fillRect(0, 0, W, H);
+
+  const allPts = [[ox, oy], ...forces.map(f => [f.px, f.py])];
+  forces.forEach(f => {
+    if (f.mag) {
+      const scale = 0.25;
+      allPts.push([f.px + f.mag * Math.cos(f.rad) * scale, f.py + f.mag * Math.sin(f.rad) * scale]);
+    }
+  });
+  const xs = allPts.map(p => p[0]);
+  const ys = allPts.map(p => p[1]);
+  let minX = Math.min(...xs), maxX = Math.max(...xs);
+  let minY = Math.min(...ys), maxY = Math.max(...ys);
+
+  const pad = 80;
+  const spanX = maxX - minX || 2;
+  const spanY = maxY - minY || 2;
+  const margin = Math.max(spanX, spanY) * 0.4;
+  minX -= margin; maxX += margin;
+  minY -= margin; maxY += margin;
+
+  const scX = (W - 2*pad) / (maxX - minX);
+  const scY = (H - 2*pad) / (maxY - minY);
+  const scBase = Math.min(scX, scY);
+  const sc = scBase * zoom;
+
+  const cx0 = W / 2, cy0 = H / 2;
+
+  const toCanv = (x, y) => {
+    const bx = pad + (x - minX) * scBase;
+    const by = H - pad - (y - minY) * scBase;
+    return [
+      cx0 + (bx - cx0) * zoom + panX,
+      cy0 + (by - cy0) * zoom + panY
+    ];
+  };
+
+  // Grid
+  ctx.strokeStyle = 'rgba(226,232,240,.7)';
+  ctx.lineWidth = 1;
+  const gridStep = niceStep((maxX - minX) / Math.max(4, Math.round(6 * zoom)));
+  const gx0 = Math.ceil(minX / gridStep) * gridStep;
+  for (let gx = gx0; gx <= maxX + gridStep; gx += gridStep) {
+    const [cx] = toCanv(gx, 0);
+    if (cx < -10 || cx > W + 10) continue;
+    ctx.beginPath(); ctx.moveTo(cx, 0); ctx.lineTo(cx, H); ctx.stroke();
+  }
+  const gy0 = Math.ceil(minY / gridStep) * gridStep;
+  for (let gy = gy0; gy <= maxY + gridStep; gy += gridStep) {
+    const [,cy] = toCanv(0, gy);
+    if (cy < -10 || cy > H + 10) continue;
+    ctx.beginPath(); ctx.moveTo(0, cy); ctx.lineTo(W, cy); ctx.stroke();
+  }
+
+  // Axis labels
+  ctx.fillStyle = 'rgba(100,116,139,.5)';
+  ctx.font = '10px Roboto, sans-serif';
+  ctx.textAlign = 'center';
+  for (let gx = gx0; gx <= maxX + gridStep; gx += gridStep) {
+    const [cx, cy] = toCanv(gx, minY);
+    if (cx < 0 || cx > W) continue;
+    const labelY = Math.min(cy + 14, H - 4);
+    ctx.fillText(+gx.toFixed(2), cx, labelY);
+  }
+  ctx.textAlign = 'right';
+  for (let gy = gy0; gy <= maxY + gridStep; gy += gridStep) {
+    const [cx2, cy] = toCanv(minX, gy);
+    if (cy < 0 || cy > H) continue;
+    ctx.fillText(+gy.toFixed(2), Math.max(cx2 - 4, 38), cy + 4);
+  }
+
+  // Axes
+  const [ax0, ay0] = toCanv(minX, 0);
+  const [ax1]      = toCanv(maxX, 0);
+  const [,ay1]     = toCanv(0, minY);
+  const [,ay2]     = toCanv(0, maxY);
+  ctx.strokeStyle = 'rgba(100,116,139,.35)';
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(Math.max(0,ax0), ay0); ctx.lineTo(Math.min(W,ax1), ay0); ctx.stroke();
+  const yAxisX = toCanv(0,0)[0];
+  ctx.beginPath(); ctx.moveTo(yAxisX, Math.max(0,ay2)); ctx.lineTo(yAxisX, Math.min(H,ay1)); ctx.stroke();
+
+  ctx.fillStyle = 'rgba(100,116,139,.5)';
+  ctx.font = '11px Inter, sans-serif';
+  ctx.textAlign = 'left';
+  if (Math.min(W,ax1) > 20) ctx.fillText('x ('+lu+')', Math.min(W,ax1) - 26, Math.max(ay0 - 6, 14));
+  ctx.textAlign = 'center';
+  if (Math.max(0,ay2) < H-10) ctx.fillText('y ('+lu+')', yAxisX + 18, Math.max(ay2+14, 14));
+
+  const maxMag = Math.max(...forces.filter(f=>f.mag).map(f=>Math.abs(f.mag)), 1);
+  const arrowLen = Math.max(spanX, spanY) * 0.28;
+  const fScale = arrowLen / maxMag;
+
+  forces.forEach((f, idx) => {
+    if (!f.mag && f.mag !== 0) return;
+    const color = FORCE_COLORS[idx % FORCE_COLORS.length];
+    const [ax, ay] = toCanv(f.px, f.py);
+    const mag = Math.abs(f.mag);
+    const ang = f.rad + (f.mag < 0 ? Math.PI : 0);
+    const tipX = ax + mag * fScale * sc * Math.cos(ang);
+    const tipY = ay - mag * fScale * sc * Math.sin(ang);
+
+    ctx.fillStyle = color;
+    ctx.beginPath(); ctx.arc(ax, ay, 5, 0, Math.PI*2); ctx.fill();
+
+    const [ocx2, ocy2] = toCanv(ox, oy);
+    ctx.strokeStyle = color + '44';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([4, 4]);
+    ctx.beginPath(); ctx.moveTo(ocx2, ocy2); ctx.lineTo(ax, ay); ctx.stroke();
+    ctx.setLineDash([]);
+
+    drawArrow(ctx, ax, ay, tipX, tipY, color, 2.5);
+
+    const fxTipX = ax + mag * fScale * sc * Math.cos(ang);
+    const fxTipY = ay;
+    ctx.strokeStyle = color + '55';
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([4, 4]);
+    ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(fxTipX, fxTipY); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(fxTipX, fxTipY); ctx.lineTo(tipX, tipY); ctx.stroke();
+    ctx.setLineDash([]);
+
+    ctx.fillStyle = color;
+    ctx.font = 'bold 13px Inter, sans-serif';
+    ctx.textAlign = 'left';
+    const lx = (ax + tipX) / 2 + 8;
+    const ly = (ay + tipY) / 2 - 8;
+    ctx.fillText(f.label + (f.known?'':' (calc)'), lx, ly);
+    ctx.font = '10px Roboto, sans-serif';
+    ctx.fillStyle = color + 'cc';
+    ctx.fillText(`θ=${f.ang.toFixed(1)}°`, lx, ly + 13);
+    if (f.mag) ctx.fillText(`|F|=${Math.abs(f.mag).toFixed(2)} ${fu}`, lx, ly + 24);
+
+    ctx.fillStyle = '#55555588';
+    ctx.font = '10px Inter, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(`A${f.id}(${f.px},${f.py})`, ax, ay + 16);
+
+    drawMomentArc(ctx, toCanv(ox, oy)[0], toCanv(ox, oy)[1], ax, ay, f, ox, oy, color);
+  });
+
+  const [ocx, ocy] = toCanv(ox, oy);
+  ctx.fillStyle = '#059669';
+  ctx.beginPath(); ctx.arc(ocx, ocy, 8, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#ffffff';
+  ctx.font = 'bold 10px Inter';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText('O', ocx, ocy);
+  ctx.textBaseline = 'alphabetic';
+  ctx.fillStyle = '#555';
+  ctx.font = '11px Inter, sans-serif';
+  ctx.fillText(`O(${ox},${oy})`, ocx, ocy - 14);
+
+  drawLegend(ctx, forces, W);
+}
+
+function drawArrow(ctx, x1, y1, x2, y2, color, lw) {
+  const angle = Math.atan2(y2 - y1, x2 - x1);
+  const headLen = 12;
+  ctx.strokeStyle = color; ctx.fillStyle = color;
+  ctx.lineWidth = lw;
+  ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(x2, y2);
+  ctx.lineTo(x2 - headLen*Math.cos(angle-0.4), y2 - headLen*Math.sin(angle-0.4));
+  ctx.lineTo(x2 - headLen*Math.cos(angle+0.4), y2 - headLen*Math.sin(angle+0.4));
+  ctx.closePath(); ctx.fill();
+}
+
+function drawMomentArc(ctx, ocx, ocy, ax, ay, f, ox, oy, color) {
+  if (!f.mag || !f.Fx === undefined) return;
+  const dx = f.px - ox, dy = f.py - oy;
+  const M_raw = dx * f.Fy - dy * f.Fx;
+  if (Math.abs(M_raw) < 1e-9) return;
+  const dist = Math.sqrt((ax-ocx)**2 + (ay-ocy)**2);
+  const arcR = Math.max(dist * 0.38, 22);
+  const startAngle = Math.atan2(ay - ocy, ax - ocx);
+  const sweep = M_raw > 0 ? -Math.PI*0.6 : Math.PI*0.6;
+  ctx.strokeStyle = color + 'aa';
+  ctx.lineWidth = 2.2;
+  ctx.beginPath();
+  ctx.arc(ocx, ocy, arcR, startAngle, startAngle + sweep, M_raw > 0);
+  ctx.stroke();
+  const endAngle = startAngle + sweep;
+  const ex = ocx + arcR * Math.cos(endAngle);
+  const ey = ocy + arcR * Math.sin(endAngle);
+  const tDir = M_raw > 0 ? endAngle - Math.PI/2 : endAngle + Math.PI/2;
+  ctx.fillStyle = color + 'aa';
+  ctx.beginPath();
+  ctx.moveTo(ex, ey);
+  ctx.lineTo(ex - 9*Math.cos(tDir-0.4), ey - 9*Math.sin(tDir-0.4));
+  ctx.lineTo(ex - 9*Math.cos(tDir+0.4), ey - 9*Math.sin(tDir+0.4));
+  ctx.closePath(); ctx.fill();
+  const midAngle = startAngle + sweep * 0.5;
+  const mlx = ocx + (arcR + 14) * Math.cos(midAngle);
+  const mly = ocy + (arcR + 14) * Math.sin(midAngle);
+  ctx.fillStyle = color + 'cc';
+  ctx.font = 'bold 10px Inter, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText(M_raw > 0 ? '⟳' : '⟲', mlx, mly);
+}
+
+function drawLegend(ctx, forces, W) {
+  const lx = W - 190, ly = 18;
+  ctx.fillStyle = 'rgba(255,255,255,.92)';
+  ctx.strokeStyle = 'rgba(226,232,240,.8)';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.roundRect(lx-10, ly-10, 190, forces.length * 20 + 28, 8);
+  ctx.fill(); ctx.stroke();
+  ctx.fillStyle = 'rgba(5,150,105,.6)';
+  ctx.font = 'bold 10px Inter, sans-serif';
+  ctx.textAlign = 'left';
+  ctx.fillText('LEYENDA', lx, ly + 6);
+  forces.forEach((f, i) => {
+    const color = FORCE_COLORS[i % FORCE_COLORS.length];
+    ctx.fillStyle = color;
+    ctx.beginPath(); ctx.arc(lx + 5, ly + 20 + i*20, 4, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = '#555';
+    ctx.font = '10px Roboto, sans-serif';
+    ctx.fillText(`${f.label}  θ=${f.ang.toFixed(1)}°${f.mag?'  |F|='+Math.abs(f.mag).toFixed(2):''}`, lx+14, ly+24+i*20);
+  });
+}
+
+function niceStep(rough) {
+  const p = Math.pow(10, Math.floor(Math.log10(rough)));
+  const frac = rough / p;
+  if (frac < 1.5) return p;
+  if (frac < 3.5) return 2 * p;
+  if (frac < 7.5) return 5 * p;
+  return 10 * p;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// DOWNLOAD
+// ═══════════════════════════════════════════════════════════════
+function downloadSolution() {
+  if (!lastResult) { try { calculate(); } catch(e) { alert('Calcula primero.'); return; } }
+  if (!lastResult || !lastResult.results) return;
+
+  const { ox, oy, results, kL, kF, kM } = lastResult;
+  const mu = document.getElementById('momentUnit').textContent;
+  const now = new Date().toLocaleString('es-MX');
+  const conv = signConv === 'acw' ? 'Antihorario (+)' : 'Horario (+)';
+
+  let txt = `TECNM — MOMENTOS EN DOS DIMENSIONES
+MOOC — Estática 2D
+Generado: ${now}
+${'='.repeat(62)}
+
+CONFIGURACIÓN
+-------------
+  Sistema de unidades   : ${lu} / ${fu}
+  Unidad de momento     : ${mu}
+  Factor conversión     : 1 ${mu} = ${kM.toFixed(6)} N·m
+  Punto O               : (${ox}, ${oy}) ${lu}
+  Convención de signos  : ${conv}
+  Tipo de cálculo       : ${results.type === 'solve' ? 'Resolución de incógnita (ΣM_O = 0)' : 'Cálculo de momento resultante'}
+
+${'='.repeat(62)}
+FUERZAS
+-------\n`;
+
+  for (const it of results.items) {
+    const signedM = signConv === 'acw' ? it.M_raw : -it.M_raw;
+    txt += `\n  ${it.label}${it.known?'':' (INCÓGNITA — CALCULADA)'}:
+    Punto A    : (${it.px.toFixed(4)}, ${it.py.toFixed(4)}) ${lu}
+    Ángulo θ   : ${it.ang.toFixed(4)}°
+    Magnitud   : ${Math.abs(it.mag||0).toFixed(6)} ${fu}
+    Fx         : ${it.Fx.toFixed(6)} ${fu}
+    Fy         : ${it.Fy.toFixed(6)} ${fu}
+    dx = Ax−Ox : ${it.dx.toFixed(6)} ${lu}
+    dy = Ay−Oy : ${it.dy.toFixed(6)} ${lu}
+    M_${it.label}       : ${signedM.toFixed(6)} ${mu}  (${it.M_raw>=0?'Antihorario':'Horario'})
+`;
+  }
+
+  const MR_signed = signConv === 'acw' ? results.MR_raw : -results.MR_raw;
+  txt += `
+${'='.repeat(62)}
+MOMENTO RESULTANTE
+------------------
+  ΣM_O = ${MR_signed.toFixed(6)} ${mu}
+  Sentido: ${Math.abs(results.MR_raw)<1e-9?'Nulo':(results.MR_raw>=0?'Antihorario':'Horario')}
+`;
+
+  if (results.type === 'solve') {
+    txt += `
+RESOLUCIÓN DE INCÓGNITA
+-----------------------
+  F${results.solvedId} = ${Math.abs(results.solvedMag).toFixed(6)} ${fu}
+  Residuo ΣM_O = ${results.MR_raw.toFixed(9)} ${mu}
+  Estado: ${Math.abs(results.MR_raw)<1e-6?'EQUILIBRIO VERIFICADO ✓':'REVISAR DATOS ⚠'}
+`;
+  }
+
+  txt += `\n${'='.repeat(62)}\nTecNM | MOOC Estática 2D\n`;
+
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([txt], {type:'text/plain;charset=utf-8'}));
+  a.download = 'solucion_momentos2D.txt';
+  a.click();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CLEAR
+// ═══════════════════════════════════════════════════════════════
+function clearAll() {
+  if (!confirm('¿Limpiar todo el formulario?')) return;
+  forceIds = [];
+  forceCounter = 0;
+  lastResult = null;
+  document.getElementById('forceList').innerHTML = '';
+  document.getElementById('ox').value = '0';
+  document.getElementById('oy').value = '0';
+
+  document.getElementById('resultsContent').style.display = 'none';
+  document.getElementById('resultsPH').style.display = 'flex';
+  document.getElementById('stepsContent').style.display = 'none';
+  document.getElementById('stepsPH').style.display = 'flex';
+
+  lastDrawForces = null;
+  viewZoom = 1; viewPanX = 0; viewPanY = 0;
+  const canvas = document.getElementById('graphCanvas');
+  canvas.style.display = 'none';
+  document.getElementById('graphPH').style.display = 'flex';
+  document.getElementById('zoomBar').style.display = 'none';
+  document.getElementById('zoomTip').style.display = 'none';
+
+  updateInfoBar();
+  updateForceCount();
+  switchTab('graph');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TABS
+// ═══════════════════════════════════════════════════════════════
+function switchTab(t) {
+  ['graph','results','steps'].forEach(id => {
+    document.getElementById('tab'+id[0].toUpperCase()+id.slice(1)).classList.toggle('active', id===t);
+    const el = document.getElementById('panel'+id[0].toUpperCase()+id.slice(1));
+    el.style.display = id===t ? (id==='graph'?'flex':'block') : 'none';
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════
+(function init() {
+  setSystem('SI');
+  document.getElementById('selLen').value   = 'cm';
+  document.getElementById('selForce').value = 'N';
+  document.getElementById('selMomUnit').value = 'N·m';
+  updateUnits();
+  document.getElementById('ox').value = '0';
+  document.getElementById('oy').value = '0';
+  addForce({ px: 25, py: 0, ang: 90, mag: 250, unk: false });
+  updateInfoBar();
+  updateForceCount();
+})();
+</script>
+</body>
+</html>

@@ -4,4 +4,9 @@ Calculadoras para la  conversión de unidades del libro de física fundamentos V
 INSTRUCCIONES
 
 
-Abrir el archivo índex.html
+Abrir el archivo index.html
+
+Desde este enlace
+
+https://cynthiaalejandra.github.io/FISICA_CALCULADORA/
+

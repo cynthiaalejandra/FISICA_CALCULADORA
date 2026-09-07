@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Equilibrio de la Partícula en 3D — Estática</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700&family=Roboto:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+:root{
+  --white:#ffffff;--bg:#f8fafb;--surface:#ffffff;--surface2:#f1f5f4;--surface3:#e8efed;
+  --green:#059669;--green-l:#06d68d;--teal:#0891b2;--teal-l:#22d3ee;
+  --gray:#555555;--gray-l:#94a3b8;--gray-xl:#cbd5e1;--gray-bg:#f1f5f9;
+  --red:#dc2626;--gold:#d97706;--text:#1e293b;--text2:#64748b;--text3:#94a3b8;
+  --border:#e2e8f0;--border-g:rgba(5,150,105,.22);
+  --radius:10px;--radius2:14px;
+  --shadow:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+  --shadow2:0 4px 12px rgba(0,0,0,.07),0 1px 3px rgba(0,0,0,.05);
+  --shadow3:0 8px 24px rgba(0,0,0,.08);
+  --grad:linear-gradient(135deg,#059669 0%,#0891b2 100%);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Roboto',sans-serif;font-size:14px;min-height:100vh;overflow:hidden;}
+
+/* ===== HEADER ===== */
+header{
+  background:var(--white);border-bottom:1px solid var(--border);padding:0 28px;
+  display:flex;align-items:center;justify-content:center;height:56px;position:relative;
+  box-shadow:0 1px 4px rgba(0,0,0,.04);
+}
+header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;
+  background:var(--grad);opacity:.85;}
+.hd-center{
+  display:flex;align-items:center;gap:12px;
+  font-family:'Poppins',sans-serif;font-size:17px;font-weight:700;letter-spacing:.3px;color:var(--green);
+}
+.hd-icon{
+  width:32px;height:32px;border-radius:8px;background:var(--grad);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.hd-icon svg{color:#fff;}
+.hd-sub{font-family:'Roboto',sans-serif;font-size:12px;font-weight:400;color:var(--text2);
+  margin-left:4px;letter-spacing:.2px;}
+
+/* ===== 3-COLUMN LAYOUT ===== */
+.main{display:grid;grid-template-columns:300px 1fr 340px;gap:0;height:calc(100vh - 56px);}
+.panel-left{background:var(--white);border-right:1px solid var(--border);overflow-y:auto;padding:14px 14px;}
+.panel-center{background:var(--bg);display:flex;flex-direction:column;overflow:hidden;}
+.panel-right{background:var(--white);border-left:1px solid var(--border);overflow-y:auto;padding:14px 14px;
+  display:flex;flex-direction:column;}
+
+/* ===== SECTIONS ===== */
+.sec{margin-bottom:12px;}
+.sec-title{
+  font-family:'Poppins',sans-serif;font-size:11px;font-weight:600;letter-spacing:1.4px;color:var(--green);
+  text-transform:uppercase;border-bottom:1px solid var(--border);padding-bottom:5px;margin-bottom:8px;
+  display:flex;align-items:center;gap:7px;
+}
+.sec-title svg{width:14px;height:14px;color:var(--teal);flex-shrink:0;}
+
+/* ===== UNIT TABS ===== */
+.unit-tabs{display:flex;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:8px;
+  background:var(--surface2);}
+.unit-tab{flex:1;padding:6px;text-align:center;font-family:'Inter',sans-serif;font-weight:600;font-size:11px;
+  letter-spacing:.5px;cursor:pointer;background:transparent;color:var(--text2);transition:all .2s;border:none;outline:none;}
+.unit-tab.active{background:var(--grad);color:#fff;border-radius:var(--radius);}
+
+label{font-size:11px;color:var(--text2);display:block;margin-bottom:2px;letter-spacing:.2px;font-weight:500;}
+select,input[type=number]{
+  width:100%;background:var(--white);border:1px solid var(--border);border-radius:7px;
+  color:var(--text);font-family:'Roboto',sans-serif;font-size:12.5px;padding:5px 8px;
+  outline:none;transition:border-color .2s,box-shadow .2s;
+}
+select:focus,input[type=number]:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(5,150,105,.1);}
+select option{background:var(--white);}
+
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;}
+
+/* ===== CABLE BLOCK ===== */
+.cable-block{background:var(--white);border:1px solid var(--border-g);border-radius:var(--radius2);
+  padding:10px 12px;margin-bottom:8px;transition:all .2s;box-shadow:var(--shadow);}
+.cable-block:hover{border-color:var(--green);box-shadow:var(--shadow2);}
+.cable-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;}
+.cable-name{font-family:'Poppins',sans-serif;font-size:13px;font-weight:600;letter-spacing:.5px;color:var(--text);
+  display:flex;align-items:center;gap:6px;}
+.cdot{width:9px;height:9px;border-radius:50%;flex-shrink:0;box-shadow:0 0 5px rgba(0,0,0,.15);}
+.cdot-ab{background:#0891b2;}.cdot-ac{background:#d97706;}.cdot-ad{background:#dc2626;}
+
+.coords-row{margin-bottom:0;}
+
+/* ===== MAGNITUDE ROW ===== */
+.mag-row{display:flex;align-items:center;gap:5px;margin-top:7px;padding-top:7px;border-top:1px solid var(--border);}
+.mag-label{font-family:'Inter',sans-serif;font-size:12px;font-weight:600;color:var(--text2);
+  white-space:nowrap;min-width:32px;}
+.mag-input-wrap{flex:1;max-width:90px;position:relative;}
+.mag-input-wrap input{width:100%;}
+.mag-input-wrap input.is-unknown{
+  opacity:.45;cursor:not-allowed;border-style:dashed;border-color:var(--gold);background:var(--surface2);
+}
+.mag-unit{font-size:11px;color:var(--text2);white-space:nowrap;font-weight:500;}
+
+/* ===== TOGGLE ===== */
+.switch{position:relative;width:34px;height:18px;flex-shrink:0;}
+.switch input{opacity:0;width:0;height:0;}
+.slider{position:absolute;cursor:pointer;inset:0;background:var(--gray-xl);border-radius:20px;transition:.22s;}
+.slider:before{content:'';position:absolute;height:12px;width:12px;left:3px;bottom:3px;
+  background:#fff;border-radius:50%;transition:.22s;box-shadow:0 1px 3px rgba(0,0,0,.15);}
+.switch input:checked+.slider{background:var(--green);}
+.switch input:checked+.slider:before{transform:translateX(16px);}
+
+/* pills */
+.pill{font-size:9px;padding:2px 7px;border-radius:11px;font-family:'Inter',sans-serif;
+  font-weight:600;letter-spacing:.3px;white-space:nowrap;}
+.pill-dato{background:rgba(5,150,105,.1);color:var(--green);border:1px solid rgba(5,150,105,.3);}
+.pill-unk{background:rgba(217,119,6,.1);color:var(--gold);border:1px solid rgba(217,119,6,.3);}
+.pill-na{background:var(--surface2);color:var(--text3);border:1px solid var(--border);}
+
+.sw-label{font-size:10px;color:var(--text2);white-space:nowrap;font-weight:500;}
+
+/* ===== WEIGHT BLOCK ===== */
+.weight-block{background:var(--white);border:1px solid var(--border-g);border-radius:var(--radius2);
+  padding:10px 12px;margin-bottom:8px;box-shadow:var(--shadow);}
+.weight-head{font-family:'Poppins',sans-serif;font-size:12px;font-weight:600;color:var(--gold);
+  margin-bottom:7px;display:flex;align-items:center;gap:6px;}
+.weight-mag-row{display:flex;align-items:center;gap:5px;}
+.weight-mag-row input{flex:1;max-width:100px;}
+
+/* info bar */
+.info-bar{background:rgba(5,150,105,.06);border:1px solid rgba(5,150,105,.2);border-radius:var(--radius);
+  padding:6px 10px;font-size:11px;color:var(--green);margin-bottom:10px;
+  font-family:'Inter',sans-serif;font-weight:500;letter-spacing:.2px;
+  display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.info-bar.warn{background:rgba(220,38,38,.05);border-color:rgba(220,38,38,.2);color:var(--red);}
+
+/* ===== ACTIONS ===== */
+.actions{display:flex;flex-wrap:wrap;gap:5px;margin-top:2px;}
+.btn{flex:1;min-width:60px;padding:8px 4px;border-radius:var(--radius);border:none;
+  font-family:'Inter',sans-serif;font-weight:600;font-size:10.5px;letter-spacing:.4px;
+  cursor:pointer;transition:all .2s;text-transform:uppercase;
+  display:flex;align-items:center;justify-content:center;gap:4px;}
+.btn svg{width:13px;height:13px;}
+.btn-calc{background:var(--grad);color:#fff;box-shadow:0 2px 8px rgba(5,150,105,.25);}
+.btn-calc:hover{filter:brightness(1.1);box-shadow:0 4px 12px rgba(5,150,105,.35);}
+.btn-graph{background:var(--teal);color:#fff;}
+.btn-graph:hover{filter:brightness(1.1);}
+.btn-steps{background:rgba(217,119,6,.08);color:var(--gold);border:1px solid rgba(217,119,6,.3);}
+.btn-steps:hover{background:rgba(217,119,6,.15);}
+.btn-dl{background:rgba(5,150,105,.08);color:var(--green);border:1px solid rgba(5,150,105,.3);}
+.btn-dl:hover{background:rgba(5,150,105,.15);}
+.btn-clear{background:rgba(220,38,38,.06);color:var(--red);border:1px solid rgba(220,38,38,.2);}
+.btn-clear:hover{background:rgba(220,38,38,.12);}
+
+/* ===== CENTER PANEL ===== */
+.rtabs{display:flex;border-bottom:1px solid var(--border);background:var(--white);}
+.rtab{padding:10px 16px;font-family:'Poppins',sans-serif;font-weight:600;font-size:11px;
+  letter-spacing:.8px;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;
+  transition:all .2s;text-transform:uppercase;display:flex;align-items:center;gap:5px;}
+.rtab svg{width:13px;height:13px;}
+.rtab.active{color:var(--green);border-bottom-color:var(--green);}
+
+.canvas-wrap{flex:1;position:relative;overflow:hidden;background:var(--white);}
+.canvas-overlay{position:absolute;top:10px;right:10px;display:flex;flex-direction:column;gap:5px;
+  background:rgba(255,255,255,.92);border:1px solid var(--border);border-radius:var(--radius);padding:8px 10px;
+  box-shadow:var(--shadow);}
+.leg-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--gray);font-family:'Roboto',sans-serif;}
+.leg-dot{width:9px;height:9px;border-radius:50%;}
+
+#panelResults{padding:16px;overflow-y:auto;background:var(--bg);}
+.result-card{background:var(--white);border:1px solid var(--border-g);border-radius:var(--radius2);
+  padding:12px 14px;margin-bottom:10px;box-shadow:var(--shadow);}
+.result-title{font-family:'Poppins',sans-serif;font-size:11px;font-weight:600;letter-spacing:1px;
+  color:var(--green);text-transform:uppercase;margin-bottom:8px;}
+.rrow{display:flex;justify-content:space-between;align-items:center;padding:4px 0;
+  border-bottom:1px solid var(--border);font-size:12px;color:var(--text);}
+.rrow:last-child{border:none;}
+.rval{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:500;color:var(--teal);}
+.rval.ans{color:var(--green);font-size:16px;font-weight:700;}
+.rval.neg{color:var(--red);}
+.rval.na{color:var(--text3);font-size:11px;font-style:italic;}
+.check-row{margin-top:8px;padding:7px 10px;border-radius:var(--radius);font-size:11px;
+  font-family:'Inter',sans-serif;font-weight:600;letter-spacing:.3px;}
+.check-ok{background:rgba(5,150,105,.1);color:var(--green);border:1px solid rgba(5,150,105,.25);}
+.check-fail{background:rgba(220,38,38,.08);color:var(--red);border:1px solid rgba(220,38,38,.2);}
+
+/* ===== STEPS ===== */
+.step-item{display:flex;gap:12px;margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--border);}
+.step-num{width:28px;height:28px;border-radius:50%;background:var(--grad);color:#fff;
+  display:flex;align-items:center;justify-content:center;font-family:'Inter',sans-serif;
+  font-weight:700;font-size:13px;flex-shrink:0;box-shadow:0 2px 6px rgba(5,150,105,.2);}
+.step-body h4{font-family:'Poppins',sans-serif;font-size:12px;font-weight:600;color:var(--green);
+  margin-bottom:4px;letter-spacing:.3px;}
+.step-body p{font-size:12px;color:var(--text2);line-height:1.6;}
+.math-block{background:var(--surface2);border-left:3px solid var(--green);padding:7px 10px;
+  margin:6px 0;border-radius:0 var(--radius) var(--radius) 0;
+  font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--text);white-space:pre-wrap;
+  line-height:1.55;}
+
+.placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  height:100%;color:var(--text3);gap:10px;}
+.placeholder svg{opacity:.15;}
+.placeholder p{font-size:12px;text-align:center;max-width:220px;line-height:1.6;color:var(--text2);}
+.tip{font-size:10px;color:var(--text2);margin-top:3px;font-style:italic;}
+
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--gray-xl);border-radius:3px;}
+::-webkit-scrollbar-thumb:hover{background:var(--green);}
+
+/* ===== EXTRA FORCE BLOCK ===== */
+.ef-block{background:var(--white);border:1px solid var(--border-g);border-radius:var(--radius2);
+  padding:10px 12px;margin-bottom:8px;position:relative;transition:all .2s;
+  border-left:3px solid #8b5cf6;box-shadow:var(--shadow);}
+.ef-block:nth-child(2){border-left-color:#14b8a6;}
+.ef-block:nth-child(3){border-left-color:#f97316;}
+.ef-block:nth-child(4){border-left-color:#3b82f6;}
+.ef-block:nth-child(5){border-left-color:#eab308;}
+.ef-block:hover{box-shadow:var(--shadow2);}
+.ef-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;gap:5px;}
+.ef-name-input{background:transparent;border:none;border-bottom:1px solid var(--border);
+  color:var(--teal);font-family:'Inter',sans-serif;font-size:12px;font-weight:600;
+  letter-spacing:.3px;padding:2px 4px;outline:none;width:100px;transition:border-color .2s;}
+.ef-name-input:focus{border-bottom-color:var(--green);}
+.ef-del{background:none;border:1px solid rgba(220,38,38,.2);border-radius:7px;color:var(--red);
+  width:24px;height:24px;display:flex;align-items:center;justify-content:center;cursor:pointer;
+  font-size:12px;transition:all .2s;flex-shrink:0;}
+.ef-del:hover{background:rgba(220,38,38,.08);border-color:var(--red);}
+
+.btn-add-force{width:100%;padding:9px;background:rgba(139,92,246,.06);border:1px dashed rgba(139,92,246,.35);
+  border-radius:var(--radius);color:#7c3aed;font-family:'Inter',sans-serif;font-size:11px;
+  font-weight:600;letter-spacing:.6px;cursor:pointer;transition:all .2s;text-transform:uppercase;
+  display:flex;align-items:center;justify-content:center;gap:6px;margin-top:auto;}
+.btn-add-force:hover{background:rgba(139,92,246,.12);border-color:#7c3aed;
+  box-shadow:0 0 12px rgba(139,92,246,.1);}
+
+/* ===== RIGHT PANEL TITLE ===== */
+.rp-title{
+  font-family:'Poppins',sans-serif;font-size:11px;font-weight:600;letter-spacing:1.4px;color:var(--green);
+  text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:7px;
+  padding-bottom:5px;border-bottom:1px solid var(--border);
+}
+.rp-title svg{width:14px;height:14px;color:var(--teal);flex-shrink:0;}
+
+/* ===== HAND CONVENTION TABS ===== */
+.hand-tabs{display:flex;gap:5px;}
+.hand-tab{flex:1;display:flex;align-items:center;gap:6px;padding:7px 8px;
+  background:var(--white);border:1px solid var(--border);border-radius:var(--radius);
+  color:var(--text2);cursor:pointer;transition:all .22s;font-family:'Inter',sans-serif;
+  font-size:11px;font-weight:500;letter-spacing:.3px;line-height:1.3;text-align:left;outline:none;}
+.hand-tab:hover{border-color:rgba(5,150,105,.4);}
+.hand-tab.active{background:rgba(5,150,105,.06);border-color:var(--green);color:var(--green);
+  box-shadow:0 0 0 3px rgba(5,150,105,.08);}
+.hand-tab.active svg{color:var(--green);}
+.hand-tab small{font-size:9px;color:var(--text3);font-weight:400;letter-spacing:.2px;}
+.hand-tab.active small{color:var(--teal);}
+.hand-badge{position:absolute;top:8px;left:8px;font-size:10px;padding:3px 8px;border-radius:11px;
+  font-family:'Inter',sans-serif;font-weight:600;letter-spacing:.3px;z-index:5;
+  background:rgba(5,150,105,.1);color:var(--green);border:1px solid rgba(5,150,105,.25);
+  box-shadow:var(--shadow);}
+
+/* ===== EXTRA FORCES SECTION DIVIDER ===== */
+.ef-divider{
+  font-family:'Poppins',sans-serif;font-size:10px;font-weight:600;letter-spacing:1.2px;color:var(--teal);
+  text-transform:uppercase;margin:6px 0 8px;display:flex;align-items:center;gap:7px;
+  padding-top:6px;border-top:1px dashed var(--border);
+}
+.ef-divider svg{width:13px;height:13px;flex-shrink:0;}
+
+/* ===== RESPONSIVE ===== */
+@media(max-width:1100px){
+  .main{grid-template-columns:260px 1fr 300px;}
+}
+@media(max-width:900px){
+  .main{grid-template-columns:1fr;grid-template-rows:auto 1fr auto;}
+  .panel-left{max-height:40vh;border-right:none;border-bottom:1px solid var(--border);}
+  .panel-right{max-height:40vh;border-left:none;border-top:1px solid var(--border);}
+  .panel-center{min-height:350px;}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hd-center">
+    <div class="hd-icon">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+        <path d="M12 2L2 19h20L12 2z"/><circle cx="12" cy="14" r="2"/>
+      </svg>
+    </div>
+    Equilibrio de la Partícula en 3D
+    <span class="hd-sub">Análisis de Estática Vectorial</span>
+  </div>
+</header>
+
+<div class="main">
+
+<!-- ═══════════ LEFT PANEL: CONFIGURACIÓN ═══════════ -->
+<div class="panel-left">
+
+  <!-- Sistema de Unidades -->
+  <div class="sec">
+    <div class="sec-title">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg>
+      Sistema de Unidades
+    </div>
+    <div class="unit-tabs">
+      <button class="unit-tab active" onclick="setSystem('SI')">SI</button>
+      <button class="unit-tab" onclick="setSystem('ENG')">Inglés</button>
+    </div>
+    <div class="g2">
+      <div><label>Longitud</label>
+        <select id="selLen" onchange="updateUnits()">
+          <option value="m">m</option><option value="cm">cm</option><option value="mm">mm</option>
+        </select></div>
+      <div><label>Fuerza</label>
+        <select id="selForce" onchange="updateUnits()">
+          <option value="N">N</option><option value="kN">kN</option>
+        </select></div>
+    </div>
+  </div>
+
+  <!-- Convención de Ejes -->
+  <div class="sec">
+    <div class="sec-title">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M2 12h20"/><path d="M12 2l-2 4h4L12 2z" fill="currentColor" stroke="none"/><path d="M22 12l-4-2v4l4-2z" fill="currentColor" stroke="none"/></svg>
+      Convención de Ejes
+    </div>
+    <div class="hand-tabs">
+      <button class="hand-tab active" id="handRBtn" onclick="setHandedness('right')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="flex-shrink:0;">
+          <path d="M2 18 L12 12 L22 18" stroke-linejoin="round"/><line x1="12" y1="12" x2="12" y2="1"/>
+          <polygon points="12,1 10,4 14,4" fill="currentColor" stroke="none"/>
+          <polygon points="22,18 19,16 20,19" fill="currentColor" stroke="none"/>
+        </svg>
+        <span>Dextro<br><small>mano der.</small></span>
+      </button>
+      <button class="hand-tab" id="handLBtn" onclick="setHandedness('left')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="flex-shrink:0;">
+          <path d="M22 18 L12 12 L2 18" stroke-linejoin="round"/><line x1="12" y1="12" x2="12" y2="1"/>
+          <polygon points="12,1 10,4 14,4" fill="currentColor" stroke="none"/>
+          <polygon points="2,18 5,16 4,19" fill="currentColor" stroke="none"/>
+        </svg>
+        <span>Levogiro<br><small>mano izq.</small></span>
+      </button>
+    </div>
+    <div class="tip" id="handTip" style="color:var(--green);">
+      📐 <strong>Dextrogiro:</strong> Z sale hacia ti (Z = X × Y).
+    </div>
+  </div>
+
+  <!-- Punto A -->
+  <div class="sec">
+    <div class="sec-title">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg>
+      Punto A — Nudo
+    </div>
+    <div style="margin-bottom:8px;">
+      <div style="font-size:10px;color:var(--text2);margin-bottom:4px;font-weight:500;">Modo de coordenadas:</div>
+      <div class="unit-tabs" style="margin-bottom:0;">
+        <button class="unit-tab active" id="modeAbsBtn" onclick="setCoordMode('abs')">Absolutas</button>
+        <button class="unit-tab" id="modeVecBtn" onclick="setCoordMode('vec')">Vectores desde A</button>
+      </div>
+    </div>
+    <div class="g3">
+      <div><label>Ax (<span class="ulen">m</span>)</label><input type="number" id="ax" value="0" step="any"></div>
+      <div><label>Ay (<span class="ulen">m</span>)</label><input type="number" id="ay" value="0" step="any"></div>
+      <div><label>Az (<span class="ulen">m</span>)</label><input type="number" id="az" value="0" step="any"></div>
+    </div>
+    <div class="tip" id="coordModeTip" style="color:var(--green);">
+      📌 <strong>Absolutas</strong> — coords globales de B, C, D.
+    </div>
+  </div>
+
+  <!-- Info bar -->
+  <div class="info-bar" id="infoBar">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+    </svg>
+    <span id="infoTxt">Sin incógnitas — verificación.</span>
+  </div>
+
+  <!-- Botones -->
+  <div class="actions">
+    <button class="btn btn-calc" onclick="calculate()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/>
+        <line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="12" y2="14"/>
+      </svg>Calcular
+    </button>
+    <button class="btn btn-graph" onclick="graficar()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M3 3v18h18"/><path d="M7 16l5-5 4 4 4-8"/>
+      </svg>Graficar
+    </button>
+    <button class="btn btn-steps" onclick="showSteps()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
+      </svg>Pasos
+    </button>
+  </div>
+  <div class="actions" style="margin-top:5px;">
+    <button class="btn btn-dl" onclick="downloadSolution()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+        <polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/>
+      </svg>Descargar
+    </button>
+    <button class="btn btn-clear" onclick="clearAll()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="3,6 5,6 21,6"/><path d="M19,6l-1,14a2,2,0,0,1-2,2H8a2,2,0,0,1-2-2L5,6"/>
+        <path d="M10,11v6"/><path d="M14,11v6"/><path d="M9,6V4a1,1,0,0,1,1-1h4a1,1,0,0,1,1,1V6"/>
+      </svg>Limpiar
+    </button>
+  </div>
+
+</div><!-- end panel-left -->
+
+<!-- ═══════════ CENTER PANEL: VISUALIZACIÓN ═══════════ -->
+<div class="panel-center">
+  <div class="rtabs">
+    <div class="rtab active" id="tabGraph" onclick="switchTab('graph')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><circle cx="12" cy="12" r="2.5"/></svg>
+      Gráfica 3D
+    </div>
+    <div class="rtab" id="tabResults" onclick="switchTab('results')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/></svg>
+      Resultados
+    </div>
+    <div class="rtab" id="tabSteps" onclick="switchTab('steps')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/></svg>
+      Procedimiento
+    </div>
+  </div>
+
+  <div id="panelGraph" class="canvas-wrap">
+    <div class="placeholder" id="graphPH">
+      <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" style="color:var(--green);">
+        <path d="M3 3v18h18"/><line x1="3" y1="21" x2="21" y2="3"/><circle cx="12" cy="12" r="3"/>
+      </svg>
+      <p>Ingresa coordenadas y presiona <strong style="color:var(--green)">Graficar</strong></p>
+    </div>
+    <canvas id="graphCanvas" style="display:none;"></canvas>
+    <div class="canvas-overlay" id="graphLeg" style="display:none;">
+      <div id="graphLegItems">
+        <div class="leg-item"><div class="leg-dot" style="background:#0891b2;"></div>Cable AB (T₁)</div>
+        <div class="leg-item"><div class="leg-dot" style="background:#d97706;"></div>Cable AC (T₂)</div>
+        <div class="leg-item"><div class="leg-dot" style="background:#dc2626;"></div>Cable AD (T₃)</div>
+        <div class="leg-item"><div class="leg-dot" style="background:#059669;"></div>Peso W</div>
+      </div>
+      <div style="font-size:10px;color:var(--text3);margin-top:3px;">Arrastra · Rueda=zoom</div>
+    </div>
+  </div>
+
+  <div id="panelResults" style="display:none;">
+    <div class="placeholder" id="resultsPH">
+      <svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" style="color:var(--green);">
+        <rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="12" y2="14"/>
+      </svg>
+      <p>Presiona <strong style="color:var(--green)">Calcular</strong> para resultados.</p>
+    </div>
+    <div id="resultsContent" style="display:none;"></div>
+  </div>
+
+  <div id="panelSteps" style="display:none;overflow-y:auto;flex:1;padding:16px;background:var(--bg);">
+    <div class="placeholder" id="stepsPH">
+      <svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" style="color:var(--green);">
+        <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
+      </svg>
+      <p>Presiona <strong style="color:var(--green)">Calcular</strong> y luego <strong style="color:var(--green)">Procedimiento</strong>.</p>
+    </div>
+    <div id="stepsContent" style="display:none;"></div>
+  </div>
+</div><!-- end panel-center -->
+
+<!-- ═══════════ RIGHT PANEL: FUERZAS ═══════════ -->
+<div class="panel-right">
+
+  <div class="rp-title">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20L12 4l8 16"/><line x1="7" y1="14" x2="17" y2="14"/></svg>
+    Fuerzas del Sistema
+  </div>
+
+  <!-- CABLE AB -->
+  <div class="cable-block">
+    <div class="cable-head">
+      <span class="cable-name"><span class="cdot cdot-ab"></span>Cable AB</span>
+      <span class="pill pill-dato" id="pillT1">T₁ = DATO</span>
+    </div>
+    <div class="g3 coords-row">
+      <div><label><span class="clbl-b">Bx</span> (<span class="ulen">m</span>)</label><input type="number" id="bx" value="-0.5" step="any"></div>
+      <div><label><span class="clbl-b">By</span> (<span class="ulen">m</span>)</label><input type="number" id="by" value="0.32" step="any"></div>
+      <div><label><span class="clbl-b">Bz</span> (<span class="ulen">m</span>)</label><input type="number" id="bz" value="0.45" step="any"></div>
+    </div>
+    <div class="mag-row">
+      <span class="mag-label">T₁ =</span>
+      <div class="mag-input-wrap"><input type="number" id="T1" value="6" step="any" placeholder="valor"></div>
+      <span class="mag-unit uforce">kN</span>
+      <label class="switch" title="ON = dato · OFF = incógnita"><input type="checkbox" id="chkT1" checked onchange="onToggleMag('T1')"><span class="slider"></span></label>
+      <span class="sw-label" id="swlT1">Dato</span>
+    </div>
+  </div>
+
+  <!-- CABLE AC -->
+  <div class="cable-block">
+    <div class="cable-head">
+      <span class="cable-name"><span class="cdot cdot-ac"></span>Cable AC</span>
+      <span class="pill pill-dato" id="pillT2">T₂ = DATO</span>
+    </div>
+    <div class="g3 coords-row">
+      <div><label><span class="clbl-c">Cx</span> (<span class="ulen">m</span>)</label><input type="number" id="cx" value="0" step="any"></div>
+      <div><label><span class="clbl-c">Cy</span> (<span class="ulen">m</span>)</label><input type="number" id="cy" value="0.32" step="any"></div>
+      <div><label><span class="clbl-c">Cz</span> (<span class="ulen">m</span>)</label><input type="number" id="cz" value="0" step="any"></div>
+    </div>
+    <div class="mag-row">
+      <span class="mag-label">T₂ =</span>
+      <div class="mag-input-wrap"><input type="number" id="T2" value="" step="any" placeholder="valor"></div>
+      <span class="mag-unit uforce">kN</span>
+      <label class="switch" title="ON = dato · OFF = incógnita"><input type="checkbox" id="chkT2" checked onchange="onToggleMag('T2')"><span class="slider"></span></label>
+      <span class="sw-label" id="swlT2">Dato</span>
+    </div>
+  </div>
+
+  <!-- CABLE AD -->
+  <div class="cable-block">
+    <div class="cable-head">
+      <span class="cable-name"><span class="cdot cdot-ad"></span>Cable AD</span>
+      <span class="pill pill-dato" id="pillT3">T₃ = DATO</span>
+    </div>
+    <div class="g3 coords-row">
+      <div><label><span class="clbl-d">Dx</span> (<span class="ulen">m</span>)</label><input type="number" id="dx" value="0.6" step="any"></div>
+      <div><label><span class="clbl-d">Dy</span> (<span class="ulen">m</span>)</label><input type="number" id="dy" value="0.36" step="any"></div>
+      <div><label><span class="clbl-d">Dz</span> (<span class="ulen">m</span>)</label><input type="number" id="dz" value="0" step="any"></div>
+    </div>
+    <div class="mag-row">
+      <span class="mag-label">T₃ =</span>
+      <div class="mag-input-wrap"><input type="number" id="T3" value="" step="any" placeholder="valor"></div>
+      <span class="mag-unit uforce">kN</span>
+      <label class="switch" title="ON = dato · OFF = incógnita"><input type="checkbox" id="chkT3" checked onchange="onToggleMag('T3')"><span class="slider"></span></label>
+      <span class="sw-label" id="swlT3">Dato</span>
+    </div>
+  </div>
+
+  <!-- PESO W -->
+  <div class="weight-block">
+    <div class="weight-head">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2v20M2 12l10 10 10-10"/></svg>
+      Peso / Fuerza (W)
+      <span class="pill pill-dato" id="pillW" style="margin-left:auto;">W = DATO</span>
+    </div>
+    <div style="margin-bottom:6px;">
+      <div style="font-size:10px;color:var(--text2);margin-bottom:4px;font-weight:500;">Dirección de W — se normaliza</div>
+      <div class="g3">
+        <div><label>Wx</label><input type="number" id="wdx" value="0" step="any"></div>
+        <div><label>Wy</label><input type="number" id="wdy" value="-1" step="any"></div>
+        <div><label>Wz</label><input type="number" id="wdz" value="0" step="any"></div>
+      </div>
+      <div class="tip" style="margin-top:3px;">Gravedad: (0,−1,0) · Flotación: (0,+1,0)</div>
+    </div>
+    <div class="weight-mag-row" style="padding-top:6px;border-top:1px solid var(--border);">
+      <span style="font-family:'Inter',sans-serif;font-size:12px;font-weight:600;color:var(--text2);min-width:28px;">|W| =</span>
+      <input type="number" id="W" value="" step="any" placeholder="valor">
+      <span class="uforce" style="font-size:12px;color:var(--gold);font-family:'Inter',sans-serif;font-weight:600;">kN</span>
+      <label class="switch" title="ON = dato · OFF = incógnita"><input type="checkbox" id="chkW" checked onchange="onToggleMag('W')"><span class="slider"></span></label>
+      <span class="sw-label" id="swlW">Dato</span>
+    </div>
+  </div>
+
+  <!-- EXTRA FORCES DIVIDER -->
+  <div class="ef-divider">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3 7h7l-5.5 4 2 7L12 16l-6.5 4 2-7L2 9h7z"/></svg>
+    Fuerzas Adicionales
+  </div>
+  <div id="extraForcesContainer"></div>
+
+  <!-- ADD FORCE BUTTON (always at bottom) -->
+  <button class="btn-add-force" onclick="addExtraForce()">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+      <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+    </svg>
+    Agregar fuerza
+  </button>
+  <div class="tip" style="margin-top:4px;">Resortes, viento, empujes, etc.</div>
+
+</div><!-- end panel-right -->
+</div><!-- end main -->
+
+<script>
+// ==============================================================
+// STATE
+// ==============================================================
+let lastResult = null;
+let mouse = {down:false, x:0, y:0};
+let spherical = {theta:0.6, phi:1.1, radius:3};
+let threeRenderer=null, threeScene=null, threeCamera=null;
+let coordMode = 'abs';
+let handedness = 'right';
+const isKnown = {T1:true, T2:true, T3:true, W:true};
+let extraForces = [];
+let efCounter = 0;
+
+// ==============================================================
+// COORD MODE
+// ==============================================================
+function setCoordMode(mode) {
+  coordMode = mode;
+  document.getElementById('modeAbsBtn').classList.toggle('active', mode==='abs');
+  document.getElementById('modeVecBtn').classList.toggle('active', mode==='vec');
+  const tip = document.getElementById('coordModeTip');
+  if (mode === 'abs') {
+    tip.innerHTML = '📌 <strong>Absolutas</strong> — coords globales de B, C, D.';
+    relabelCoords('B','C','D');
+  } else {
+    tip.innerHTML = '📌 <strong style="color:var(--gold)">Vectores desde A</strong> — componentes AB, AC, AD directamente.';
+    relabelCoords('ABx·','ACx·','ADx·');
+  }
+}
+function relabelCoords(b, c, d) {
+  const axes = ['x','y','z'];
+  const bBase = b.replace('·',''), cBase = c.replace('·',''), dBase = d.replace('·','');
+  document.querySelectorAll('.clbl-b').forEach((el,i) => el.textContent = bBase + axes[i]);
+  document.querySelectorAll('.clbl-c').forEach((el,i) => el.textContent = cBase + axes[i]);
+  document.querySelectorAll('.clbl-d').forEach((el,i) => el.textContent = dBase + axes[i]);
+}
+
+// ==============================================================
+// HANDEDNESS
+// ==============================================================
+function setHandedness(h) {
+  handedness = h;
+  document.getElementById('handRBtn').classList.toggle('active', h==='right');
+  document.getElementById('handLBtn').classList.toggle('active', h==='left');
+  const tip = document.getElementById('handTip');
+  tip.innerHTML = h === 'right'
+    ? '📐 <strong>Dextrogiro:</strong> Z sale hacia ti (Z = X × Y).'
+    : '📐 <strong>Levogiro:</strong> Z entra (Z = Y × X).';
+  const badge = document.getElementById('handBadge');
+  if (badge) badge.textContent = h === 'right' ? '🫱 Dextrogiro' : '🫲 Levogiro';
+  if (lastResult && document.getElementById('graphCanvas').style.display !== 'none') graficar();
+}
+
+// ==============================================================
+// EXTRA FORCES
+// ==============================================================
+function addExtraForce() {
+  efCounter++;
+  const id = efCounter;
+  const name = 'F' + (extraForces.length + 4);
+  const ef = { id, name, isKnown: true };
+  extraForces.push(ef);
+  const container = document.getElementById('extraForcesContainer');
+  const fu = document.getElementById('selForce').value;
+  const colors = ['#8b5cf6','#14b8a6','#f97316','#3b82f6','#eab308'];
+  const color = colors[(extraForces.length - 1) % colors.length];
+  const div = document.createElement('div');
+  div.className = 'ef-block'; div.id = 'efBlock' + id;
+  div.style.borderLeftColor = color;
+  div.innerHTML = `
+    <div class="ef-head">
+      <input type="text" class="ef-name-input" id="efName${id}" value="${name}"
+        style="color:${color}" onchange="onEfNameChange(${id})" title="Nombre editable">
+      <span class="pill pill-dato" id="efPill${id}">${name} = DATO</span>
+      <button class="ef-del" onclick="removeExtraForce(${id})" title="Eliminar">✕</button>
+    </div>
+    <div style="font-size:10px;color:var(--text2);margin-bottom:4px;font-weight:500;">Dirección (se normaliza)</div>
+    <div class="g3" style="margin-bottom:6px;">
+      <div><label>dx</label><input type="number" id="efDx${id}" value="1" step="any"></div>
+      <div><label>dy</label><input type="number" id="efDy${id}" value="0" step="any"></div>
+      <div><label>dz</label><input type="number" id="efDz${id}" value="0" step="any"></div>
+    </div>
+    <div class="mag-row">
+      <span class="mag-label" style="color:${color}">${name} =</span>
+      <div class="mag-input-wrap"><input type="number" id="efMag${id}" value="" step="any" placeholder="valor"></div>
+      <span class="mag-unit uforce">${fu}</span>
+      <label class="switch" title="ON = dato · OFF = incógnita">
+        <input type="checkbox" id="efChk${id}" checked onchange="onToggleEf(${id})"><span class="slider"></span></label>
+      <span class="sw-label" id="efSwl${id}">Dato</span>
+    </div>`;
+  container.appendChild(div);
+  updateInfoBar();
+}
+function removeExtraForce(id) {
+  extraForces = extraForces.filter(ef => ef.id !== id);
+  const el = document.getElementById('efBlock' + id); if (el) el.remove();
+  updateInfoBar();
+}
+function onEfNameChange(id) {
+  const ef = extraForces.find(e => e.id === id); if (!ef) return;
+  ef.name = document.getElementById('efName' + id).value || ('F' + id);
+  document.getElementById('efPill' + id).textContent = ef.name + (ef.isKnown ? ' = DATO' : ' = INCÓGNITA');
+}
+function onToggleEf(id) {
+  const ef = extraForces.find(e => e.id === id); if (!ef) return;
+  ef.isKnown = document.getElementById('efChk' + id).checked;
+  const inp = document.getElementById('efMag' + id), swl = document.getElementById('efSwl' + id), pill = document.getElementById('efPill' + id);
+  if (ef.isKnown) { inp.disabled=false;inp.classList.remove('is-unknown');inp.placeholder='valor';swl.textContent='Dato';pill.className='pill pill-dato';pill.textContent=ef.name+' = DATO'; }
+  else { inp.disabled=true;inp.classList.add('is-unknown');inp.value='';inp.placeholder='incógnita';swl.textContent='Incógnita';pill.className='pill pill-unk';pill.textContent=ef.name+' = INCÓGNITA'; }
+  updateInfoBar();
+}
+
+// ==============================================================
+// TOGGLE MAGNITUDE
+// ==============================================================
+function onToggleMag(id) {
+  isKnown[id] = document.getElementById('chk'+id).checked;
+  const inp=document.getElementById(id), swl=document.getElementById('swl'+id);
+  const pillId=id==='W'?'pillW':'pillT'+id.slice(1), pill=document.getElementById(pillId);
+  if (isKnown[id]) { inp.disabled=false;inp.classList.remove('is-unknown');inp.placeholder='valor';swl.textContent='Dato';pill.className='pill pill-dato';pill.textContent=id+' = DATO'; }
+  else { inp.disabled=true;inp.classList.add('is-unknown');inp.value='';inp.placeholder='incógnita';swl.textContent='Incógnita';pill.className='pill pill-unk';pill.textContent=id+' = INCÓGNITA'; }
+  updateInfoBar();
+}
+function updateInfoBar() {
+  const unks = ['T1','T2','T3','W'].filter(id => !isKnown[id]);
+  extraForces.forEach(ef => { if (!ef.isKnown) unks.push(ef.name); });
+  const bar=document.getElementById('infoBar'), txt=document.getElementById('infoTxt');
+  if (unks.length===0) { bar.className='info-bar warn'; txt.textContent='Sin incógnitas — verificación.'; }
+  else if (unks.length>3) { bar.className='info-bar warn'; txt.textContent=`${unks.length} incógnitas — máx 3.`; }
+  else { bar.className='info-bar'; txt.textContent=`Incógnitas: ${unks.join(', ')} — ${unks.length}×${unks.length}`; }
+}
+
+// ==============================================================
+// UNITS
+// ==============================================================
+function setSystem(s) {
+  document.querySelectorAll('.unit-tab').forEach((b,i)=>b.classList.toggle('active',(i===0&&s==='SI')||(i===1&&s==='ENG')));
+  const ls=document.getElementById('selLen'), fs=document.getElementById('selForce');
+  ls.innerHTML = s==='SI'?'<option value="m">m</option><option value="cm">cm</option><option value="mm">mm</option>':'<option value="ft">ft</option><option value="in">in</option>';
+  fs.innerHTML = s==='SI'?'<option value="N">N</option><option value="kN">kN</option>':'<option value="lbf">lbf</option><option value="kip">kip</option>';
+  updateUnits();
+}
+function updateUnits() {
+  const lu=document.getElementById('selLen').value, fu=document.getElementById('selForce').value;
+  document.querySelectorAll('.ulen').forEach(el=>el.textContent=lu);
+  document.querySelectorAll('.uforce').forEach(el=>el.textContent=fu);
+}
+
+// ==============================================================
+// MATH
+// ==============================================================
+function getVec(ax,ay,az,bx,by,bz){
+  const dx=bx-ax,dy=by-ay,dz=bz-az,len=Math.sqrt(dx*dx+dy*dy+dz*dz);
+  if(len<1e-10)return{u:[0,0,0],len:0}; return{u:[dx/len,dy/len,dz/len],len};
+}
+function gaussSolve(A,b){
+  const n=b.length,M=A.map((row,i)=>[...row,b[i]]);
+  for(let col=0;col<n;col++){let mx=col;for(let r=col+1;r<n;r++)if(Math.abs(M[r][col])>Math.abs(M[mx][col]))mx=r;
+    [M[col],M[mx]]=[M[mx],M[col]];if(Math.abs(M[col][col])<1e-12)return null;
+    for(let r=0;r<n;r++){if(r===col)continue;const f=M[r][col]/M[col][col];for(let c=col;c<=n;c++)M[r][c]-=f*M[col][c];}}
+  return M.map((row,i)=>row[n]/row[i]);
+}
+
+// ==============================================================
+// CORE SOLVER
+// ==============================================================
+function buildAndSolve(){
+  const ax=+document.getElementById('ax').value||0,ay=+document.getElementById('ay').value||0,az=+document.getElementById('az').value||0;
+  const bx=+document.getElementById('bx').value,by=+document.getElementById('by').value,bz=+document.getElementById('bz').value;
+  const cx=+document.getElementById('cx').value,cy=+document.getElementById('cy').value,cz=+document.getElementById('cz').value;
+  const dx=+document.getElementById('dx').value,dy=+document.getElementById('dy').value,dz=+document.getElementById('dz').value;
+  let Bpt,Cpt,Dpt;
+  if(coordMode==='abs'){Bpt=[bx,by,bz];Cpt=[cx,cy,cz];Dpt=[dx,dy,dz];}
+  else{Bpt=[ax+bx,ay+by,az+bz];Cpt=[ax+cx,ay+cy,az+cz];Dpt=[ax+dx,ay+dy,az+dz];}
+  const r1=getVec(ax,ay,az,...Bpt),r2=getVec(ax,ay,az,...Cpt),r3=getVec(ax,ay,az,...Dpt);
+  if(r1.len<1e-10)throw new Error('Cable AB longitud cero.');if(r2.len<1e-10)throw new Error('Cable AC longitud cero.');if(r3.len<1e-10)throw new Error('Cable AD longitud cero.');
+  const[a1,a2,a3]=r1.u,[b1,b2,b3]=r2.u,[c1,c2,c3]=r3.u;
+  const wdx=+document.getElementById('wdx').value||0,wdy=+document.getElementById('wdy').value||-1,wdz=+document.getElementById('wdz').value||0;
+  const wLen=Math.sqrt(wdx*wdx+wdy*wdy+wdz*wdz);
+  if(wLen<1e-10)throw new Error('Dirección de W es (0,0,0).');
+  const uW=[wdx/wLen,wdy/wLen,wdz/wLen];
+  const efData=[];
+  for(const ef of extraForces){const edx=+document.getElementById('efDx'+ef.id).value||0,edy=+document.getElementById('efDy'+ef.id).value||0,edz=+document.getElementById('efDz'+ef.id).value||0;
+    const eLen=Math.sqrt(edx*edx+edy*edy+edz*edz);if(eLen<1e-10)throw new Error(`"${ef.name}" dirección (0,0,0).`);efData.push({...ef,u:[edx/eLen,edy/eLen,edz/eLen]});}
+  const allForceIds=['T1','T2','T3','W'];efData.forEach(ef=>allForceIds.push('EF'+ef.id));
+  const unknowns=[],knowns=[];
+  ['T1','T2','T3','W'].forEach(id=>{(isKnown[id]?knowns:unknowns).push(id);});
+  efData.forEach(ef=>{(ef.isKnown?knowns:unknowns).push('EF'+ef.id);});
+  const umap={T1:[a1,a2,a3],T2:[b1,b2,b3],T3:[c1,c2,c3],W:[uW[0],uW[1],uW[2]]};
+  efData.forEach(ef=>{umap['EF'+ef.id]=ef.u;});
+  const nameMap={T1:'T₁',T2:'T₂',T3:'T₃',W:'W'};efData.forEach(ef=>{nameMap['EF'+ef.id]=ef.name;});
+  if(unknowns.length===0){const T1=+document.getElementById('T1').value,T2=+document.getElementById('T2').value,T3=+document.getElementById('T3').value,W=+document.getElementById('W').value;
+    let Rx=a1*T1+b1*T2+c1*T3+uW[0]*W,Ry=a2*T1+b2*T2+c2*T3+uW[1]*W,Rz=a3*T1+b3*T2+c3*T3+uW[2]*W;const solObj={T1,T2,T3,W};
+    efData.forEach(ef=>{const mag=+document.getElementById('efMag'+ef.id).value||0;solObj['EF'+ef.id]=mag;Rx+=ef.u[0]*mag;Ry+=ef.u[1]*mag;Rz+=ef.u[2]*mag;});
+    return{sol:solObj,r1,r2,r3,uW,Bpt,Cpt,Dpt,A:[ax,ay,az],Rx,Ry,Rz,residual:Math.sqrt(Rx*Rx+Ry*Ry+Rz*Rz),unknowns,nameMap,efData,fu:document.getElementById('selForce').value,lu:document.getElementById('selLen').value};}
+  if(unknowns.length>3)throw new Error(`${unknowns.length} incógnitas, máx 3.`);
+  const vals={T1:0,T2:0,T3:0,W:0};
+  for(const id of knowns){if(id.startsWith('EF')){const eid=id.replace('EF',''),v=+document.getElementById('efMag'+eid).value;if(isNaN(v)||document.getElementById('efMag'+eid).value==='')throw new Error(`"${nameMap[id]}" vacío.`);vals[id]=v;}
+    else{const v=+document.getElementById(id).value;if(isNaN(v)||document.getElementById(id).value==='')throw new Error(`${id} vacío.`);vals[id]=v;}}
+  unknowns.forEach(id=>{if(id.startsWith('EF')&&!(id in vals))vals[id]=0;});
+  const rhs=[0,0,0];for(const id of knowns)for(let a=0;a<3;a++)rhs[a]-=vals[id]*umap[id][a];
+  const n=unknowns.length;let solution;
+  if(n===3){const A3=[[0,0,0],[0,0,0],[0,0,0]];for(let row=0;row<3;row++)for(let col=0;col<3;col++)A3[row][col]=umap[unknowns[col]][row];solution=gaussSolve(A3,rhs);if(!solution)throw new Error('Sistema singular.');}
+  else if(n===2){const pairs=[[0,1],[0,2],[1,2]];let bd=0,bs=null;for(const[r1,r2]of pairs){const A2=[[umap[unknowns[0]][r1],umap[unknowns[1]][r1]],[umap[unknowns[0]][r2],umap[unknowns[1]][r2]]],b2=[rhs[r1],rhs[r2]],s=gaussSolve(A2,b2);if(!s)continue;const det=Math.abs(A2[0][0]*A2[1][1]-A2[0][1]*A2[1][0]);if(det>bd){bd=det;bs=s;}}if(!bs)throw new Error('Indeterminado.');solution=bs;}
+  else{const id0=unknowns[0];let bc=0,br=0;for(let row=0;row<3;row++)if(Math.abs(umap[id0][row])>Math.abs(bc)){bc=umap[id0][row];br=rhs[row];}if(Math.abs(bc)<1e-12)throw new Error(`No se puede despejar ${id0}.`);solution=[br/bc];}
+  unknowns.forEach((id,i)=>vals[id]=solution[i]);
+  let Rx=0,Ry=0,Rz=0;for(const id of allForceIds){const u=umap[id];Rx+=u[0]*vals[id];Ry+=u[1]*vals[id];Rz+=u[2]*vals[id];}
+  return{sol:vals,r1,r2,r3,uW,Bpt,Cpt,Dpt,A:[ax,ay,az],Rx,Ry,Rz,residual:Math.sqrt(Rx*Rx+Ry*Ry+Rz*Rz),unknowns,nameMap,efData,fu:document.getElementById('selForce').value,lu:document.getElementById('selLen').value};
+}
+
+// ==============================================================
+// CALCULATE
+// ==============================================================
+function calculate(){
+  try{lastResult=buildAndSolve();renderResults(lastResult);switchTab('results');
+    lastResult.unknowns.forEach(id=>{if(id.startsWith('EF')){const inp=document.getElementById('efMag'+id.replace('EF',''));if(inp)inp.value=lastResult.sol[id].toFixed(4);}else document.getElementById(id).value=lastResult.sol[id].toFixed(4);});
+  }catch(e){alert('Error: '+e.message);}
+}
+function renderResults(r){
+  const{sol,r1,r2,r3,uW,Rx,Ry,Rz,residual,fu,lu,unknowns,nameMap,efData}=r;const ok=residual<0.005,f=v=>v.toFixed(4),isUnk=id=>unknowns.includes(id);
+  let efUnitRows='';if(efData&&efData.length>0)efData.forEach(ef=>{efUnitRows+=`<div class="rrow"><span>λ<sub>${ef.name}</sub></span><span class="rval" style="font-size:11px;color:#8b5cf6">(${f(ef.u[0])}, ${f(ef.u[1])}, ${f(ef.u[2])})</span></div>`;});
+  let efMagRows='';if(efData&&efData.length>0)efData.forEach(ef=>{const id='EF'+ef.id,v=sol[id]||0;efMagRows+=`<div class="rrow"><span>${ef.name} ${isUnk(id)?'<span class="pill pill-unk" style="font-size:8px">INC</span>':'<span class="pill pill-dato" style="font-size:8px">DATO</span>'}</span><span class="rval${isUnk(id)?' ans':''}${v<0?' neg':''}">${f(v)} ${fu}</span></div>`;});
+  document.getElementById('resultsPH').style.display='none';document.getElementById('resultsContent').style.display='block';
+  document.getElementById('resultsContent').innerHTML=`
+  <div class="result-card"><div class="result-title">Vectores unitarios</div>
+    <div class="rrow"><span>λ<sub>AB</sub> |AB|=${f(r1.len)} ${lu}</span><span class="rval" style="font-size:11px">(${f(r1.u[0])}, ${f(r1.u[1])}, ${f(r1.u[2])})</span></div>
+    <div class="rrow"><span>λ<sub>AC</sub> |AC|=${f(r2.len)} ${lu}</span><span class="rval" style="font-size:11px">(${f(r2.u[0])}, ${f(r2.u[1])}, ${f(r2.u[2])})</span></div>
+    <div class="rrow"><span>λ<sub>AD</sub> |AD|=${f(r3.len)} ${lu}</span><span class="rval" style="font-size:11px">(${f(r3.u[0])}, ${f(r3.u[1])}, ${f(r3.u[2])})</span></div>
+    <div class="rrow"><span>λ<sub>W</sub></span><span class="rval" style="font-size:11px;color:var(--gold)">(${f(uW[0])}, ${f(uW[1])}, ${f(uW[2])})</span></div>${efUnitRows}</div>
+  <div class="result-card"><div class="result-title">Magnitudes</div>
+    <div class="rrow"><span>T₁ — AB ${isUnk('T1')?'<span class="pill pill-unk" style="font-size:8px">INC</span>':'<span class="pill pill-dato" style="font-size:8px">DATO</span>'}</span><span class="rval${isUnk('T1')?' ans':''}${sol.T1<0?' neg':''}">${f(sol.T1)} ${fu}</span></div>
+    <div class="rrow"><span>T₂ — AC ${isUnk('T2')?'<span class="pill pill-unk" style="font-size:8px">INC</span>':'<span class="pill pill-dato" style="font-size:8px">DATO</span>'}</span><span class="rval${isUnk('T2')?' ans':''}${sol.T2<0?' neg':''}">${f(sol.T2)} ${fu}</span></div>
+    <div class="rrow"><span>T₃ — AD ${isUnk('T3')?'<span class="pill pill-unk" style="font-size:8px">INC</span>':'<span class="pill pill-dato" style="font-size:8px">DATO</span>'}</span><span class="rval${isUnk('T3')?' ans':''}${sol.T3<0?' neg':''}">${f(sol.T3)} ${fu}</span></div>
+    <div class="rrow" style="border-top:2px solid var(--green);margin-top:3px;padding-top:5px;">
+      <span>W ${isUnk('W')?'<span class="pill pill-unk" style="font-size:8px">INC</span>':'<span class="pill pill-dato" style="font-size:8px">DATO</span>'}</span><span class="rval${isUnk('W')?' ans':''}${sol.W<0?' neg':''}">${f(sol.W)} ${fu}</span></div>${efMagRows}</div>
+  <div class="result-card"><div class="result-title">Verificación ΣF = 0</div>
+    <div class="rrow"><span>ΣFx</span><span class="rval" style="font-size:12px">${Rx.toFixed(6)} ${fu}</span></div>
+    <div class="rrow"><span>ΣFy</span><span class="rval" style="font-size:12px">${Ry.toFixed(6)} ${fu}</span></div>
+    <div class="rrow"><span>ΣFz</span><span class="rval" style="font-size:12px">${Rz.toFixed(6)} ${fu}</span></div>
+    <div class="check-row ${ok?'check-ok':'check-fail'}">${ok?'✓ Equilibrio verificado':'⚠ Residuo: '+residual.toFixed(6)+' '+fu}</div></div>`;
+}
+
+// ==============================================================
+// STEPS
+// ==============================================================
+function showSteps(){
+  if(!lastResult){calculate();if(!lastResult)return;}switchTab('steps');
+  const{sol,r1,r2,r3,uW,Bpt,Cpt,Dpt,A,Rx,Ry,Rz,residual,fu,lu,unknowns,efData}=lastResult;
+  const f=v=>v.toFixed(4),[ax,ay,az]=A,[a1,a2,a3]=r1.u,[b1,b2,b3]=r2.u,[c1,c2,c3]=r3.u,[w1,w2,w3]=uW;
+  const ok=residual<0.005;
+  const wDescr=(w2<-0.99&&Math.abs(w1)<0.01&&Math.abs(w3)<0.01)?'gravitacional −y':(w2>0.99&&Math.abs(w1)<0.01&&Math.abs(w3)<0.01)?'flotación +y':`inclinada (${f(w1)}, ${f(w2)}, ${f(w3)})`;
+  const efList=efData&&efData.length>0?` +${efData.length} fuerza(s): ${efData.map(e=>e.name).join(', ')}.`:'';
+  const efVecStep=efData&&efData.length>0?'\n'+efData.map(e=>`${e.name}⃗ = |${e.name}|(${f(e.u[0])}î + ${f(e.u[1])}ĵ + ${f(e.u[2])}k̂)`).join('\n'):'';
+  const efEqX=efData&&efData.length>0?efData.map(e=>` + ${f(e.u[0])}·${e.name}`).join(''):'';
+  const efEqY=efData&&efData.length>0?efData.map(e=>` + ${f(e.u[1])}·${e.name}`).join(''):'';
+  const efEqZ=efData&&efData.length>0?efData.map(e=>` + ${f(e.u[2])}·${e.name}`).join(''):'';
+  const efSolLines=efData&&efData.length>0?'\n'+efData.map(e=>{const id='EF'+e.id,v=sol[id]||0;return`${e.name.padEnd(3)} = ${f(v)} ${fu}${!unknowns.includes(id)?' (dato)':' ← RESULTADO'}`;}).join('\n'):'';
+  const allUnkNames=unknowns.map(id=>lastResult.nameMap?.[id]||id);
+  document.getElementById('stepsPH').style.display='none';document.getElementById('stepsContent').style.display='block';
+  document.getElementById('stepsContent').innerHTML=`
+  <div class="step-item"><div class="step-num">1</div><div class="step-body"><h4>DCL — identificación de fuerzas</h4>
+    <p>Nudo A en equilibrio. Tensiones + W en dirección <strong style="color:var(--gold)">${wDescr}</strong>.${efList}</p>
+    <div class="math-block">Incógnitas : ${allUnkNames.join(', ')||'ninguna (verificación)'}
+Datos      : ${['T1','T2','T3','W'].filter(id=>!unknowns.includes(id)).join(', ')||'ninguno'}
+Condición  : ΣFx = 0 · ΣFy = 0 · ΣFz = 0</div></div></div>
+  <div class="step-item"><div class="step-num">2</div><div class="step-body"><h4>Vectores de posición y longitudes</h4>
+    <p style="font-size:11px;color:var(--${coordMode==='vec'?'gold':'green'});">Modo: ${coordMode==='vec'?'Vectores desde A':'Coordenadas absolutas'}</p>
+    <div class="math-block">AB⃗ = (${f(Bpt[0]-ax)}, ${f(Bpt[1]-ay)}, ${f(Bpt[2]-az)}) ${lu}  →  |AB| = ${f(r1.len)} ${lu}
+AC⃗ = (${f(Cpt[0]-ax)}, ${f(Cpt[1]-ay)}, ${f(Cpt[2]-az)}) ${lu}  →  |AC| = ${f(r2.len)} ${lu}
+AD⃗ = (${f(Dpt[0]-ax)}, ${f(Dpt[1]-ay)}, ${f(Dpt[2]-az)}) ${lu}  →  |AD| = ${f(r3.len)} ${lu}</div></div></div>
+  <div class="step-item"><div class="step-num">3</div><div class="step-body"><h4>Vectores unitarios (cosenos directores)</h4>
+    <div class="math-block">λ_AB = (${f(a1)}, ${f(a2)}, ${f(a3)})
+λ_AC = (${f(b1)}, ${f(b2)}, ${f(b3)})
+λ_AD = (${f(c1)}, ${f(c2)}, ${f(c3)})</div></div></div>
+  <div class="step-item"><div class="step-num">4</div><div class="step-body"><h4>Vector unitario de W y fuerzas</h4>
+    <div class="math-block">λ_W = (${f(w1)}, ${f(w2)}, ${f(w3)})
+
+F_AB = T₁(${f(a1)}î + ${f(a2)}ĵ + ${f(a3)}k̂)
+F_AC = T₂(${f(b1)}î + ${f(b2)}ĵ + ${f(b3)}k̂)
+F_AD = T₃(${f(c1)}î + ${f(c2)}ĵ + ${f(c3)}k̂)${efVecStep}</div></div></div>
+  <div class="step-item"><div class="step-num">5</div><div class="step-body"><h4>Ecuaciones de equilibrio</h4>
+    <div class="math-block">ΣFx = ${f(a1)}T₁ + ${f(b1)}T₂ + ${f(c1)}T₃ + ${f(w1)}W${efEqX} = 0
+ΣFy = ${f(a2)}T₁ + ${f(b2)}T₂ + ${f(c2)}T₃ + ${f(w2)}W${efEqY} = 0
+ΣFz = ${f(a3)}T₁ + ${f(b3)}T₂ + ${f(c3)}T₃ + ${f(w3)}W${efEqZ} = 0
+
+Sistema ${unknowns.length}×${unknowns.length} → ${allUnkNames.join(', ')||'verificación'}</div></div></div>
+  <div class="step-item"><div class="step-num">6</div><div class="step-body"><h4>Solución</h4>
+    <div class="math-block">T₁ = ${f(sol.T1)} ${fu}${!unknowns.includes('T1')?' (dato)':' ← RESULTADO'}
+T₂ = ${f(sol.T2)} ${fu}${!unknowns.includes('T2')?' (dato)':' ← RESULTADO'}
+T₃ = ${f(sol.T3)} ${fu}${!unknowns.includes('T3')?' (dato)':' ← RESULTADO'}
+ W = ${f(sol.W)} ${fu}${!unknowns.includes('W')?' (dato)':' ← RESULTADO'}${efSolLines}</div></div></div>
+  <div class="step-item" style="border:none;margin:0;padding:0;"><div class="step-num" style="background:var(--green);">✓</div><div class="step-body"><h4>Verificación</h4>
+    <div class="math-block">ΣFx = ${Rx.toFixed(7)} ${fu}
+ΣFy = ${Ry.toFixed(7)} ${fu}
+ΣFz = ${Rz.toFixed(7)} ${fu}
+${ok?'✓ Equilibrio satisfecho':'⚠ Residuo: '+residual.toFixed(6)+' '+fu}</div></div></div>`;
+}
+
+// ==============================================================
+// 3D GRAPH
+// ==============================================================
+function graficar(){
+  try{lastResult=buildAndSolve();}catch(e){alert('Error: '+e.message);return;}switchTab('graph');
+  const{sol,uW,A,Bpt,Cpt,Dpt}=lastResult;
+  document.getElementById('graphPH').style.display='none';document.getElementById('graphLeg').style.display='flex';
+  const legItems=document.getElementById('graphLegItems');
+  let legHtml=`<div class="leg-item"><div class="leg-dot" style="background:#0891b2;"></div>AB (T₁)</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#d97706;"></div>AC (T₂)</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#dc2626;"></div>AD (T₃)</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#059669;"></div>W</div>`;
+  const efColorsLeg=['#8b5cf6','#14b8a6','#f97316','#3b82f6','#eab308'];
+  extraForces.forEach((ef,i)=>{legHtml+=`<div class="leg-item"><div class="leg-dot" style="background:${efColorsLeg[i%efColorsLeg.length]};"></div>${ef.name}</div>`;});
+  legItems.innerHTML=legHtml;
+  const canvas=document.getElementById('graphCanvas');canvas.style.display='block';
+  if(threeRenderer){threeRenderer.dispose();threeScene=threeCamera=null;}
+  const cw=canvas.parentElement,w=cw.clientWidth,h=cw.clientHeight;
+  threeRenderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
+  threeRenderer.setSize(w,h);threeRenderer.setPixelRatio(window.devicePixelRatio);threeRenderer.setClearColor(0xf8fafb,1);
+  threeScene=new THREE.Scene();threeCamera=new THREE.PerspectiveCamera(50,w/h,.01,1000);
+  const allPts=[A,Bpt,Cpt,Dpt];let maxR=0.01;allPts.forEach(p=>p.forEach(v=>{if(Math.abs(v)>maxR)maxR=Math.abs(v);}));
+  const sc=1/maxR,zSign=handedness==='left'?-1:1;
+  const vp=p=>new THREE.Vector3(p[0]*sc,p[1]*sc,p[2]*sc*zSign);
+  const aV=vp(A),bV=vp(Bpt),cV=vp(Cpt),dV=vp(Dpt);
+  function addArrow(from,to,color){const mat=new THREE.LineBasicMaterial({color,linewidth:2});threeScene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([from,to]),mat));const dir=to.clone().sub(from).normalize(),len=from.distanceTo(to);if(len>0.005)threeScene.add(new THREE.ArrowHelper(dir,from,len,color,.08,.05));}
+  const axL=1.3;
+  addArrow(new THREE.Vector3(0,0,0),new THREE.Vector3(axL,0,0),0x94a3b8);
+  addArrow(new THREE.Vector3(0,0,0),new THREE.Vector3(0,axL,0),0x94a3b8);
+  addArrow(new THREE.Vector3(0,0,0),new THREE.Vector3(0,0,axL*zSign),0x94a3b8);
+  addArrow(aV,bV,0x0891b2);addArrow(aV,cV,0xd97706);addArrow(aV,dV,0xdc2626);
+  const wSc=Math.min(.65,Math.abs(sol.W)*sc*.18)||.45;
+  addArrow(aV,aV.clone().add(new THREE.Vector3(uW[0]*wSc,uW[1]*wSc,uW[2]*wSc*zSign)),0x059669);
+  function sph(pos,color,r){const m=new THREE.Mesh(new THREE.SphereGeometry(r,16,16),new THREE.MeshStandardMaterial({color,roughness:.4,metalness:.3}));m.position.copy(pos);threeScene.add(m);}
+  sph(aV,0x1e293b,.042);sph(bV,0x0891b2,.028);sph(cV,0xd97706,.028);sph(dV,0xdc2626,.028);
+  cw.querySelectorAll('.lbl3d').forEach(el=>el.remove());const labels=[];
+  function lbl(text,pos,color){const d=document.createElement('div');d.className='lbl3d';const c=color||'#555';d.style.cssText=`position:absolute;color:${c};font-size:12px;font-family:Inter,sans-serif;font-weight:700;pointer-events:none;text-shadow:0 0 4px rgba(255,255,255,.9),0 1px 2px rgba(0,0,0,.15);`;d.textContent=text;cw.appendChild(d);labels.push({div:d,pos});}
+  lbl('A',aV);lbl('B',bV);lbl('C',cV);lbl('D',dV);
+  lbl('x',new THREE.Vector3(axL+.06,0,0));lbl('y',new THREE.Vector3(0,axL+.06,0));
+  lbl(handedness==='left'?'z(inv)':'z',new THREE.Vector3(0,0,(axL+.06)*zSign));
+  const fu2=lastResult.fu;
+  const midAB=aV.clone().add(bV).multiplyScalar(.5),midAC=aV.clone().add(cV).multiplyScalar(.5),midAD=aV.clone().add(dV).multiplyScalar(.5);
+  const wEnd=aV.clone().add(new THREE.Vector3(uW[0]*wSc,uW[1]*wSc,uW[2]*wSc*zSign)),midW=aV.clone().add(wEnd).multiplyScalar(.5);
+  lbl(`T₁=${sol.T1.toFixed(2)} ${fu2}`,midAB,'#0891b2');lbl(`T₂=${sol.T2.toFixed(2)} ${fu2}`,midAC,'#d97706');
+  lbl(`T₃=${sol.T3.toFixed(2)} ${fu2}`,midAD,'#dc2626');lbl(`W=${sol.W.toFixed(2)} ${fu2}`,midW,'#059669');
+  const efColors=['#8b5cf6','#14b8a6','#f97316','#3b82f6','#eab308'];
+  extraForces.forEach((ef,i)=>{const mag=ef.isKnown?(+document.getElementById('efMag'+ef.id).value||0):(lastResult.sol['EF'+ef.id]||0);
+    const edx=+document.getElementById('efDx'+ef.id).value||0,edy=+document.getElementById('efDy'+ef.id).value||0,edz=+document.getElementById('efDz'+ef.id).value||0;
+    const eLen=Math.sqrt(edx*edx+edy*edy+edz*edz);if(eLen<1e-10||mag===0)return;const eu=[edx/eLen,edy/eLen,edz/eLen];
+    const eSc=Math.min(.65,Math.abs(mag)*sc*.18)||.35;const eEnd=aV.clone().add(new THREE.Vector3(eu[0]*eSc,eu[1]*eSc,eu[2]*eSc*zSign));
+    const col=parseInt(efColors[i%efColors.length].replace('#',''),16);addArrow(aV,eEnd,col);
+    lbl(`${ef.name}=${mag.toFixed(2)} ${fu2}`,aV.clone().add(eEnd).multiplyScalar(.5),efColors[i%efColors.length]);});
+  let badge=document.getElementById('handBadge');if(!badge){badge=document.createElement('div');badge.id='handBadge';badge.className='hand-badge';cw.appendChild(badge);}
+  badge.textContent=handedness==='right'?'🫱 Dextrogiro':'🫲 Levogiro';
+  threeScene.add(new THREE.AmbientLight(0xffffff,.8));const dl=new THREE.DirectionalLight(0xffffff,.6);dl.position.set(5,10,5);threeScene.add(dl);
+  threeCamera.position.set(2,2,2);threeCamera.lookAt(0,0,0);
+  cw.onmousedown=e=>{mouse.down=true;mouse.x=e.clientX;mouse.y=e.clientY;};
+  cw.onmousemove=e=>{if(!mouse.down)return;spherical.theta-=(e.clientX-mouse.x)*.01;spherical.phi-=(e.clientY-mouse.y)*.01;spherical.phi=Math.max(.1,Math.min(Math.PI-.1,spherical.phi));mouse.x=e.clientX;mouse.y=e.clientY;};
+  cw.onmouseup=()=>mouse.down=false;
+  cw.onwheel=e=>{spherical.radius=Math.max(.5,Math.min(9,spherical.radius+e.deltaY*.005));e.preventDefault();};
+  (function animate(){requestAnimationFrame(animate);
+    threeCamera.position.set(spherical.radius*Math.sin(spherical.phi)*Math.sin(spherical.theta),spherical.radius*Math.cos(spherical.phi),spherical.radius*Math.sin(spherical.phi)*Math.cos(spherical.theta));
+    threeCamera.lookAt(0,0,0);threeRenderer.render(threeScene,threeCamera);
+    labels.forEach(({div,pos})=>{const v=pos.clone().project(threeCamera);div.style.left=((v.x*.5+.5)*w+5)+'px';div.style.top=((-.5*v.y+.5)*h-10)+'px';});})();
+}
+
+// ==============================================================
+// TABS
+// ==============================================================
+function switchTab(t){['graph','results','steps'].forEach(id=>{const cap=id[0].toUpperCase()+id.slice(1);document.getElementById('tab'+cap).classList.toggle('active',id===t);document.getElementById('panel'+cap).style.display=id===t?(id==='graph'?'flex':'block'):'none';});}
+
+// ==============================================================
+// DOWNLOAD
+// ==============================================================
+function downloadSolution(){
+  if(!lastResult){try{lastResult=buildAndSolve();}catch(e){alert(e.message);return;}}
+  const{sol,r1,r2,r3,uW,Bpt,Cpt,Dpt,A,Rx,Ry,Rz,residual,fu,lu,unknowns,efData}=lastResult;
+  const f=v=>v.toFixed(6),ok=residual<0.005,now=new Date().toLocaleString('es-MX'),[ax,ay,az]=A,[a1,a2,a3]=r1.u,[b1,b2,b3]=r2.u,[c1,c2,c3]=r3.u,[w1,w2,w3]=uW;
+  const efUL=efData&&efData.length>0?'\n'+efData.map(e=>`  λ_${e.name} = (${f(e.u[0])}, ${f(e.u[1])}, ${f(e.u[2])})`).join('\n'):'';
+  const efX=efData&&efData.length>0?efData.map(e=>` + ${f(e.u[0])}·${e.name}`).join(''):'';
+  const efY=efData&&efData.length>0?efData.map(e=>` + ${f(e.u[1])}·${e.name}`).join(''):'';
+  const efZ=efData&&efData.length>0?efData.map(e=>` + ${f(e.u[2])}·${e.name}`).join(''):'';
+  const efS=efData&&efData.length>0?'\n'+efData.map(e=>{const id='EF'+e.id,v=sol[id]||0;return`  ${e.name.padEnd(15)} = ${f(v)} ${fu}${unknowns.includes(id)?' ← CALCULADO':''}`;}).join('\n'):'';
+  const content=`EQUILIBRIO DE LA PARTÍCULA EN 3D\nAnálisis de Estática Vectorial\nGenerado: ${now}\n${'='.repeat(62)}\n\nCONFIGURACIÓN\n${'-'.repeat(14)}\n  Unidades: ${lu} / ${fu}\n  Ejes: ${handedness==='right'?'Dextrogiro':'Levogiro'}\n  Incógnitas: ${unknowns.join(', ')||'ninguna'}\n\nCOORDENADAS\n${'-'.repeat(12)}\n  A: (${ax}, ${ay}, ${az}) ${lu}\n  B: (${Bpt[0]}, ${Bpt[1]}, ${Bpt[2]}) ${lu}\n  C: (${Cpt[0]}, ${Cpt[1]}, ${Cpt[2]}) ${lu}\n  D: (${Dpt[0]}, ${Dpt[1]}, ${Dpt[2]}) ${lu}\n\nVECTORES UNITARIOS\n${'-'.repeat(19)}\n  λ_AB = (${f(a1)}, ${f(a2)}, ${f(a3)})\n  λ_AC = (${f(b1)}, ${f(b2)}, ${f(b3)})\n  λ_AD = (${f(c1)}, ${f(c2)}, ${f(c3)})\n  λ_W  = (${f(w1)}, ${f(w2)}, ${f(w3)})${efUL}\n\nECUACIONES\n${'-'.repeat(11)}\n  ΣFx = ${f(a1)}·T₁ + ${f(b1)}·T₂ + ${f(c1)}·T₃ + ${f(w1)}·W${efX} = 0\n  ΣFy = ${f(a2)}·T₁ + ${f(b2)}·T₂ + ${f(c2)}·T₃ + ${f(w2)}·W${efY} = 0\n  ΣFz = ${f(a3)}·T₁ + ${f(b3)}·T₂ + ${f(c3)}·T₃ + ${f(w3)}·W${efZ} = 0\n\nSOLUCIÓN\n${'-'.repeat(9)}\n  T₁ = ${f(sol.T1)} ${fu}${unknowns.includes('T1')?' ← CALCULADO':''}\n  T₂ = ${f(sol.T2)} ${fu}${unknowns.includes('T2')?' ← CALCULADO':''}\n  T₃ = ${f(sol.T3)} ${fu}${unknowns.includes('T3')?' ← CALCULADO':''}\n   W = ${f(sol.W)} ${fu}${unknowns.includes('W')?' ← CALCULADO':''}${efS}\n\nVERIFICACIÓN\n${'-'.repeat(13)}\n  ΣFx = ${f(Rx)} ${fu}\n  ΣFy = ${f(Ry)} ${fu}\n  ΣFz = ${f(Rz)} ${fu}\n  ${ok?'✓ EQUILIBRIO VERIFICADO':'⚠ REVISAR'}\n`;
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([content],{type:'text/plain;charset=utf-8'}));a.download='solucion_tensiones3D.txt';a.click();
+}
+
+// ==============================================================
+// CLEAR ALL
+// ==============================================================
+function clearAll(){
+  if(!confirm('¿Limpiar todo?'))return;
+  ['ax','ay','az'].forEach(id=>document.getElementById(id).value='0');
+  ['bx','by','bz','cx','cy','cz','dx','dy','dz'].forEach(id=>document.getElementById(id).value='');
+  ['T1','T2','T3'].forEach(id=>{const inp=document.getElementById(id);inp.value='';inp.placeholder='valor';
+    document.getElementById('chk'+id).checked=true;isKnown[id]=true;inp.disabled=false;inp.classList.remove('is-unknown');
+    const pm={T1:'pillT1',T2:'pillT2',T3:'pillT3'},sm={T1:'swlT1',T2:'swlT2',T3:'swlT3'};
+    document.getElementById(pm[id]).className='pill pill-dato';document.getElementById(pm[id]).textContent=id+' = DATO';document.getElementById(sm[id]).textContent='Dato';});
+  const wI=document.getElementById('W');wI.value='';wI.placeholder='valor';wI.disabled=false;wI.classList.remove('is-unknown');
+  document.getElementById('chkW').checked=true;isKnown['W']=true;
+  document.getElementById('pillW').className='pill pill-dato';document.getElementById('pillW').textContent='W = DATO';document.getElementById('swlW').textContent='Dato';
+  document.getElementById('wdx').value='0';document.getElementById('wdy').value='-1';document.getElementById('wdz').value='0';
+  setCoordMode('abs');setHandedness('right');
+  extraForces=[];efCounter=0;document.getElementById('extraForcesContainer').innerHTML='';
+  lastResult=null;
+  document.getElementById('resultsContent').style.display='none';document.getElementById('resultsPH').style.display='flex';
+  document.getElementById('stepsContent').style.display='none';document.getElementById('stepsPH').style.display='flex';
+  const canvas=document.getElementById('graphCanvas');canvas.style.display='none';
+  document.getElementById('graphLeg').style.display='none';document.getElementById('graphPH').style.display='flex';
+  if(threeRenderer){threeRenderer.dispose();threeRenderer=null;threeScene=null;threeCamera=null;}
+  canvas.parentElement.querySelectorAll('.lbl3d').forEach(el=>el.remove());
+  const hb=document.getElementById('handBadge');if(hb)hb.remove();
+  updateInfoBar();switchTab('graph');
+}
+
+// ==============================================================
+// INIT
+// ==============================================================
+updateInfoBar();updateUnits();
+</script>
+</body>
+</html>

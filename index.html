@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Recursos Interactivos de Física</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+body{
+    font-family:'Inter',sans-serif;
+    background:#f7faf9;
+    color:#1e293b;
+    line-height:1.6;
+}
+
+/* ENCABEZADO */
+
+header{
+    background:linear-gradient(135deg,#047857,#0891b2);
+    color:white;
+    padding:55px 20px;
+    text-align:center;
+}
+
+header h1{
+    font-family:'Poppins',sans-serif;
+    font-size:clamp(2rem,5vw,3.2rem);
+    margin-bottom:8px;
+}
+
+header h2{
+    font-weight:500;
+    font-size:1.25rem;
+    opacity:.95;
+}
+
+header p{
+    margin-top:15px;
+    font-size:.95rem;
+    opacity:.85;
+}
+
+/* CONTENEDOR */
+
+main{
+    max-width:1100px;
+    margin:auto;
+    padding:50px 25px;
+}
+
+.intro{
+    text-align:center;
+    max-width:760px;
+    margin:0 auto 40px;
+}
+
+.intro h2{
+    font-family:'Poppins',sans-serif;
+    color:#047857;
+    margin-bottom:10px;
+}
+
+.intro p{
+    color:#64748b;
+}
+
+/* TARJETAS */
+
+.grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+    gap:22px;
+}
+
+.card{
+    background:white;
+    border:1px solid #e2e8f0;
+    border-radius:14px;
+    padding:26px;
+    text-decoration:none;
+    color:#1e293b;
+
+    box-shadow:
+        0 2px 5px rgba(0,0,0,.04),
+        0 8px 20px rgba(0,0,0,.04);
+
+    transition:
+        transform .25s ease,
+        box-shadow .25s ease,
+        border-color .25s ease;
+}
+
+.card:hover{
+    transform:translateY(-5px);
+    border-color:#059669;
+
+    box-shadow:
+        0 8px 25px rgba(5,150,105,.14);
+}
+
+.numero{
+    width:42px;
+    height:42px;
+    border-radius:10px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    background:linear-gradient(135deg,#059669,#0891b2);
+
+    color:white;
+    font-weight:700;
+
+    margin-bottom:17px;
+}
+
+.card h3{
+    font-family:'Poppins',sans-serif;
+    font-size:1.05rem;
+    color:#334155;
+    margin-bottom:8px;
+}
+
+.card p{
+    font-size:.88rem;
+    color:#64748b;
+    margin-bottom:18px;
+}
+
+.abrir{
+    color:#059669;
+    font-weight:600;
+    font-size:.85rem;
+}
+
+.card:hover .abrir{
+    color:#047857;
+}
+
+/* PIE */
+
+footer{
+    text-align:center;
+    padding:30px 20px;
+    margin-top:25px;
+
+    border-top:1px solid #e2e8f0;
+
+    color:#94a3b8;
+    font-size:.8rem;
+}
+
+footer strong{
+    color:#059669;
+}
+
+/* RESPONSIVO */
+
+@media(max-width:600px){
+
+    header{
+        padding:40px 15px;
+    }
+
+    main{
+        padding:35px 18px;
+    }
+
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+
+    <h1>Física</h1>
+
+    <h2>Recursos Interactivos</h2>
+
+    <p>
+        Fundamentos Vectoriales y Estática de la Partícula
+    </p>
+
+</header>
+
+
+<main>
+
+<section class="intro">
+
+    <h2>Recursos de aprendizaje</h2>
+
+    <p>
+        Selecciona un recurso para explorar conceptos,
+        realizar cálculos y visualizar aplicaciones de
+        física y estática.
+    </p>
+
+</section>
+
+
+<div class="grid">
+
+
+<a class="card" href="01_conversion_unidades.html">
+
+    <div class="numero">01</div>
+
+    <h3>Conversión de Unidades</h3>
+
+    <p>
+        Conversión entre unidades del Sistema Internacional
+        y el Sistema Inglés.
+    </p>
+
+    <span class="abrir">
+        Abrir recurso →
+    </span>
+
+</a>
+
+
+<a class="card" href="02_fuerza_resultante_grafica.html">
+
+    <div class="numero">02</div>
+
+    <h3>Fuerza Resultante — Método Gráfico</h3>
+
+    <p>
+        Representación gráfica y análisis de la fuerza
+        resultante de un sistema de vectores.
+    </p>
+
+    <span class="abrir">
+        Abrir recurso →
+    </span>
+
+</a>
+
+
+<a class="card" href="03_fuerza_resultante_sen_cos.html">
+
+    <div class="numero">03</div>
+
+    <h3>Fuerza Resultante — Senos y Cosenos</h3>
+
+    <p>
+        Determinación de fuerzas resultantes utilizando
+        las leyes de senos y cosenos.
+    </p>
+
+    <span class="abrir">
+        Abrir recurso →
+    </span>
+
+</a>
+
+
+<a class="card" href="04_equilibrio_partícula2d.html">
+
+    <div class="numero">04</div>
+
+    <h3>Equilibrio de una Partícula 2D</h3>
+
+    <p>
+        Análisis de las condiciones de equilibrio
+        para sistemas de fuerzas bidimensionales.
+    </p>
+
+    <span class="abrir">
+        Abrir recurso →
+    </span>
+
+</a>
+
+
+<a class="card" href="05_equilibrio_partícula3D.html">
+
+    <div class="numero">05</div>
+
+    <h3>Equilibrio de una Partícula 3D</h3>
+
+    <p>
+        Estudio del equilibrio de partículas sometidas
+        a sistemas de fuerzas tridimensionales.
+    </p>
+
+    <span class="abrir">
+        Abrir recurso →
+    </span>
+
+</a>
+
+
+<a class="card" href="06_momentos2d.html">
+
+    <div class="numero">06</div>
+
+    <h3>Momentos en 2D</h3>
+
+    <p>
+        Cálculo y representación del momento de una
+        fuerza en sistemas bidimensionales.
+    </p>
+
+    <span class="abrir">
+        Abrir recurso →
+    </span>
+
+</a>
+
+
+<a class="card" href="07_producto_cruz.html">
+
+    <div class="numero">07</div>
+
+    <h3>Producto Cruz</h3>
+
+    <p>
+        Aplicación interactiva del producto vectorial
+        para el análisis de problemas de física.
+    </p>
+
+    <span class="abrir">
+        Abrir recurso →
+    </span>
+
+</a>
+
+
+<a class="card" href="08_momentos3d.html">
+
+    <div class="numero">08</div>
+
+    <h3>Momentos en 3D</h3>
+
+    <p>
+        Cálculo vectorial de momentos de fuerzas
+        en sistemas tridimensionales.
+    </p>
+
+    <span class="abrir">
+        Abrir recurso →
+    </span>
+
+</a>
+
+
+</div>
+
+</main>
+
+
+<footer>
+
+    <strong>Física</strong><br>
+
+    Fundamentos Vectoriales y Estática de la Partícula
+
+</footer>
+
+
+</body>
+</html>
